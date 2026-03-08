@@ -3,7 +3,7 @@ import { app } from "../../scripts/app.js";
 app.registerExtension({
     name: "ComfyNodes.StringSelector",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if (nodeData.name === "StringSelectorNode" || nodeData.name === "StringListSelectorNode") {
+        if (nodeData.name === "StringSelectorNode") {
             
             // ノード作成時に初期の入力ピン（string_0）を追加する
             const onNodeCreated = nodeType.prototype.onNodeCreated;
