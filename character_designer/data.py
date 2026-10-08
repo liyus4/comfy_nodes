@@ -385,7 +385,7 @@ ARCHETYPES = {
         "expression": ["sadistic smirk, looking down on viewer", "cold smile", "amused smirk"],
         "pose": ["hand on hip, one foot forward", "arms crossed, chin raised", "holding a riding crop"],
         "body": ["tall"],
-        "accessories": ["{main} choker with an {accent} ring", "{accent} earrings"],
+        "accessories": ["{main} choker with a {accent} ring", "{accent} earrings"],
         "footwear": None,
     },
 }
@@ -411,7 +411,7 @@ MOTIFS = {
         "features_primary": ["{sub} curved demon horns", "small {main} demon horns with {accent} tips", "{accent} twisted demon horns"],
         "features_optional": ["small bat wings on the back, {main} membrane with {accent} edges", "{main} spade-tipped demon tail with {accent} tip", "slit pupils", "small fangs"],
         "palettes": [("black", "crimson", "gold"), ("dark purple", "black", "hot pink"), ("black", "hot pink", "white"), ("wine red", "black", "silver")],
-        "patterns": ["bat-wing motif", "pentagram embroidery", "heart motif", "flame pattern"],
+        "patterns": ["bat-wing motif", "pentagram motif", "heart motif", "flame pattern"],
         "props": ["small trident", "heart-shaped lollipop", "chained pendant with a {accent} gem"],
         "classic_roles": ["succubus", "gothic_lolita", "dancer", "bunny_girl"],
         "gap_roles": ["sister", "shrine_miko", "school_uniform", "nurse", "idol", "maid", "teacher", "magical_girl", "office_lady"],
@@ -429,7 +429,7 @@ MOTIFS = {
         "features_primary": ["small white feathered wings", "{accent} glowing halo floating above the head", "large white feathered wings with {accent}-tipped feathers"],
         "features_optional": ["{accent} glowing halo floating above the head", "feathers floating around", "glowing {accent} markings"],
         "palettes": [("white", "gold", "sky blue"), ("white", "cream", "gold"), ("sky blue", "white", "silver"), ("black", "white", "gold")],
-        "patterns": ["feather motif", "gold filigree embroidery", "cross pattern", "cloud motif"],
+        "patterns": ["feather motif", "gold filigree motif", "cross pattern", "cloud motif"],
         "props": ["small golden harp", "holy book with a {accent} clasp", "glowing {accent} orb"],
         "classic_roles": ["sister", "princess_dress", "magical_girl", "idol"],
         "gap_roles": ["delinquent", "succubus", "military", "pirate", "casual_street", "gothic_lolita", "ninja"],
@@ -465,7 +465,7 @@ MOTIFS = {
         "features_primary": ["large pointed {main} witch hat with {accent} band and {sub} buckle", "wide-brimmed {main} witch hat with {accent} ribbon"],
         "features_optional": ["glowing {accent} magic circle floating beside", "small familiar (black cat) on the shoulder", "{accent} star-shaped earrings"],
         "palettes": [("black", "purple", "gold"), ("dark purple", "black", "orange"), ("navy", "gold", "white"), ("brown", "cream", "emerald green")],
-        "patterns": ["star and moon embroidery", "rune pattern", "constellation embroidery", "spiral motif"],
+        "patterns": ["star and moon motif", "rune pattern", "constellation motif", "spiral motif"],
         "props": ["broomstick with {accent} bindings", "staff with a glowing {accent} crystal", "thick grimoire with a {accent} lock", "potion vial on a {accent} chain"],
         "classic_roles": ["witch_robe", "gothic_lolita", "princess_dress"],
         "gap_roles": ["office_lady", "nurse", "sportswear", "idol", "school_uniform", "swimsuit", "military"],
@@ -591,7 +591,7 @@ MOTIFS = {
         "features_primary": ["translucent insect-like wings with {accent} glow", "small butterfly wings with {sub} and {accent} pattern"],
         "features_optional": ["pointy ears", "{accent} flower hair ornament", "glowing {accent} particles floating around"],
         "palettes": [("mint", "white", "gold"), ("pastel pink", "white", "lavender"), ("emerald green", "cream", "gold"), ("sky blue", "white", "yellow")],
-        "patterns": ["leaf motif", "flower pattern", "butterfly motif", "vine embroidery"],
+        "patterns": ["leaf motif", "flower pattern", "butterfly motif", "vine motif"],
         "props": ["wand with a {accent} star tip", "flower basket", "acorn-shaped bag"],
         "classic_roles": ["magical_girl", "princess_dress", "idol", "loungewear"],
         "gap_roles": ["military", "office_lady", "gothic_lolita", "knight", "delinquent", "ninja"],
@@ -699,7 +699,7 @@ MOTIFS = {
         "features_primary": ["star-shaped pupils", "hair with a galaxy gradient and {accent} sparkles"],
         "features_optional": ["small floating stars with {accent} glow", "{accent} star-shaped hair ornament", "constellation markings on the skin"],
         "palettes": [("navy", "gold", "white"), ("dark purple", "sky blue", "gold"), ("black", "silver", "pastel pink")],
-        "patterns": ["star pattern", "constellation embroidery", "crescent moon motif", "planet motif"],
+        "patterns": ["star pattern", "constellation motif", "crescent moon motif", "planet motif"],
         "props": ["star-tipped wand", "small telescope", "glowing {accent} star charm"],
         "classic_roles": ["magical_girl", "idol", "witch_robe", "princess_dress"],
         "gap_roles": ["school_uniform", "sportswear", "office_lady", "casual_street", "nurse", "knight"],
@@ -717,7 +717,7 @@ MOTIFS = {
         "features_primary": ["large {accent} flower hair ornament", "crown of {sub} flowers"],
         "features_optional": ["petals floating around", "vine accents wrapped around the arms", "{accent} petal-shaped earrings"],
         "palettes": [("white", "emerald green", "pastel pink"), ("crimson", "emerald green", "gold"), ("pastel pink", "white", "crimson"), ("lavender", "white", "gold")],
-        "patterns": ["floral pattern", "leaf embroidery", "rose motif", "sakura pattern"],
+        "patterns": ["floral pattern", "leaf motif", "rose motif", "sakura pattern"],
         "props": ["lace parasol with {accent} trim", "flower basket", "single {accent} rose"],
         "classic_roles": ["princess_dress", "kimono", "gothic_lolita", "idol"],
         "gap_roles": ["military", "knight", "delinquent", "bodysuit", "sportswear", "pirate"],
@@ -753,7 +753,7 @@ MOTIFS = {
         "features_primary": [],
         "features_optional": [],
         "palettes": [("white", "navy", "crimson"), ("black", "white", "gold"), ("pastel pink", "white", "gold"), ("navy", "white", "gold"), ("gray", "black", "sky blue")],
-        "patterns": ["ribbon motif", "star accents", "stripe accents", "small floral embroidery", "checkered pattern"],
+        "patterns": ["ribbon motif", "star accents", "stripe accents", "small floral motif", "checkered pattern"],
         "props": ["tote bag in {main} with {accent} handles", "folding umbrella", "paperback book"],
         "classic_roles": [],  # 空 = 全ての服装系統
         "gap_roles": [],
@@ -1761,9 +1761,8 @@ CHEST_SIZES = ["small breasts", "medium breasts", "large breasts"]
 # 靴の判定キーワード（性格の footwear 置換に使う）
 FOOTWEAR_KEYWORDS = ["shoes", "loafers", "boots", "sneakers", "heels", "sandals", "pumps", "mary janes", "slippers", "barefoot", "geta", "zori", "flats"]
 
+# 品質系（lowres 等）はこのノードの責務外なので入れない。キャラ特徴の整合性に関わるものだけ
 NEGATIVE_BASE = [
-    "lowres", "worst quality", "low quality", "bad anatomy", "bad hands", "extra digits",
-    "missing fingers", "jpeg artifacts", "signature", "watermark", "text", "username", "blurry",
     "extra accessories", "mismatched colors",
 ]
 

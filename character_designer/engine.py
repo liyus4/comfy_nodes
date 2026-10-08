@@ -193,7 +193,7 @@ class Character:
     extras: List[str]
     unrecognized: List[str]
     prompt_style: str
-    prefix: str
+    expression_pose: str        # "expression_only" / "both" / "none"
 
     @property
     def main(self):
@@ -260,7 +260,7 @@ def generate(
     exposure: str = "auto",
     personality: str = "auto",
     prompt_style: str = "tags",
-    prefix: str = "",
+    expression_pose: str = "expression_only",
 ) -> Character:
     rng = random.Random(seed)
     spec = parse_brief(brief)
@@ -457,7 +457,7 @@ def generate(
         palette=palette, pattern=pattern, material=material,
         hair=hair, eyes=eyes, skin=skin, body=body, features=features, outfit=outfit,
         accessories=accessories, prop=prop, expression=expression, pose=pose,
-        extras=[], unrecognized=spec.extras, prompt_style=prompt_style, prefix=prefix or "",
+        extras=[], unrecognized=spec.extras, prompt_style=prompt_style, expression_pose=expression_pose,
     )
 
 
@@ -484,10 +484,8 @@ def build_positive(c: Character) -> str:
         pron, poss = ("She", "her") if c.gender == "girl" else ("He", "his")
         who = "girl" if c.gender == "girl" else "boy"
         parts = []
-        if c.prefix.strip():
-            parts.append(c.prefix.strip().rstrip(",") + ".")
         # 服装1点の中にカンマが入るので、項目の区切りはセミコロンにする
-        parts.append(f"A single {who} ({', '.join(c.body)}) with {', '.join(c.hair)}; {', '.join(c.eyes)}; {c.skin}.")
+        parts.append(f"A {who} ({', '.join(c.body)}) with {', '.join(c.hair)}; {', '.join(c.eyes)}; {c.skin}.")
         if c.features:
             parts.append(f"{pron} has {'; '.join(c.features)}.")
         parts.append(f"{pron} wears: {'; '.join(c.outfit)}.")
@@ -495,16 +493,17 @@ def build_positive(c: Character) -> str:
             parts.append(f"{pron} also has {'; '.join(c.accessories)}.")
         if c.prop:
             parts.append(f"{poss.capitalize()} signature item is {c.prop}.")
-        parts.append(f"Expression and pose: {c.expression}; {c.pose}.")
+        if c.expression_pose == "both":
+            parts.append(f"Expression and pose: {c.expression}; {c.pose}.")
+        elif c.expression_pose == "expression_only":
+            parts.append(f"Default expression: {c.expression}.")
         parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the only pattern used is {c.pattern}.")
         if c.unrecognized:
             parts.append(" ".join(c.unrecognized))
         return " ".join(parts)
 
     tags = []
-    if c.prefix.strip():
-        tags.append(c.prefix.strip().rstrip(","))
-    tags += [gender_tag, "solo"]
+    tags.append(gender_tag)
     tags += c.body
     tags += c.hair
     tags += c.eyes
@@ -514,7 +513,10 @@ def build_positive(c: Character) -> str:
     tags += c.accessories
     if c.prop:
         tags.append(c.prop)
-    tags += [c.expression, c.pose]
+    if c.expression_pose == "both":
+        tags += [c.expression, c.pose]
+    elif c.expression_pose == "expression_only":
+        tags.append(c.expression)
     tags.append(color_anchor)
     tags += c.unrecognized
     return ", ".join(_dedupe(tags))
@@ -523,9 +525,9 @@ def build_positive(c: Character) -> str:
 def build_negative(c: Character) -> str:
     neg = list(D.NEGATIVE_BASE)
     if c.gender == "girl":
-        neg += ["1boy", "male", "multiple girls", "2girls"]
+        neg += ["1boy", "male"]
     else:
-        neg += ["1girl", "female", "multiple boys", "2boys"]
+        neg += ["1girl", "female"]
 
     everything = " ".join(c.features + c.outfit + c.accessories + [c.prop] + c.hair + c.eyes + c.body).lower()
     # 設計に含まれていない記号は負方向に入れて「勝手に生える」のを防ぐ
@@ -593,7 +595,7 @@ def build_sheet(c: Character) -> str:
         f"#   -> {arch['design_jp']}",
         f"# palette    : main={c.main} / sub={c.sub} / accent={c.accent}   pattern={c.pattern}   material={c.material}",
         f"# signature  : {c.prop or '(なし)'}",
-        f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}",
+        f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
         f"# design     : {design_note}",
     ]
     if c.unrecognized:

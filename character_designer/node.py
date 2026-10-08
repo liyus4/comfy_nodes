@@ -5,6 +5,9 @@ ComfyUI ノード: Random Character Designer
 キャラクターを1体設計し、再現性の高いプロンプト（positive / negative）と
 「キャラクターシート」を出力します。
 
+出力は「キャラの特徴」だけです。品質タグ（masterpiece 等）・solo・画風・状況は含めないので、
+別ノードで作ったテキストと連結して使ってください。
+
 使い方:
   1. brief に雰囲気を書いて Queue。seed を変えるたびに別のキャラが出ます。
   2. 気に入ったら lock を ON。character_sheet 欄に残ったシートが
@@ -36,7 +39,8 @@ class CharacterDesignerNode:
                 "personality": (engine.personality_choices(), {"default": "auto"}),
                 # tags = SD/Pony/Illustrious 向けのカンマ区切り / natural = Flux/SD3 向けの文章
                 "prompt_style": (["tags", "natural"], {"default": "tags"}),
-                "prefix": ("STRING", {"default": "masterpiece, best quality, highly detailed", "multiline": False}),
+                # 表情はキャラのデフォルト顔として含め、ポーズは状況側の責務なので既定では含めない
+                "expression_pose": (["expression_only", "both", "none"], {"default": "expression_only"}),
                 "lock": ("BOOLEAN", {"default": False, "label_on": "locked (use sheet)", "label_off": "generate"}),
                 "character_sheet": ("STRING", {
                     "multiline": True,
@@ -52,7 +56,7 @@ class CharacterDesignerNode:
     CATEGORY = "Test/Example Nodes"
     OUTPUT_NODE = True
 
-    def design(self, brief, seed, twist, exposure, personality, prompt_style, prefix, lock, character_sheet):
+    def design(self, brief, seed, twist, exposure, personality, prompt_style, expression_pose, lock, character_sheet):
         if lock and character_sheet.strip():
             # ロック中: シートを正として positive / negative を取り出す（再生成しない）
             positive, negative = engine.parse_sheet(character_sheet)
@@ -65,7 +69,7 @@ class CharacterDesignerNode:
                 exposure=exposure,
                 personality=engine.personality_key(personality),
                 prompt_style=prompt_style,
-                prefix=prefix,
+                expression_pose=expression_pose,
             )
             sheet = engine.build_sheet(character)
             positive = engine.build_positive(character)
