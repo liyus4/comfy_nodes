@@ -15,7 +15,46 @@ ComfyUI ノード: Random Character Designer
      シートは手で編集しても OK（'#' 以降はコメント扱い）。
 """
 
-from . import engine
+import importlib
+import os
+
+from . import data, engine
+
+# --- 開発用ホットリロード -----------------------------------------------------
+# data.py / engine.py が更新されていたら、実行時に再読み込みする（ComfyUI の再起動不要）。
+# node.py 自体（入力欄の定義）と js/ の変更は従来どおり再起動 + ブラウザリロードが必要。
+_WATCHED = (data, engine)
+_MTIMES = {}
+
+
+def _source_mtimes():
+    out = {}
+    for m in _WATCHED:
+        try:
+            out[m.__name__] = os.path.getmtime(m.__file__)
+        except OSError:
+            pass
+    return out
+
+
+def _reload_if_changed():
+    global _MTIMES
+    current = _source_mtimes()
+    if current == _MTIMES:
+        return
+    if _MTIMES:  # 初回は記録だけ
+        try:
+            # data -> engine の順で reload（engine は data を参照しているため）
+            importlib.reload(data)
+            importlib.reload(engine)
+            print("[CharacterDesigner] data.py / engine.py を再読み込みしました")
+        except Exception as e:  # 編集途中の構文エラー等で落とさない
+            print(f"[CharacterDesigner] 再読み込みに失敗しました（前回の内容で続行）: {e!r}")
+            return
+    _MTIMES = current
+
+
+_reload_if_changed()
 
 
 class CharacterDesignerNode:
@@ -56,7 +95,14 @@ class CharacterDesignerNode:
     CATEGORY = "Test/Example Nodes"
     OUTPUT_NODE = True
 
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        # data.py / engine.py を編集したら、同じ入力でもキャッシュを使わず再実行させる
+        return str(sorted(_source_mtimes().items()))
+
     def design(self, brief, seed, twist, exposure, personality, prompt_style, expression_pose, lock, character_sheet):
+        _reload_if_changed()
+
         if lock and character_sheet.strip():
             # ロック中: シートを正として positive / negative を取り出す（再生成しない）
             positive, negative = engine.parse_sheet(character_sheet)
