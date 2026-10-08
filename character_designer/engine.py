@@ -477,7 +477,6 @@ def _dedupe(items: List[str]) -> List[str]:
 
 
 def build_positive(c: Character) -> str:
-    gender_tag = "1girl" if c.gender == "girl" else "1boy"
     color_anchor = f"{c.main} and {c.sub} color scheme with {c.accent} accents"
 
     if c.prompt_style == "natural":
@@ -503,7 +502,7 @@ def build_positive(c: Character) -> str:
         return " ".join(parts)
 
     tags = []
-    tags.append(gender_tag)
+    # 人数・性別タグ(1girl/1boy)は状況側で指定する前提なので入れない
     tags += c.body
     tags += c.hair
     tags += c.eyes
@@ -524,10 +523,6 @@ def build_positive(c: Character) -> str:
 
 def build_negative(c: Character) -> str:
     neg = list(D.NEGATIVE_BASE)
-    if c.gender == "girl":
-        neg += ["1boy", "male"]
-    else:
-        neg += ["1girl", "female"]
 
     everything = " ".join(c.features + c.outfit + c.accessories + [c.prop] + c.hair + c.eyes + c.body).lower()
     # 設計に含まれていない記号は負方向に入れて「勝手に生える」のを防ぐ

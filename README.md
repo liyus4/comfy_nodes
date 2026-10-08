@@ -43,7 +43,7 @@ ComfyUI用のカスタムノード詰め合わせリポジトリです。
   - `expression_pose`: `expression_only`（既定。性格を表すデフォルト表情のみ）/ `both`（ポーズも含める）/ `none`。
   - `lock` + `character_sheet`: 後述。
 - **出力**: `positive` / `negative` / `character_sheet` / `seed`
-  - 出力は**キャラの特徴だけ**です。品質タグ（masterpiece 等）・`solo`・画風・状況・品質系ネガティブ（lowres 等）は含めないので、別ノードのテキストと連結して使います。`negative` は「設計に無い記号（角・翼・眼鏡など）」「反対の性別」など、キャラの整合性に関わるものだけです。
+  - 出力は**キャラの特徴だけ**です。品質タグ（masterpiece 等）・`solo`・`1girl`/`1boy`・画風・状況・品質系ネガティブ（lowres 等）は含めないので、別ノードのテキストと連結して使います。`negative` は「設計に無い記号（角・翼・眼鏡など）」露出度に応じた除外など、キャラの整合性に関わるものだけです。
 - **同じキャラを再現する（lock）**
   1. 生成するたびに、設計内容が **`character_sheet` 欄にシートとして書き戻されます**（seed・コンセプト・パレット・設計メモ・positive・negative）。
   2. 気に入ったら `lock` を ON。以降は brief や seed を変えてもシートの内容がそのまま `positive` / `negative` に出力されます。

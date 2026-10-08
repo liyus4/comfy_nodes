@@ -5,7 +5,7 @@ ComfyUI ノード: Random Character Designer
 キャラクターを1体設計し、再現性の高いプロンプト（positive / negative）と
 「キャラクターシート」を出力します。
 
-出力は「キャラの特徴」だけです。品質タグ（masterpiece 等）・solo・画風・状況は含めないので、
+出力は「キャラの特徴」だけです。品質タグ（masterpiece 等）・solo・1girl/1boy・画風・状況は含めないので、
 別ノードで作ったテキストと連結して使ってください。
 
 使い方:
