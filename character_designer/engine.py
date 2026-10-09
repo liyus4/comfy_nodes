@@ -409,7 +409,8 @@ def generate(
         accent = next(c for c in D.CONTRAST_FALLBACK if c not in (main, sub))
     palette = (main, sub, accent)
 
-    pattern = _pick(rng, motif["patterns"]) or "ribbon motif"
+    base_pattern = _pick(rng, motif["patterns"]) or "ribbon motif"
+    pattern = f"{_pick(rng, D.PATTERN_STYLES)} {base_pattern}"
     material = _pick(rng, role.get("materials", [])) or "cotton"
     slots = {"main": main, "sub": sub, "accent": accent, "pattern": pattern, "material": material}
 
@@ -468,6 +469,9 @@ def generate(
         else:
             chest = rng.choices(D.CHEST_SIZES, weights=[3, 4, 3], k=1)[0]
         body.append(chest)
+    motif_body = [b for b in motif.get("body", []) if gender == "girl"]
+    if motif_body and not spec.traits and not arch["body"]:
+        body = [b for b in body if "breasts" not in b] + motif_body
     if arch_key == "mesugaki" and "petite" not in body:
         body.insert(0, "petite")
 
@@ -551,7 +555,7 @@ def build_positive(c: Character) -> str:
             parts.append(f"Expression and pose: {c.expression}; {c.pose}.")
         elif c.expression_pose == "expression_only":
             parts.append(f"Default expression: {c.expression}.")
-        parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the only pattern used is {c.pattern}.")
+        parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
         if c.unrecognized:
             parts.append(" ".join(c.unrecognized))
         return " ".join(parts)
