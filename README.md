@@ -35,10 +35,12 @@ ComfyUI用のカスタムノード詰め合わせリポジトリです。
 
 - **入力**
   - `brief`: 雰囲気の指示文。`・`/`,`/空白区切り。日本語・英語どちらでも可。辞書に無い語はそのままプロンプト末尾に通します。
+  - `exclude`: 出したくない語（例: `水着, バニー, 高露出, ヤンデレ`）。ランダム選択のプールからモチーフ/服装/性格/露出を外します。brief やドロップダウンで明示した指定は除外より優先されます。
+  - `motif` / `role`: モチーフと服装系統をドロップダウンで固定（`auto` 以外は brief より優先）。
   - `seed`: 同じ brief + seed なら必ず同じキャラになります。
   - `twist`: `classic`=王道（悪魔→サキュバス）/ `surprise`=意外性（悪魔→シスター、悪魔なのに内気 など）/ `auto`=4割で surprise。
   - `exposure`: 露出度（`auto` は brief の指定 > ランダム）。
-  - `personality`: 性格を固定したい時に指定（`auto` なら brief かモチーフから選択）。
+  - `personality`: 性格をドロップダウンで固定（`auto` なら brief かモチーフから選択）。
   - `prompt_style`: `tags`（SD/Pony/Illustrious 向けカンマ区切り）/ `natural`（Flux/SD3 向け文章）。
   - `expression_pose`: `expression_only`（既定。性格を表すデフォルト表情のみ）/ `both`（ポーズも含める）/ `none`。
   - `lock` + `character_sheet`: 後述。

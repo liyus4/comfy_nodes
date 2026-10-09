@@ -67,6 +67,12 @@ class CharacterDesignerNode:
                     "default": "悪魔・女の子・高露出",
                     "placeholder": "例: 悪魔・女の子・高露出 / 猫耳メイド・ツンデレ / 天使・清楚・黒髪",
                 }),
+                # 除外リスト: ランダム選択のプールから外す（例: "水着, バニー, 高露出, ヤンデレ"）
+                "exclude": ("STRING", {"default": "", "multiline": False, "placeholder": "出したくない語（例: 水着, バニー, 高露出）"}),
+                # ドロップダウン指定は brief より優先。auto なら brief かランダム
+                "motif": (engine.motif_choices(), {"default": "auto"}),
+                "role": (engine.role_choices(), {"default": "auto"}),
+                "personality": (engine.personality_choices(), {"default": "auto"}),
                 "seed": ("INT", {
                     "default": 0, "min": 0, "max": 0xffffffffffffffff,
                     "control_after_generate": True,
@@ -75,7 +81,6 @@ class CharacterDesignerNode:
                 "twist": (list(engine.TWISTS), {"default": "auto"}),
                 # auto = brief の指定 > ランダム（標準多め）
                 "exposure": (["auto", *engine.EXPOSURES], {"default": "auto"}),
-                "personality": (engine.personality_choices(), {"default": "auto"}),
                 # tags = SD/Pony/Illustrious 向けのカンマ区切り / natural = Flux/SD3 向けの文章
                 "prompt_style": (["tags", "natural"], {"default": "tags"}),
                 # 表情はキャラのデフォルト顔として含め、ポーズは状況側の責務なので既定では含めない
@@ -100,7 +105,7 @@ class CharacterDesignerNode:
         # data.py / engine.py を編集したら、同じ入力でもキャッシュを使わず再実行させる
         return str(sorted(_source_mtimes().items()))
 
-    def design(self, brief, seed, twist, exposure, personality, prompt_style, expression_pose, lock, character_sheet):
+    def design(self, brief, exclude, motif, role, personality, seed, twist, exposure, prompt_style, expression_pose, lock, character_sheet):
         _reload_if_changed()
 
         if lock and character_sheet.strip():
@@ -113,7 +118,10 @@ class CharacterDesignerNode:
                 seed=seed,
                 twist=twist,
                 exposure=exposure,
-                personality=engine.personality_key(personality),
+                personality=engine.choice_key(personality),
+                motif=engine.choice_key(motif),
+                role=engine.choice_key(role),
+                exclude=exclude,
                 prompt_style=prompt_style,
                 expression_pose=expression_pose,
             )

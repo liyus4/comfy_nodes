@@ -161,6 +161,43 @@ def parse_brief(brief: str) -> Spec:
     return spec
 
 
+def parse_exclude(text: str) -> Dict[str, set]:
+    """
+    除外欄（例: "水着, バニー, 高露出, ヤンデレ"）を解釈して、
+    ランダム選択のプールから外す motif / role / archetype / exposure のキー集合にする。
+    """
+    out = {"motif": set(), "role": set(), "archetype": set(), "exposure": set()}
+    tables = [
+        ("motif", {k: v["syn"] for k, v in D.MOTIFS.items()}),
+        ("role", {k: v["syn"] for k, v in D.ROLES.items()}),
+        ("archetype", {k: v["syn"] for k, v in D.ARCHETYPES.items()}),
+        ("exposure", D.EXPOSURE_WORDS),
+    ]
+    text2, _ = _extract_multiword(text)
+    for tok in _SPLIT_RE.split(text2):
+        tok = tok.strip().replace("_", " ")
+        if not tok:
+            continue
+        # 「サキュバス衣装」がモチーフ「悪魔」(同義語"サキュバス")まで巻き込まないよう、
+        # 最も長い同義語で一致した辞書だけに適用する
+        best_len, best = 0, None
+        for name, table in tables:
+            for key in _lookup(tok, table):
+                length = max(len(syn) for syn in table[key] if _syn_hits(tok, [syn]))
+                if length > best_len:
+                    best_len, best = length, (name, key)
+        if best:
+            out[best[0]].add(best[1])
+    return out
+
+
+def _without(pool, excluded) -> list:
+    """プールから除外分を引く。全部消えてしまう場合は除外を無視して元のプールを返す。"""
+    pool = list(pool)
+    kept = [x for x in pool if x not in excluded]
+    return kept or pool
+
+
 # ---------------------------------------------------------------------------
 # 生成結果
 # ---------------------------------------------------------------------------
@@ -192,6 +229,7 @@ class Character:
     pose: str
     extras: List[str]
     unrecognized: List[str]
+    excluded: Dict[str, set]
     prompt_style: str
     expression_pose: str        # "expression_only" / "both" / "none"
 
@@ -261,15 +299,29 @@ def generate(
     personality: str = "auto",
     prompt_style: str = "tags",
     expression_pose: str = "expression_only",
+    motif: str = "auto",
+    role: str = "auto",
+    exclude: str = "",
 ) -> Character:
     rng = random.Random(seed)
     spec = parse_brief(brief)
+    excluded = parse_exclude(exclude)
+
+    # ドロップダウン指定（auto 以外）は brief より優先
+    if motif != "auto" and motif in D.MOTIFS:
+        spec.motif = motif
+    if role != "auto" and role in D.ROLES:
+        spec.role = role
 
     # --- 性別 -------------------------------------------------------------
     gender = spec.gender or "girl"
 
     # --- モチーフ ---------------------------------------------------------
-    motif_key = spec.motif or _weighted_pick(rng, D.MOTIF_WEIGHTS)
+    if spec.motif:
+        motif_key = spec.motif
+    else:
+        weights = {k: w for k, w in D.MOTIF_WEIGHTS.items() if k not in excluded["motif"]} or dict(D.MOTIF_WEIGHTS)
+        motif_key = _weighted_pick(rng, weights)
     motif = D.MOTIFS[motif_key]
 
     # --- ギャップ（意外性）判定 ------------------------------------------
@@ -302,13 +354,14 @@ def generate(
             pool = [D.ROLE_ALIASES.get(r, r) for r in motif["gap_roles"]]
         else:
             pool = [D.ROLE_ALIASES.get(r, r) for r in motif["classic_roles"]]
-        pool = [r for r in pool if _role_available(r, gender)]
+        pool = [r for r in pool if _role_available(r, gender) and r not in excluded["role"]]
         if not pool:
             # human モチーフなど候補が無い場合は全系統から（surprise なら王道を除く）
             pool = _all_roles(gender)
             if twist_role:
                 classic = set(D.ROLE_ALIASES.get(r, r) for r in motif["classic_roles"])
                 pool = [r for r in pool if r not in classic] or pool
+            pool = _without(pool, excluded["role"])
         role_key = _pick(rng, pool)
     role = D.ROLES[role_key]
 
@@ -318,11 +371,12 @@ def generate(
     elif spec.archetype is not None:
         arch_key = spec.archetype
     else:
-        pool = motif["gap_arch"] if twist_arch else motif["classic_arch"]
+        pool = [a for a in (motif["gap_arch"] if twist_arch else motif["classic_arch"]) if a not in excluded["archetype"]]
         if not pool:
             pool = list(D.ARCHETYPES.keys())
             if twist_arch:
                 pool = [a for a in pool if a not in motif["classic_arch"]] or pool
+            pool = _without(pool, excluded["archetype"])
         arch_key = _pick(rng, pool)
     arch = D.ARCHETYPES[arch_key]
 
@@ -339,7 +393,8 @@ def generate(
     elif spec.exposure in EXPOSURES:
         exp = spec.exposure
     else:
-        exp = rng.choices(EXPOSURES, weights=[2, 5, 3], k=1)[0]
+        cands = [(e, w) for e, w in zip(EXPOSURES, [2, 5, 3]) if e not in excluded["exposure"]] or list(zip(EXPOSURES, [2, 5, 3]))
+        exp = rng.choices([e for e, _ in cands], weights=[w for _, w in cands], k=1)[0]
 
     # --- テーマカラー（3色ルール） ---------------------------------------
     palette_pool = list(motif["palettes"]) * 2 + list(arch["palettes"]) + list(role.get("palettes", []))
@@ -457,7 +512,7 @@ def generate(
         palette=palette, pattern=pattern, material=material,
         hair=hair, eyes=eyes, skin=skin, body=body, features=features, outfit=outfit,
         accessories=accessories, prop=prop, expression=expression, pose=pose,
-        extras=[], unrecognized=spec.extras, prompt_style=prompt_style, expression_pose=expression_pose,
+        extras=[], unrecognized=spec.extras, excluded=excluded, prompt_style=prompt_style, expression_pose=expression_pose,
     )
 
 
@@ -593,6 +648,9 @@ def build_sheet(c: Character) -> str:
         f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
         f"# design     : {design_note}",
     ]
+    ex = [f"{k}={','.join(sorted(v))}" for k, v in c.excluded.items() if v]
+    if ex:
+        lines.append(f"# exclude    : {'  '.join(ex)}")
     if c.unrecognized:
         lines.append(f"# passthrough: {', '.join(c.unrecognized)}  (辞書に無い語はそのままプロンプト末尾に追加)")
     lines += [
@@ -625,10 +683,26 @@ def parse_sheet(text: str) -> Tuple[str, str]:
     return "\n".join(buf["positive"]), "\n".join(buf["negative"])
 
 
-def personality_choices() -> List[str]:
+def _choices(table) -> List[str]:
     """ノードのコンボ用: 'auto' + 'key 日本語名' の一覧"""
-    return ["auto"] + [f"{k} {v['jp']}" for k, v in D.ARCHETYPES.items()]
+    return ["auto"] + [f"{k} {v['jp']}" for k, v in table.items()]
 
 
-def personality_key(choice: str) -> str:
+def personality_choices() -> List[str]:
+    return _choices(D.ARCHETYPES)
+
+
+def motif_choices() -> List[str]:
+    return _choices(D.MOTIFS)
+
+
+def role_choices() -> List[str]:
+    return _choices(D.ROLES)
+
+
+def choice_key(choice: str) -> str:
+    """'demon 悪魔' -> 'demon'"""
     return (choice or "auto").split(" ", 1)[0]
+
+
+personality_key = choice_key
