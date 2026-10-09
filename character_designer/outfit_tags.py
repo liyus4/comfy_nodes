@@ -304,14 +304,33 @@ OUTFIT_TAGS = {
     },
     "loungewear": {
         "female": {
-            "modest": ["{main} pajamas", "long sleeves", "{sub} slippers", "sleep mask on head"],
-            "standard": ["{main} shirt", "oversized shirt", "bare legs", "{sub} slippers", "{main} thighhighs", "sleep mask on head"],
-            "high": ["{main} negligee", "see-through", "lingerie", "cleavage", "{sub} slippers", "{main} thighhighs", "lace-trimmed thighhighs", "sleep mask on head"],
+            "modest": [
+                ["{main} pajamas", "{main} nightgown", "{main} hoodie, {sub} sweatpants", "{main} yukata, sleepwear"],
+                "sleepwear",
+                "?sleep mask on head",
+                ["{sub} slippers", "barefoot", "{sub} socks"],
+                "?hugging pillow",
+            ],
+            "standard": [
+                ["{main} shirt, oversized shirt", "{main} camisole, {sub} shorts, pajama shorts", "{main} nightgown, short nightgown", "{main} sweater, sweater dress"],
+                "sleepwear",
+                "?sleep mask on head",
+                ["{main} thighhighs", "bare legs", "{sub} socks"],
+                ["{sub} slippers", "barefoot"],
+            ],
+            "high": [
+                ["{main} negligee, see-through", "{main} babydoll, lace", "{main} dress shirt, open shirt, {sub} lingerie", "{main} camisole, micro shorts"],
+                "lingerie",
+                "cleavage",
+                "?sleep mask on head",
+                ["{main} thighhighs, lace-trimmed thighhighs", "bare legs"],
+                ["{sub} slippers", "barefoot"],
+            ],
         },
         "male": {
-            "modest": ["{main} pajamas", "{sub} slippers"],
-            "standard": ["{main} pajamas", "{sub} slippers"],
-            "high": ["topless male", "{main} pajama pants", "{sub} slippers"],
+            "modest": [["{main} pajamas", "{main} t-shirt, {sub} sweatpants", "{main} yukata, sleepwear"], "?sleep mask on head", ["{sub} slippers", "barefoot"]],
+            "standard": [["{main} pajamas", "{main} t-shirt, {sub} sweatpants", "{main} yukata, sleepwear"], "?sleep mask on head", ["{sub} slippers", "barefoot"]],
+            "high": [["topless male, {main} pajama pants", "topless male, {main} boxers"], "?sleep mask on head", ["{sub} slippers", "barefoot"]],
         },
     },
     "teacher": {

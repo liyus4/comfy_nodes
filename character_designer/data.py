@@ -13,6 +13,12 @@ Random Character Designer の知識ベース。
   6. 模様の固定     : 服の模様は「スタイル＋モチーフ由来の模様」（{pattern}）として具体的に決め、配置場所も明記してブレを抑える
   7. 細部の固定     : 素材・縁取り色・留め具・丈・レッグウェア・靴まで文章で指定する
 
+服装リストの記法（data.ROLES / outfit_tags.OUTFIT_TAGS 共通）:
+  "item"                 … 必ず入る
+  ["item A", "item B"]   … どれか1つ（seed で決まる。説明文版とタグ版で選択肢の数を揃えると同じ選択になる）
+  "?item"                … 50% で入る
+  OPTIONAL_ITEM_KEYWORDS に該当する小物 … 指定した確率で入る（先頭＝主役の服は必ず残す）
+
 テンプレート文字列の置換キー:
   {main} {sub} {accent}  … テーマカラー3色
   {pattern}              … スタイル修飾＋モチーフ由来の模様（例: small repeating bat-wing motif）
@@ -1935,30 +1941,46 @@ ROLES = {
         "syn": ["パジャマ", "部屋着", "ネグリジェ", "寝間着", "pajamas", "loungewear", "nightgown", "sleepwear"],
         "outfits": {
             "modest": [
-                "{material} {main} long pajama set with {sub} {pattern} print and {accent} piping on the collar",
-                "{sub} fluffy slippers",
-                "{main} sleep mask pushed up on the head with {accent} trim",
+                [
+                    "{material} {main} long pajama set with {sub} {pattern} print and {accent} piping on the collar",
+                    "{material} {main} ankle-length nightgown with {accent} lace trim on the collar, {sub} {pattern} print",
+                    "{material} {main} oversized hoodie and {sub} sweatpants with {pattern} print on the chest",
+                    "{material} {main} yukata-style sleepwear with {sub} {pattern}, {accent} sash",
+                ],
+                "?{main} sleep mask pushed up on the head with {accent} trim",
+                ["{sub} fluffy slippers", "barefoot", "{sub} fluffy socks"],
+                "?hugging a {sub} pillow",
             ],
             "standard": [
-                "{material} {main} oversized sleep shirt with {sub} {pattern} print and {accent} buttons, reaching the thighs",
-                "{sub} fluffy slippers",
-                "{main} thigh-high socks with {accent} top band",
-                "{main} sleep mask pushed up on the head with {accent} trim",
+                [
+                    "{material} {main} oversized sleep shirt with {sub} {pattern} print and {accent} buttons, reaching the thighs",
+                    "{material} {main} camisole and {sub} shorts pajama set with {accent} lace trim and {pattern} print",
+                    "{material} {main} short nightgown with {accent} lace trim, {sub} {pattern} print",
+                    "{material} {main} oversized sweater worn as a dress with {sub} {pattern} print",
+                ],
+                "?{main} sleep mask pushed up on the head with {accent} trim",
+                ["{main} thigh-high socks with {accent} top band", "bare legs", "{sub} fluffy socks"],
+                ["{sub} fluffy slippers", "barefoot"],
             ],
             "high": [
-                "{material} {main} sheer negligee with {accent} lace trim and {sub} {pattern} ribbons, deep neckline",
-                "{sub} fluffy slippers",
-                "{main} thigh-high stockings with {accent} lace tops",
-                "{main} sleep mask pushed up on the head with {accent} trim",
+                [
+                    "{material} {main} sheer negligee with {accent} lace trim and {sub} {pattern} ribbons, deep neckline",
+                    "{material} {main} lace babydoll with {accent} trim and {sub} {pattern} ribbons",
+                    "{material} {main} oversized dress shirt worn open over {sub} lingerie, {pattern} print",
+                    "{material} {main} silk camisole and micro shorts with {accent} lace trim, {sub} {pattern} ribbons",
+                ],
+                "?{main} sleep mask pushed up on the head with {accent} trim",
+                ["{main} thigh-high stockings with {accent} lace tops", "bare legs"],
+                ["{sub} fluffy slippers", "barefoot"],
             ],
         },
         "male": {
-            "modest": ["{material} {main} pajama set with {sub} {pattern} print and {accent} piping", "{sub} slippers"],
-            "standard": ["{material} {main} pajama set with {sub} {pattern} print and {accent} piping", "{sub} slippers"],
-            "high": ["shirtless, {material} {main} pajama pants with {sub} {pattern} print and {accent} drawstring", "{sub} slippers"],
+            "modest": [["{material} {main} pajama set with {sub} {pattern} print and {accent} piping", "{material} {main} t-shirt and {sub} sweatpants with {pattern} print", "{material} {main} yukata-style sleepwear with {sub} {pattern}"], "?{main} sleep mask pushed up on the head", ["{sub} slippers", "barefoot"]],
+            "standard": [["{material} {main} pajama set with {sub} {pattern} print and {accent} piping", "{material} {main} t-shirt and {sub} sweatpants with {pattern} print", "{material} {main} yukata-style sleepwear with {sub} {pattern}"], "?{main} sleep mask pushed up on the head", ["{sub} slippers", "barefoot"]],
+            "high": [["shirtless, {material} {main} pajama pants with {sub} {pattern} print and {accent} drawstring", "shirtless, {material} {main} boxers with {sub} {pattern} print"], "?{main} sleep mask pushed up on the head", ["{sub} slippers", "barefoot"]],
         },
         "props": ["oversized plush toy", "pillow", "mug of cocoa"],
-        "materials": ["silk", "flannel"],
+        "materials": ["silk", "flannel", "cotton"],
         "palettes": [("pastel pink", "white", "lavender"), ("sky blue", "white", "gold"), ("black", "white", "hot pink")],
     },
     "teacher": {
@@ -2793,6 +2815,17 @@ BODY_DEFAULT_FEMALE = ["slender", "medium build", "petite", "curvy"]
 BODY_DEFAULT_MALE = ["slender", "medium build", "athletic", "lean"]
 CHEST_SIZES = ["small breasts", "medium breasts", "large breasts"]
 
+# 「無くても成立する小物」の採用確率（単語境界で一致。先頭の主役の服には適用しない）
+OPTIONAL_ITEM_KEYWORDS = {
+    "sleep mask": 0.35, "stethoscope": 0.6, "headset": 0.6, "school bag": 0.5, "towel": 0.5, "watch": 0.5,
+    "bell": 0.6, "chain": 0.6, "wrist cuffs": 0.7, "anklet": 0.6, "coin purse": 0.6, "satchel": 0.5,
+    "crossbody bag": 0.5, "pom pom": 0.6, "pom-poms": 0.6, "umbrella": 0.5, "holster": 0.7, "surgical mask": 0.5,
+    "bandaid": 0.6, "band-aid": 0.6, "bandage on the cheek": 0.6, "goggles": 0.7, "handcuffs": 0.6, "headband": 0.6,
+    "armband": 0.6, "rosary": 0.7, "pearl necklace": 0.7, "hoop earrings": 0.6, "wristband": 0.6, "wristbands": 0.6,
+    "fake tail": 0.7, "cotton tail": 0.7, "ribbon choker": 0.7, "choker": 0.7, "bow tie": 0.7, "bowtie": 0.7,
+    "quiver": 0.7, "belt pouch": 0.7, "pouches": 0.7, "half-mask": 0.5, "mask around neck": 0.5, "scarf": 0.7,
+}
+
 # 靴の判定キーワード（性格の footwear 置換に使う）
 FOOTWEAR_KEYWORDS = ["shoes", "loafers", "boots", "sneakers", "heels", "sandals", "pumps", "mary janes", "slippers", "barefoot", "geta", "zori", "flats"]
 
@@ -2844,6 +2877,8 @@ def _validate():
         for g in ("female", "male"):
             for ex in ("modest", "standard", "high"):
                 assert _OT.OUTFIT_TAGS[rk][g][ex], f"outfit_tags[{rk}][{g}][{ex}] が空"
+                for it in _OT.OUTFIT_TAGS[rk][g][ex]:
+                    assert isinstance(it, (str, list)) and it, f"outfit_tags[{rk}][{g}][{ex}] に不正な要素: {it!r}"
     for mk, m in MOTIFS.items():
         for key in ("classic_roles", "gap_roles"):
             for r in m[key]:

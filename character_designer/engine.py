@@ -282,6 +282,56 @@ def _weighted_pick(rng: random.Random, weights: Dict[str, int]) -> str:
     return rng.choices(keys, weights=[weights[k] for k in keys], k=1)[0]
 
 
+_OPTIONAL_RE = None
+
+
+def _optional_patterns():
+    """OPTIONAL_ITEM_KEYWORDS を事前コンパイル（data の再読み込み時は engine も再読み込みされるので作り直される）"""
+    global _OPTIONAL_RE
+    if _OPTIONAL_RE is None:
+        _OPTIONAL_RE = [(kw, prob, re.compile(r"(?<![a-z])" + re.escape(kw) + r"(?![a-z])")) for kw, prob in D.OPTIONAL_ITEM_KEYWORDS.items()]
+    return _OPTIONAL_RE
+
+
+def _expand_items(items, variant: float, keep: Dict[str, bool], rng: random.Random) -> List[str]:
+    """
+    服装リストの記法を展開する。
+      - list       : どれか1つ（variant で位置を決めるので、説明文版とタグ版で選択肢の数が同じなら同じ選択になる）
+      - "?item"    : 任意。OPTIONAL_ITEM_KEYWORDS に該当すればその確率、無ければ 50%。
+                     採否は「何番目の ? アイテムか」で説明文版とタグ版が共有する（順番を揃えて書く）
+      - OPTIONAL_ITEM_KEYWORDS に該当 : 指定確率（採否はキーワードで共有）
+    先頭（主役の服）は必ず残す。
+    """
+    out: List[str] = []
+    q_index = 0
+    for i, it in enumerate(items):
+        if isinstance(it, list):
+            it = it[min(int(variant * len(it)), len(it) - 1)]
+        if not it:
+            continue
+        if i == 0:
+            out.append(it.lstrip("?"))
+            continue
+        low = it.lower().lstrip("?")
+        matched = next(((kw, prob) for kw, prob, pat in _optional_patterns() if pat.search(low)), None)
+        if it.startswith("?"):
+            key = f"?{q_index}"
+            q_index += 1
+            if key not in keep:
+                keep[key] = rng.random() < (matched[1] if matched else 0.5)
+            if keep[key]:
+                out.append(it[1:])
+            continue
+        if matched:
+            kw, prob = matched
+            if kw not in keep:
+                keep[kw] = rng.random() < prob
+            if not keep[kw]:
+                continue
+        out.append(it)
+    return out
+
+
 def _role_available(role: str, gender: str) -> bool:
     role = D.ROLE_ALIASES.get(role, role)
     if role not in D.ROLES:
@@ -545,14 +595,16 @@ def generate(
         outfit_src = role["male"][exp]
     else:
         outfit_src = role["outfits"][exp]
-    outfit_detail = [_fill(o, slots).replace("print print", "print") for o in outfit_src]
+    variant = rng.random()          # 選択肢の位置（説明文版・タグ版で共有）
+    keep: Dict[str, bool] = {}      # 任意小物の採用判断（同上）
+    outfit_detail = [_fill(o, slots).replace("print print", "print") for o in _expand_items(outfit_src, variant, keep, rng)]
     if arch.get("footwear"):
         outfit_detail = [o for o in outfit_detail if not any(k in o for k in D.FOOTWEAR_KEYWORDS)]
         outfit_detail.append(_fill(arch["footwear"], slots))
     if strict:
         # booru の正規タグ列（先頭が主役の服）
         tag_src = OT.OUTFIT_TAGS[role_key]["male" if gender == "boy" else "female"][exp]
-        outfit = [_fill(t, slots_strict) for t in tag_src]
+        outfit = [_fill(t, slots_strict) for t in _expand_items(tag_src, variant, keep, rng)]
         if arch.get("footwear_tags"):
             outfit = [t for t in outfit if not any(k in t for k in D.FOOTWEAR_KEYWORDS)]
             outfit += [_fill(t, slots_strict) for t in arch["footwear_tags"]]
@@ -617,7 +669,7 @@ def _w(tag: str, weight: float, enabled: bool) -> str:
 
 def _primary_noun(tag: str) -> str:
     """主役の服タグから名詞を取り出す（"black pleated skirt" -> "skirt"）"""
-    words = re.sub(r"[()]|:\d+(\.\d+)?", "", tag).split()
+    words = re.sub(r"[()]|:\d+(\.\d+)?", "", tag.split(",")[0]).split()
     return words[-1] if words else ""
 
 
