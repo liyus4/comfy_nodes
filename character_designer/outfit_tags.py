@@ -554,6 +554,18 @@ OUTFIT_TAGS = {
             "high": ["{main} open vest", "waiter", "bare pectorals", "{sub} bowtie", "{sub} apron", "{main} pants", "dress shoes"],
         },
     },
+    "fortune_teller": {
+        "female": {
+            "modest": ["{main} robe", "fortune teller", "hooded robe", "hood up", "long sleeves", "wide sleeves", "{sub} shawl", "head scarf", "coins", "bangle", "{main} flats"],
+            "standard": ["{main} dress", "fortune teller", "off-shoulder dress", "layered skirt", "{sub} shawl", "head scarf", "coins", "bangle", "hoop earrings", "{main} sandals"],
+            "high": ["{main} crop top", "fortune teller", "plunging neckline", "cleavage", "{main} long skirt", "see-through skirt", "side slit", "{sub} shawl", "head scarf", "coins", "bangle", "hoop earrings", "{main} sandals"],
+        },
+        "male": {
+            "modest": ["{main} robe", "fortune teller", "hooded robe", "{sub} sash", "rings", "{main} boots"],
+            "standard": ["{main} vest", "fortune teller", "{sub} shirt", "head scarf", "rings", "{main} pants", "{main} boots"],
+            "high": ["{main} open vest", "fortune teller", "bare pectorals", "head scarf", "rings", "{main} pants", "{main} sandals"],
+        },
+    },
     "flight_attendant": {
         "female": {
             "modest": ["{main} jacket", "flight attendant", "white blouse", "{sub} scarf", "{main} long skirt", "pencil skirt", "pillbox hat", "black pantyhose", "{main} pumps"],

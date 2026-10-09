@@ -408,7 +408,10 @@ def generate(
         exp = rng.choices([e for e, _ in cands], weights=[w for _, w in cands], k=1)[0]
 
     # --- テーマカラー（3色ルール） ---------------------------------------
-    palette_pool = list(motif["palettes"]) * 2 + list(arch["palettes"]) + list(role.get("palettes", []))
+    if motif.get("palette_only"):
+        palette_pool = list(motif["palettes"])
+    else:
+        palette_pool = list(motif["palettes"]) * 2 + list(arch["palettes"]) + list(role.get("palettes", []))
     main, sub, accent = _pick(rng, palette_pool)
     if spec.theme_color:
         main = spec.theme_color
@@ -420,12 +423,17 @@ def generate(
         accent = next(c for c in D.CONTRAST_FALLBACK if c not in (main, sub))
     palette = (main, sub, accent)
 
-    base_pattern = _pick(rng, motif["patterns"]) or "ribbon motif"
-    pattern = f"{_pick(rng, D.PATTERN_STYLES)} {base_pattern}"
+    if motif.get("signature_print"):
+        base_pattern = motif["signature_print"]
+        pattern = base_pattern
+    else:
+        base_pattern = _pick(rng, motif["patterns"]) or "ribbon motif"
+        pattern = f"{_pick(rng, D.PATTERN_STYLES)} {base_pattern}"
     material = _pick(rng, role.get("materials", [])) or "cotton"
-    slots = {"main": main, "sub": sub, "accent": accent, "pattern": pattern, "material": material}
+    girl_or_boy = "girl" if gender == "girl" else "boy"
+    slots = {"main": main, "sub": sub, "accent": accent, "pattern": pattern, "material": material, "girl_or_boy": girl_or_boy}
     # strict: 色を main + accent の2色に圧縮（{sub} は main に寄せる）
-    slots_strict = {"main": main, "sub": main, "accent": accent, "pattern": pattern, "material": ""}
+    slots_strict = {"main": main, "sub": main, "accent": accent, "pattern": pattern, "material": "", "girl_or_boy": girl_or_boy}
     fill_slots = slots  # 記号・小物は3色のまま（2色圧縮は服タグにだけ適用）
     omitted: List[str] = []
 
@@ -436,6 +444,8 @@ def generate(
     # --- 髪 ---------------------------------------------------------------
     if spec.hair_color:
         hair_color = spec.hair_color
+    elif motif.get("hair_from_main"):
+        hair_color = D.COLOR_TO_HAIR.get(main, "blue hair")
     elif rng.random() < 0.5:
         # 「髪か瞳にテーマカラーを乗せる」ルール: main か sub を髪色にする
         hair_color = D.COLOR_TO_HAIR.get(_pick(rng, [main, sub]), _pick(rng, arch["hair_colors"]))
@@ -446,9 +456,30 @@ def generate(
         hair_style = ", ".join(spec.hair_styles)
     else:
         hair_style = _pick(rng, arch["hair_styles"])
-    hair = [hair_color, hair_style]
-    if "bangs" not in hair_style and "hiding the face" not in hair_style and "covering" not in hair_style:
+    style_low = hair_style.lower()
+    hair = [hair_color]
+    # 長さ（型から推定。推定できなければランダム）
+    length = next((tag for kw, tag in D.HAIR_LENGTH_KEYWORDS if kw in style_low), None)
+    if not length and not spec.hair_styles:
+        length = rng.choices(["very long hair", "long hair", "medium hair", "short hair"], weights=[2, 4, 3, 2], k=1)[0]
+    if length:
+        hair.append(length)
+    # 質感（型に含まれていなければ追加）
+    if not any(k in style_low for k in D.HAIR_TEXTURE_KEYWORDS):
+        hair.append(_pick(rng, D.HAIR_TEXTURES))
+    hair.append(hair_style)
+    if motif.get("hair_extra"):
+        hair.append(motif["hair_extra"])
+    # 前髪・横髪
+    if "bangs" not in style_low and "hiding the face" not in style_low and "covering" not in style_low:
         hair.append(_pick(rng, D.BANGS))
+    if "sidelocks" not in style_low and rng.random() < 0.7:
+        hair.append(_pick(rng, D.SIDELOCKS))
+    # 差し色・アホ毛など（40%で1つ。型に ahoge があれば重複させない）
+    if rng.random() < 0.4:
+        extra = _fill(_pick(rng, D.HAIR_EXTRAS), slots)
+        if not ("ahoge" in extra and "ahoge" in style_low):
+            hair.append(extra)
 
     # --- 瞳 ---------------------------------------------------------------
     if spec.eye_color:
@@ -464,7 +495,7 @@ def generate(
         eyes.insert(0, "heterochromia")
 
     # --- 肌・体型 ---------------------------------------------------------
-    skin = motif.get("skin") or "fair skin"
+    skin = _fill(motif.get("skin") or "fair skin", slots)
     if "dark skin" in spec.traits:
         skin = "dark skin"
     elif arch_key == "gal" and rng.random() < 0.5 and not spec.traits:
@@ -514,7 +545,7 @@ def generate(
         outfit_src = role["male"][exp]
     else:
         outfit_src = role["outfits"][exp]
-    outfit_detail = [_fill(o, slots) for o in outfit_src]
+    outfit_detail = [_fill(o, slots).replace("print print", "print") for o in outfit_src]
     if arch.get("footwear"):
         outfit_detail = [o for o in outfit_detail if not any(k in o for k in D.FOOTWEAR_KEYWORDS)]
         outfit_detail.append(_fill(arch["footwear"], slots))
@@ -544,7 +575,7 @@ def generate(
     prop = _fill(_pick(rng, list(motif["props"]) + list(role.get("props", []))) or "", fill_slots)
 
     # strict: 模様は booru に print タグがあるものだけ出す
-    print_tag = D.BOORU_PRINT.get(base_pattern, "") if strict else ""
+    print_tag = (motif.get("signature_print") or D.BOORU_PRINT.get(base_pattern, "")) if strict else ""
     if strict and not print_tag:
         omitted.append(f"pattern: {pattern}")
 
@@ -701,6 +732,8 @@ def build_negative(c: Character) -> str:
         neg.append("hat")
     if "heterochromia" not in everything:
         neg.append("heterochromia")
+    if "colored skin" in c.skin:
+        neg += ["fair skin", "pale skin"]
     if c.consistency == "strict":
         # 不安定要素は negative でも抑える
         neg += ["facial mark", "face paint", "body markings"]

@@ -566,7 +566,7 @@ MOTIFS = {
         "palettes": [("black", "purple", "gold"), ("dark purple", "black", "orange"), ("navy", "gold", "white"), ("brown", "cream", "emerald green")],
         "patterns": ["star and moon motif", "rune pattern", "constellation motif", "spiral motif", "crescent moon motif", "cat silhouette motif", "potion bottle motif", "tarot card motif", "pentagram motif"],
         "props": ["broomstick with {accent} bindings", "staff with a glowing {accent} crystal", "thick grimoire with a {accent} lock", "potion vial on a {accent} chain"],
-        "classic_roles": ["witch_robe", "gothic_lolita", "princess_dress", "steampunk", "merchant"],
+        "classic_roles": ["witch_robe", "gothic_lolita", "princess_dress", "steampunk", "merchant", "fortune_teller"],
         "gap_roles": ["office_lady", "nurse", "sportswear", "idol", "school_uniform", "swimsuit", "military"],
         "classic_arch": ["kuudere", "ojousama", "chuuni", "uchiki"],
         "gap_arch": ["genki", "gal", "mesugaki", "dojikko"],
@@ -710,7 +710,7 @@ MOTIFS = {
         "palettes": [("white", "sky blue", "lavender"), ("black", "white", "sky blue"), ("lavender", "white", "silver")],
         "patterns": ["spiral motif", "faded hem pattern", "wisp motif", "moon motif", "candle flame motif", "lantern motif", "skull motif", "fog gradient pattern", "crescent moon motif"],
         "props": ["candle with a {accent} flame", "paper lantern", "old pocket mirror"],
-        "classic_roles": ["kimono", "gothic_lolita", "school_uniform", "sister"],
+        "classic_roles": ["kimono", "gothic_lolita", "school_uniform", "sister", "fortune_teller"],
         "gap_roles": ["idol", "gal_street", "sportswear", "swimsuit", "office_lady", "nurse"],
         "classic_arch": ["uchiki", "yandere", "kuudere", "seiso"],
         "gap_arch": ["genki", "mesugaki", "gal", "dojikko"],
@@ -800,7 +800,7 @@ MOTIFS = {
         "palettes": [("navy", "gold", "white"), ("dark purple", "sky blue", "gold"), ("black", "silver", "pastel pink")],
         "patterns": ["star pattern", "constellation motif", "crescent moon motif", "planet motif", "comet motif", "zodiac sign motif", "galaxy gradient pattern", "sparkle motif", "rocket motif"],
         "props": ["star-tipped wand", "small telescope", "glowing {accent} star charm"],
-        "classic_roles": ["magical_girl", "idol", "witch_robe", "princess_dress", "goddess_dress", "flight_attendant"],
+        "classic_roles": ["magical_girl", "idol", "witch_robe", "princess_dress", "goddess_dress", "flight_attendant", "fortune_teller"],
         "gap_roles": ["school_uniform", "sportswear", "office_lady", "casual_street", "nurse", "knight"],
         "classic_arch": ["genki", "ojousama", "kuudere", "chuuni"],
         "gap_arch": ["uchiki", "jirai", "sadistic", "dojikko"],
@@ -836,7 +836,7 @@ MOTIFS = {
         "palettes": [("purple", "gold", "black"), ("crimson", "white", "black"), ("black", "white", "crimson")],
         "patterns": ["diamond harlequin pattern", "checkered pattern", "playing-card suit motif", "star pattern", "mask motif", "spiral motif", "stripe pattern", "bell motif", "dice motif"],
         "props": ["juggling balls", "fan of playing cards", "mask on a stick"],
-        "classic_roles": ["jester_outfit", "gothic_lolita", "idol", "dancer", "thief", "merchant"],
+        "classic_roles": ["jester_outfit", "gothic_lolita", "idol", "dancer", "thief", "merchant", "fortune_teller"],
         "gap_roles": ["office_lady", "nurse", "sister", "school_uniform", "military", "teacher"],
         "classic_arch": ["mesugaki", "chuuni", "genki", "sadistic"],
         "gap_arch": ["kuudere", "seiso", "uchiki", "amaama"],
@@ -867,8 +867,9 @@ MOTIFS = {
     "cow": {
         "jp": "乳牛",
         "syn": ["乳牛", "牛", "ホルスタイン", "牛娘", "cow", "holstein"],
-        "features_primary": ["cow ears with {accent} ear tag", "small curved cow horns"],
-        "features_optional": ["cow tail with a tuft", "cow ears with {accent} ear tag", "{accent} cowbell collar", "black and white cow-print markings on the hair tips"],
+        "features_primary": ["cow ears with {accent} ear tag, cow horns", "cow horns, cow ears"],
+        "features_optional": ["cow tail", "{accent} cowbell collar", "cow print accents on the outfit"],
+        "signature_print": "cow print",  # strict/full どちらでも必ず出す模様
         "palettes": [("white", "black", "pastel pink"), ("white", "black", "gold"), ("cream", "brown", "crimson")],
         "patterns": ["cow print", "cowbell motif", "milk bottle motif", "daisy motif", "clover motif", "polka-dot pattern", "gingham pattern", "grass motif"],
         "props": ["{accent} cowbell", "milk bottle", "bucket of milk"],
@@ -927,7 +928,7 @@ MOTIFS = {
         "palettes": [("emerald green", "black", "gold"), ("dark purple", "black", "gold"), ("white", "gold", "emerald green")],
         "patterns": ["scale pattern", "serpent motif", "diamond pattern", "apple motif", "spiral motif", "moon motif", "hourglass motif", "thorn vine pattern"],
         "props": ["snake-shaped staff", "{accent} snake armlet", "glass vial of venom"],
-        "classic_roles": ["dancer", "witch_robe", "cheongsam", "succubus", "goddess_dress"],
+        "classic_roles": ["dancer", "witch_robe", "cheongsam", "succubus", "goddess_dress", "fortune_teller"],
         "gap_roles": ["nurse", "school_uniform", "idol", "office_lady", "sister", "cheerleader"],
         "classic_arch": ["sadistic", "oneesan", "yandere", "kuudere", "haraguro"],
         "gap_arch": ["dojikko", "genki", "uchiki", "amaama", "ottori"],
@@ -976,8 +977,11 @@ MOTIFS = {
     "slime": {
         "jp": "スライム",
         "syn": ["スライム", "ゼリー", "ぷにぷに", "slime", "jelly", "goo"],
-        "features_primary": ["translucent gelatinous body with a {accent} core visible in the chest", "translucent slime hair dripping slightly"],
-        "features_optional": ["small slime drops floating around", "glowing {accent} core", "slime hair with a cowlick", "bubbles inside the body"],
+        "features_primary": [
+            "slime {girl_or_boy}, monster {girl_or_boy}, translucent body, glowing {accent} core in the chest",
+            "slime {girl_or_boy}, monster {girl_or_boy}, translucent gelatinous body, see-through body",
+        ],
+        "features_optional": ["dripping slime hair", "slime drops floating around", "bubbles inside the body", "glowing {accent} core visible in the chest"],
         "palettes": [("sky blue", "white", "royal blue"), ("mint", "white", "emerald green"), ("pastel pink", "white", "hot pink"), ("purple", "lavender", "gold")],
         "patterns": ["bubble motif", "droplet motif", "star pattern", "polka-dot pattern", "heart motif", "wave pattern", "jelly cube motif", "sparkle motif"],
         "props": ["slime-shaped plush", "{accent} crystal core", "jar of jelly"],
@@ -985,10 +989,13 @@ MOTIFS = {
         "gap_roles": ["knight", "military", "office_lady", "sister", "teacher", "samurai"],
         "classic_arch": ["amaama", "dojikko", "ottori", "genki", "fushigi"],
         "gap_arch": ["sadistic", "kuudere", "chuuni", "mesugaki", "dokuzetsu"],
-        "hair_colors": ["translucent blue hair", "translucent green hair", "translucent pink hair", "translucent purple hair"],
+        "hair_colors": [],
+        "hair_from_main": True,          # 髪色は必ずテーマカラー main（体と同色）
+        "palette_only": True,            # 体色がテーマなので、性格・服装のパレットに引っ張られない
+        "hair_extra": "translucent hair",
         "eye_colors": ["blue eyes", "green eyes", "hollow glowing eyes"],
-        "skin": "pale translucent skin",
-        "classic_jp": "スライムといえば半透明——透ける体と核で人外感、1色＋白で清涼感",
+        "skin": "{main} skin, colored skin, translucent skin",
+        "classic_jp": "スライムといえば半透明——体・髪・肌を同じ色にして核で人外感、1色＋白で清涼感",
         "gap_jp": "スライムなのに{role}——ぷにぷにの記号と硬い服装のギャップ設計",
     },
     "yukionna": {
@@ -2718,6 +2725,43 @@ ROLES = {
         "materials": ["wool", "polyester"],
         "palettes": [("navy", "white", "gold"), ("crimson", "white", "gold"), ("sky blue", "white", "navy")],
     },
+    "fortune_teller": {
+        "jp": "占い師",
+        "syn": ["占い師", "占い", "タロット", "fortune teller", "fortune-teller", "diviner", "tarot", "oracle"],
+        "outfits": {
+            "modest": [
+                "{material} {main} hooded fortune teller robe with {accent} coin trim on the hood, {sub} {pattern} embroidered on the chest, long wide sleeves",
+                "{sub} shawl with {accent} tassels",
+                "{sub} head scarf with {accent} coins",
+                "{accent} bangles on both wrists",
+                "{main} flat shoes",
+            ],
+            "standard": [
+                "{material} {main} fortune teller dress with {accent} coin trim, {sub} {pattern} embroidered on the bodice, off-shoulder, knee-length layered skirt",
+                "{sub} shawl with {accent} tassels",
+                "{sub} head scarf with {accent} coins",
+                "{accent} bangles on both wrists",
+                "{accent} hoop earrings",
+                "{main} sandals",
+            ],
+            "high": [
+                "{material} {main} fortune teller top with a deep plunging neckline framed in {accent} coin trim, {sub} {pattern} embroidered, sheer {main} long skirt with high side slits",
+                "{sub} sheer shawl with {accent} tassels",
+                "{sub} head scarf with {accent} coins",
+                "{accent} bangles on both wrists",
+                "{accent} hoop earrings",
+                "{main} sandals",
+            ],
+        },
+        "male": {
+            "modest": ["{material} {main} hooded fortune teller robe with {accent} coin trim, {sub} {pattern} embroidered on the chest", "{sub} sash", "{accent} rings on every finger", "{main} boots"],
+            "standard": ["{material} {main} fortune teller vest with {accent} coin trim over a {sub} shirt, {pattern} embroidered", "{sub} head scarf", "{accent} rings on every finger", "{main} pants", "{main} boots"],
+            "high": ["{material} {main} fortune teller vest worn open over a bare chest with {accent} coin trim, {sub} {pattern} embroidered", "{sub} head scarf", "{accent} rings on every finger", "{main} pants", "{main} sandals"],
+        },
+        "props": ["crystal ball with a {accent} glow", "spread of tarot cards", "{accent} pendulum on a chain"],
+        "materials": ["velvet", "silk"],
+        "palettes": [("dark purple", "black", "gold"), ("navy", "wine red", "gold"), ("black", "purple", "silver")],
+    },
 }
 
 # モチーフの gap_roles で参照している別名（存在しないキーを吸収する）
@@ -2735,7 +2779,14 @@ PATTERN_STYLES = [
     "metallic-thread", "outlined", "tiny all-over", "single large",
 ]
 
-BANGS = ["blunt bangs", "side-swept bangs", "parted bangs", "hair between eyes", "swept bangs"]
+# 髪の構造: 色 / 長さ / 質感 / 型 / 前髪 / 横髪 / 差し色・アホ毛
+BANGS = ["blunt bangs", "swept bangs", "parted bangs", "hair between eyes", "asymmetrical bangs", "braided bangs", "crossed bangs", "curtained hair"]
+HAIR_TEXTURES = ["straight hair", "wavy hair", "curly hair", "messy hair", "fluffy hair", "sleek hair"]
+HAIR_TEXTURE_KEYWORDS = ["straight", "wavy", "curly", "messy", "fluffy", "spiky", "drill", "braid", "sleek", "wool"]
+SIDELOCKS = ["sidelocks", "long sidelocks", "short sidelocks", "hair intakes", "hair flaps"]
+# 差し色・アホ毛など（40% で1つ）。{accent} はテーマのアクセント色
+HAIR_EXTRAS = ["ahoge", "antenna hair", "{accent} colored tips", "colored inner hair, {accent} inner hair", "streaked hair, {accent} streak", "two-tone hair", "gradient hair", "hair flower", "{accent} hairclip", "{accent} hair ribbon"]
+HAIR_LENGTH_KEYWORDS = [("very long", "very long hair"), ("long", "long hair"), ("short", "short hair"), ("bob", "medium hair"), ("medium", "medium hair"), ("pixie", "very short hair")]
 
 # 性格に体型指定が無い時の候補（女性）
 BODY_DEFAULT_FEMALE = ["slender", "medium build", "petite", "curvy"]
