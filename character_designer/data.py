@@ -832,7 +832,7 @@ MOTIFS = {
         "jp": "道化",
         "syn": ["ピエロ", "道化", "クラウン", "ジョーカー", "clown", "jester", "joker", "harlequin"],
         "features_primary": ["{accent} teardrop facial mark under the left eye", "{main} and {sub} jester hat with {accent} bells"],
-        "features_optional": ["heterochromia, {main} and {sub} eyes", "painted smile mark on the cheek", "small {accent} bells on the outfit"],
+        "features_optional": ["{accent} bell earrings", "painted smile mark on the cheek", "small {accent} bells on the outfit"],
         "palettes": [("purple", "gold", "black"), ("crimson", "white", "black"), ("black", "white", "crimson")],
         "patterns": ["diamond harlequin pattern", "checkered pattern", "playing-card suit motif", "star pattern", "mask motif", "spiral motif", "stripe pattern", "bell motif", "dice motif"],
         "props": ["juggling balls", "fan of playing cards", "mask on a stick"],
