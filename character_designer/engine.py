@@ -426,7 +426,7 @@ def generate(
     slots = {"main": main, "sub": sub, "accent": accent, "pattern": pattern, "material": material}
     # strict: 色を main + accent の2色に圧縮（{sub} は main に寄せる）
     slots_strict = {"main": main, "sub": main, "accent": accent, "pattern": pattern, "material": ""}
-    fill_slots = slots_strict if strict else slots
+    fill_slots = slots  # 記号・小物は3色のまま（2色圧縮は服タグにだけ適用）
     omitted: List[str] = []
 
     def _unstable(text: str) -> bool:
@@ -597,7 +597,14 @@ def _alt_color_negatives(c: Character) -> List[str]:
     noun = _primary_noun(c.outfit[0])
     if not noun or noun in ("clothes", "outfit", "male", "pectorals"):
         return []
-    base = D.COLOR_BASE.get(c.main, c.main)
+    # 主役タグが固定色（white kimono 等）ならその色を基準にする
+    first = c.outfit[0].lower()
+    color = c.main
+    for name in sorted(list(D.COLOR_BASE) + D.ALT_COLORS, key=len, reverse=True):
+        if first.startswith(name + " "):
+            color = name
+            break
+    base = D.COLOR_BASE.get(color, color)
     return [f"{col} {noun}" for col in D.ALT_COLORS if col != base][:5]
 
 
@@ -624,7 +631,7 @@ def build_positive(c: Character) -> str:
         elif c.expression_pose == "expression_only":
             parts.append(f"Default expression: {c.expression}.")
         if strict:
-            pat = f" with {c.print_tag}" if c.print_tag else ""
+            pat = f" and {c.print_tag}" if c.print_tag else ""
             parts.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim{pat}.")
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
