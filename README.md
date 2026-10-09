@@ -41,7 +41,9 @@ ComfyUI用のカスタムノード詰め合わせリポジトリです。
   - `twist`: `classic`=王道（悪魔→サキュバス）/ `surprise`=意外性（悪魔→シスター、悪魔なのに内気 など）/ `auto`=4割で surprise。
   - `exposure`: 露出度（`auto` は brief の指定 > ランダム）。
   - `personality`: 性格をドロップダウンで固定（`auto` なら brief かモチーフから選択）。
-  - `prompt_style`: `tags`（SD/Pony/Illustrious 向けカンマ区切り）/ `natural`（Flux/SD3 向け文章）。
+  - `prompt_style`: `tags`（カンマ区切り）/ `natural`（文章）。
+  - `consistency`: `strict`（既定）は booru の正規タグを骨格にし、色を main＋accent の2色に圧縮、縁色は `gold trim` のような1タグに集約、主役の服と記号に重み付け、別色の同じ服を negative に追加、フェイスペイントや肌の模様などの不安定要素は出力せずシートのメモに残します（Anima / Illustrious / Pony 系向け）。`full` は服1点ごとの詳細説明文です。
+  - `emphasis`: strict で主役の服と記号に `(tag:1.2)` の重みを付けます。
   - `expression_pose`: `expression_only`（既定。性格を表すデフォルト表情のみ）/ `both`（ポーズも含める）/ `none`。
   - `lock` + `character_sheet`: 後述。
 - **出力**: `positive` / `negative` / `character_sheet` / `seed`

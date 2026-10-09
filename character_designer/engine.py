@@ -15,9 +15,11 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
 from . import data as D
+from . import outfit_tags as OT
 
 EXPOSURES = ("modest", "standard", "high")
 EXPOSURE_JP = {"modest": "控えめ", "standard": "標準", "high": "高露出"}
+CONSISTENCY = ("strict", "full")
 TWISTS = ("auto", "classic", "surprise")
 
 
@@ -232,6 +234,12 @@ class Character:
     excluded: Dict[str, set]
     prompt_style: str
     expression_pose: str        # "expression_only" / "both" / "none"
+    consistency: str = "full"   # "strict" = booru タグ骨格・2色・不安定要素なし / "full" = 詳細説明文
+    emphasis: bool = True       # strict で主役の服と記号に (tag:1.2) の重みを付ける
+    pattern_base: str = ""      # スタイル修飾なしの模様名
+    print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
+    outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
+    omitted: List[str] = field(default_factory=list)        # strict で省いた不安定要素
 
     @property
     def main(self):
@@ -302,7 +310,10 @@ def generate(
     motif: str = "auto",
     role: str = "auto",
     exclude: str = "",
+    consistency: str = "strict",
+    emphasis: bool = True,
 ) -> Character:
+    strict = consistency == "strict"
     rng = random.Random(seed)
     spec = parse_brief(brief)
     excluded = parse_exclude(exclude)
@@ -413,6 +424,14 @@ def generate(
     pattern = f"{_pick(rng, D.PATTERN_STYLES)} {base_pattern}"
     material = _pick(rng, role.get("materials", [])) or "cotton"
     slots = {"main": main, "sub": sub, "accent": accent, "pattern": pattern, "material": material}
+    # strict: 色を main + accent の2色に圧縮（{sub} は main に寄せる）
+    slots_strict = {"main": main, "sub": main, "accent": accent, "pattern": pattern, "material": ""}
+    fill_slots = slots_strict if strict else slots
+    omitted: List[str] = []
+
+    def _unstable(text: str) -> bool:
+        low = text.lower()
+        return any(k in low for k in D.UNSTABLE_KEYWORDS)
 
     # --- 髪 ---------------------------------------------------------------
     if spec.hair_color:
@@ -477,34 +496,57 @@ def generate(
 
     # --- モチーフの記号 ---------------------------------------------------
     features = []
-    primary = _pick(rng, motif["features_primary"])
+    primary_pool = list(motif["features_primary"])
+    optional_pool = list(motif["features_optional"])
+    if strict:
+        omitted += [_fill(f, slots) for f in primary_pool + optional_pool if _unstable(f)]
+        primary_pool = [f for f in primary_pool if not _unstable(f)]
+        optional_pool = [f for f in optional_pool if not _unstable(f)]
+    primary = _pick(rng, primary_pool) or (_pick(rng, optional_pool) if strict else None)
     if primary:
         features.append(primary)
-    features += _sample(rng, [f for f in motif["features_optional"] if f != primary], rng.randint(1, 2))
-    features = [_fill(f, slots) for f in features]
+    n_opt = 1 if strict else rng.randint(1, 2)
+    features += _sample(rng, [f for f in optional_pool if f != primary], n_opt)
+    features = [_fill(f, fill_slots) for f in features]
 
     # --- 服装 -------------------------------------------------------------
     if gender == "boy" and "male" in role:
         outfit_src = role["male"][exp]
     else:
         outfit_src = role["outfits"][exp]
-    outfit = [_fill(o, slots) for o in outfit_src]
+    outfit_detail = [_fill(o, slots) for o in outfit_src]
     if arch.get("footwear"):
-        replacement = _fill(arch["footwear"], slots)
-        outfit = [o for o in outfit if not any(k in o for k in D.FOOTWEAR_KEYWORDS)]
-        outfit.append(replacement)
+        outfit_detail = [o for o in outfit_detail if not any(k in o for k in D.FOOTWEAR_KEYWORDS)]
+        outfit_detail.append(_fill(arch["footwear"], slots))
+    if strict:
+        # booru の正規タグ列（先頭が主役の服）
+        tag_src = OT.OUTFIT_TAGS[role_key]["male" if gender == "boy" else "female"][exp]
+        outfit = [_fill(t, slots_strict) for t in tag_src]
+        if arch.get("footwear_tags"):
+            outfit = [t for t in outfit if not any(k in t for k in D.FOOTWEAR_KEYWORDS)]
+            outfit += [_fill(t, slots_strict) for t in arch["footwear_tags"]]
+    else:
+        outfit = list(outfit_detail)
 
     # --- 性格を示す小物 ---------------------------------------------------
     feature_text = " ".join(features).lower()
     acc_pool = [a for a in arch["accessories"] if not (a == "fang" and "fang" in feature_text)]
-    accessories = [_fill(a, slots) for a in _sample(rng, acc_pool, rng.randint(1, 2))]
+    if strict:
+        omitted += [_fill(a, slots) for a in acc_pool if _unstable(a)]
+        acc_pool = [a for a in acc_pool if not _unstable(a)]
+    accessories = [_fill(a, fill_slots) for a in _sample(rng, acc_pool, 1 if strict else rng.randint(1, 2))]
     if "glasses" in spec.traits and not any("glasses" in o for o in outfit):
         accessories.append("glasses")
     if "fang" in spec.traits and not any("fang" in x for x in features + accessories):
         accessories.append("fang")
 
     # --- シグネチャ小物（1つだけ） -----------------------------------------
-    prop = _fill(_pick(rng, list(motif["props"]) + list(role.get("props", []))) or "", slots)
+    prop = _fill(_pick(rng, list(motif["props"]) + list(role.get("props", []))) or "", fill_slots)
+
+    # strict: 模様は booru に print タグがあるものだけ出す
+    print_tag = D.BOORU_PRINT.get(base_pattern, "") if strict else ""
+    if strict and not print_tag:
+        omitted.append(f"pattern: {pattern}")
 
     # --- 表情・ポーズ -----------------------------------------------------
     expression = _pick(rng, arch["expression"])
@@ -517,6 +559,8 @@ def generate(
         hair=hair, eyes=eyes, skin=skin, body=body, features=features, outfit=outfit,
         accessories=accessories, prop=prop, expression=expression, pose=pose,
         extras=[], unrecognized=spec.extras, excluded=excluded, prompt_style=prompt_style, expression_pose=expression_pose,
+        consistency=consistency, emphasis=emphasis, pattern_base=base_pattern, print_tag=print_tag,
+        outfit_detail=outfit_detail, omitted=omitted,
     )
 
 
@@ -535,18 +579,42 @@ def _dedupe(items: List[str]) -> List[str]:
     return out
 
 
+def _w(tag: str, weight: float, enabled: bool) -> str:
+    """ComfyUI 形式の重み付け (tag:1.2)"""
+    return f"({tag}:{weight})" if enabled and tag else tag
+
+
+def _primary_noun(tag: str) -> str:
+    """主役の服タグから名詞を取り出す（"black pleated skirt" -> "skirt"）"""
+    words = re.sub(r"[()]|:\d+(\.\d+)?", "", tag).split()
+    return words[-1] if words else ""
+
+
+def _alt_color_negatives(c: Character) -> List[str]:
+    """主役の服について、別色の同じ服を negative に入れる（ポーズ違いでの色ブレ対策）"""
+    if not c.outfit:
+        return []
+    noun = _primary_noun(c.outfit[0])
+    if not noun or noun in ("clothes", "outfit", "male", "pectorals"):
+        return []
+    base = D.COLOR_BASE.get(c.main, c.main)
+    return [f"{col} {noun}" for col in D.ALT_COLORS if col != base][:5]
+
+
 def build_positive(c: Character) -> str:
-    color_anchor = f"{c.main} and {c.sub} color scheme with {c.accent} accents"
+    strict = c.consistency == "strict"
+    pron, poss = ("She", "her") if c.gender == "girl" else ("He", "his")
+    who = "girl" if c.gender == "girl" else "boy"
 
     if c.prompt_style == "natural":
-        pron, poss = ("She", "her") if c.gender == "girl" else ("He", "his")
-        who = "girl" if c.gender == "girl" else "boy"
         parts = []
-        # 服装1点の中にカンマが入るので、項目の区切りはセミコロンにする
         parts.append(f"A {who} ({', '.join(c.body)}) with {', '.join(c.hair)}; {', '.join(c.eyes)}; {c.skin}.")
         if c.features:
             parts.append(f"{pron} has {'; '.join(c.features)}.")
-        parts.append(f"{pron} wears: {'; '.join(c.outfit)}.")
+        if strict:
+            parts.append(f"{pron} wears {', '.join(c.outfit)}.")
+        else:
+            parts.append(f"{pron} wears: {'; '.join(c.outfit)}.")
         if c.accessories:
             parts.append(f"{pron} also has {'; '.join(c.accessories)}.")
         if c.prop:
@@ -555,17 +623,42 @@ def build_positive(c: Character) -> str:
             parts.append(f"Expression and pose: {c.expression}; {c.pose}.")
         elif c.expression_pose == "expression_only":
             parts.append(f"Default expression: {c.expression}.")
-        parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
+        if strict:
+            pat = f" with {c.print_tag}" if c.print_tag else ""
+            parts.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim{pat}.")
+        else:
+            parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
         if c.unrecognized:
             parts.append(" ".join(c.unrecognized))
         return " ".join(parts)
 
-    tags = []
-    # 人数・性別タグ(1girl/1boy)は状況側で指定する前提なので入れない
+    tags: List[str] = []
     tags += c.body
     tags += c.hair
     tags += c.eyes
     tags.append(c.skin)
+    if strict:
+        # 記号 -> 主役の服（重み付き）-> 残りの服 -> 小物 -> 持ち物 -> 表情 -> 模様 -> 縁色 -> 短い自然文
+        if c.features:
+            tags.append(_w(c.features[0], 1.15, c.emphasis))
+            tags += c.features[1:]
+        if c.outfit:
+            tags.append(_w(c.outfit[0], 1.2, c.emphasis))
+            tags += c.outfit[1:]
+        tags += c.accessories
+        if c.prop:
+            tags.append(c.prop)
+        if c.expression_pose == "both":
+            tags += [c.expression, c.pose]
+        elif c.expression_pose == "expression_only":
+            tags.append(c.expression)
+        if c.print_tag:
+            tags.append(c.print_tag)
+        tags.append(f"{c.accent} trim")
+        tags += c.unrecognized
+        tags.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.")
+        return ", ".join(_dedupe(tags))
+
     tags += c.features
     tags += c.outfit
     tags += c.accessories
@@ -575,7 +668,7 @@ def build_positive(c: Character) -> str:
         tags += [c.expression, c.pose]
     elif c.expression_pose == "expression_only":
         tags.append(c.expression)
-    tags.append(color_anchor)
+    tags.append(f"{c.main} and {c.sub} color scheme with {c.accent} accents")
     tags += c.unrecognized
     return ", ".join(_dedupe(tags))
 
@@ -597,14 +690,16 @@ def build_negative(c: Character) -> str:
         neg.append("halo")
     if "glasses" not in everything:
         neg.append("glasses")
-    if "hat" not in everything and "cap" not in everything and "bonnet" not in everything and "veil" not in everything:
+    if not any(k in everything for k in ("hat", "cap", "bonnet", "veil", "mitre", "tricorne", "crown", "headdress", "hood")):
         neg.append("hat")
     if "heterochromia" not in everything:
         neg.append("heterochromia")
+    if c.consistency == "strict":
+        # 不安定要素は negative でも抑える
+        neg += ["facial mark", "face paint", "body markings"]
+        neg += _alt_color_negatives(c)
     if c.exposure == "modest":
         neg += ["cleavage", "navel", "bare shoulders", "midriff", "nude"]
-    elif c.exposure == "standard":
-        neg += ["nude", "nipples"]
     else:
         neg += ["nude", "nipples"]
     return ", ".join(_dedupe(neg))
@@ -650,8 +745,13 @@ def build_sheet(c: Character) -> str:
         f"# palette    : main={c.main} / sub={c.sub} / accent={c.accent}   pattern={c.pattern}   material={c.material}",
         f"# signature  : {c.prop or '(なし)'}",
         f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
+        f"# consistency: {c.consistency}" + ("（booru タグ骨格 / 色は main+accent の2色 / 不安定要素は省略）" if c.consistency == "strict" else "（詳細説明文）"),
         f"# design     : {design_note}",
     ]
+    if c.consistency == "strict":
+        lines.append("# detail(memo): " + " / ".join(c.outfit_detail))
+        if c.omitted:
+            lines.append("# omitted    : " + " / ".join(c.omitted) + "  (strict では出力しない不安定要素)")
     ex = [f"{k}={','.join(sorted(v))}" for k, v in c.excluded.items() if v]
     if ex:
         lines.append(f"# exclude    : {'  '.join(ex)}")

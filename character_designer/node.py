@@ -18,12 +18,12 @@ ComfyUI ノード: Random Character Designer
 import importlib
 import os
 
-from . import data, engine
+from . import data, engine, outfit_tags
 
 # --- 開発用ホットリロード -----------------------------------------------------
 # data.py / engine.py が更新されていたら、実行時に再読み込みする（ComfyUI の再起動不要）。
 # node.py 自体（入力欄の定義）と js/ の変更は従来どおり再起動 + ブラウザリロードが必要。
-_WATCHED = (data, engine)
+_WATCHED = (data, outfit_tags, engine)
 _MTIMES = {}
 
 
@@ -45,6 +45,7 @@ def _reload_if_changed():
     if _MTIMES:  # 初回は記録だけ
         try:
             # data -> engine の順で reload（engine は data を参照しているため）
+            importlib.reload(outfit_tags)
             importlib.reload(data)
             importlib.reload(engine)
             print("[CharacterDesigner] data.py / engine.py を再読み込みしました")
@@ -83,6 +84,10 @@ class CharacterDesignerNode:
                 "exposure": (["auto", *engine.EXPOSURES], {"default": "auto"}),
                 # tags = SD/Pony/Illustrious 向けのカンマ区切り / natural = Flux/SD3 向けの文章
                 "prompt_style": (["tags", "natural"], {"default": "tags"}),
+                # strict = booru タグ骨格・2色・不安定要素なし（再現性重視） / full = 詳細説明文
+                "consistency": (list(engine.CONSISTENCY), {"default": "strict"}),
+                # strict で主役の服と記号に (tag:1.2) の重みを付ける
+                "emphasis": ("BOOLEAN", {"default": True}),
                 # 表情はキャラのデフォルト顔として含め、ポーズは状況側の責務なので既定では含めない
                 "expression_pose": (["expression_only", "both", "none"], {"default": "expression_only"}),
                 "lock": ("BOOLEAN", {"default": False, "label_on": "locked (use sheet)", "label_off": "generate"}),
@@ -105,7 +110,7 @@ class CharacterDesignerNode:
         # data.py / engine.py を編集したら、同じ入力でもキャッシュを使わず再実行させる
         return str(sorted(_source_mtimes().items()))
 
-    def design(self, brief, exclude, motif, role, personality, seed, twist, exposure, prompt_style, expression_pose, lock, character_sheet):
+    def design(self, brief, exclude, motif, role, personality, seed, twist, exposure, prompt_style, consistency, emphasis, expression_pose, lock, character_sheet):
         _reload_if_changed()
 
         if lock and character_sheet.strip():
@@ -124,6 +129,8 @@ class CharacterDesignerNode:
                 exclude=exclude,
                 prompt_style=prompt_style,
                 expression_pose=expression_pose,
+                consistency=consistency,
+                emphasis=emphasis,
             )
             sheet = engine.build_sheet(character)
             positive = engine.build_positive(character)

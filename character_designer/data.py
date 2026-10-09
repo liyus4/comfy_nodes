@@ -233,6 +233,7 @@ ARCHETYPES = {
         "body": [],
         "accessories": ["bandaged wrist", "{accent} heart-shaped choker", "{sub} cross earring", "twin {sub} ribbon hair bows"],
         "footwear": "black platform shoes with {accent} ribbons",
+        "footwear_tags": ["black platform footwear"],
     },
     "uchiki": {
         "jp": "内気",
@@ -830,7 +831,7 @@ MOTIFS = {
     "jester": {
         "jp": "道化",
         "syn": ["ピエロ", "道化", "クラウン", "ジョーカー", "clown", "jester", "joker", "harlequin"],
-        "features_primary": ["small {accent} teardrop face paint under one eye", "{main} and {sub} jester hat with {accent} bells"],
+        "features_primary": ["{accent} teardrop facial mark under the left eye", "{main} and {sub} jester hat with {accent} bells"],
         "features_optional": ["heterochromia, {main} and {sub} eyes", "painted smile mark on the cheek", "small {accent} bells on the outfit"],
         "palettes": [("purple", "gold", "black"), ("crimson", "white", "black"), ("black", "white", "crimson")],
         "patterns": ["diamond harlequin pattern", "checkered pattern", "playing-card suit motif", "star pattern", "mask motif", "spiral motif", "stripe pattern", "bell motif", "dice motif"],
@@ -2745,6 +2746,38 @@ CHEST_SIZES = ["small breasts", "medium breasts", "large breasts"]
 FOOTWEAR_KEYWORDS = ["shoes", "loafers", "boots", "sneakers", "heels", "sandals", "pumps", "mary janes", "slippers", "barefoot", "geta", "zori", "flats"]
 
 # 品質系（lowres 等）はこのノードの責務外なので入れない。キャラ特徴の整合性に関わるものだけ
+# strict モードで「出さない」不安定要素の判定キーワード（説明文にこれが含まれる記号・小物は省く）
+UNSTABLE_KEYWORDS = [
+    "face paint", "facial mark", "markings", "painted", "paint", "stitch", "cracked",
+    "circuit lines", "tattoo", "body paint", "teardrop",
+]
+
+# strict モードで模様として出せる booru の print タグ（これ以外の模様は出さずシートのメモに残す）
+BOORU_PRINT = {
+    "heart motif": "heart print", "star pattern": "star print", "polka-dot pattern": "polka dot",
+    "plaid pattern": "plaid", "checkered pattern": "checkered", "stripe pattern": "striped",
+    "diagonal stripe pattern": "striped", "floral pattern": "floral print", "flower pattern": "floral print",
+    "small floral motif": "floral print", "paw print motif": "paw print", "cow print": "cow print",
+    "skull motif": "skull print", "bat-wing motif": "bat print", "cat silhouette motif": "cat print",
+    "fish motif": "fish print", "butterfly motif": "butterfly print", "snowflake pattern": "snowflake print",
+    "flame pattern": "flame print", "scale pattern": "scale print", "leaf motif": "leaf print",
+    "rose motif": "rose print", "sakura pattern": "cherry blossom print", "moon motif": "moon print",
+    "crescent moon motif": "crescent print", "cross pattern": "cross print", "gingham pattern": "gingham",
+    "tiger-stripe pattern": "tiger stripes", "camouflage": "camouflage", "cloud motif": "cloud print",
+    "lightning pattern": "lightning bolt print", "wave pattern": "wave print", "feather motif": "feather print",
+    "ribbon motif": "ribbon print", "bone motif": "bone print", "hexagon pattern": "honeycomb print",
+}
+
+# テーマカラー -> 基本色（別色の同じ服を negative に入れる時に「同系色」を除外するため）
+COLOR_BASE = {
+    "black": "black", "white": "white", "crimson": "red", "scarlet": "red", "wine red": "red",
+    "royal blue": "blue", "navy": "blue", "sky blue": "blue", "teal": "green", "emerald green": "green",
+    "olive green": "green", "dark green": "green", "mint": "green", "gold": "yellow", "yellow": "yellow",
+    "silver": "white", "cream": "white", "gray": "black", "pastel pink": "pink", "hot pink": "pink",
+    "purple": "purple", "dark purple": "purple", "lavender": "purple", "orange": "orange", "brown": "brown",
+}
+ALT_COLORS = ["red", "blue", "white", "black", "pink", "green", "purple", "yellow"]
+
 NEGATIVE_BASE = [
     "extra accessories", "mismatched colors",
 ]
@@ -2754,6 +2787,12 @@ NEGATIVE_BASE = [
 # ---------------------------------------------------------------------------
 
 def _validate():
+    from . import outfit_tags as _OT
+    for rk in ROLES:
+        assert rk in _OT.OUTFIT_TAGS, f"outfit_tags.py に {rk} のタグ列が無い"
+        for g in ("female", "male"):
+            for ex in ("modest", "standard", "high"):
+                assert _OT.OUTFIT_TAGS[rk][g][ex], f"outfit_tags[{rk}][{g}][{ex}] が空"
     for mk, m in MOTIFS.items():
         for key in ("classic_roles", "gap_roles"):
             for r in m[key]:
