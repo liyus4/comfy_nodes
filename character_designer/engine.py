@@ -601,6 +601,8 @@ def build_hair_special(level: int, hair: List[str], hair_color: str, palette: Tu
         fill["sub_hair"] = hair_of(accent)
     if fill["accent_hair"] == fill["hair_base"]:
         fill["accent_hair"] = hair_of(sub)
+    if fill["accent_hair"] == fill["sub_hair"]:
+        fill["accent_hair"] = next(h for h in ("white", "black", "silver", "pink") if h not in (fill["hair_base"], fill["sub_hair"]))
     tags: List[str] = []
     nl: List[str] = []
     def take(cat, n, allow):
@@ -1473,7 +1475,7 @@ def build_sheet(c: Character) -> str:
         f"# personality: {arch['jp']} ({c.archetype})",
         f"#   -> {arch['design_jp']}",
         f"# palette    : main={c.main} / sub={c.sub} / accent={c.accent}   pattern={c.pattern}   material={c.material}",
-        f"# handheld   : {c.prop or '(なし)'}   mascot: {c.mascot_nl or '(なし)'}   face mark: {c.face_mark_nl or '(なし)'}",
+        f"# handheld   : {c.prop or '(なし)'}   mascot: {(c.mascot_nl or '(なし)').replace('{poss}', 'her' if c.gender == 'girl' else 'his')}   face mark: {(c.face_mark_nl or '(なし)').replace('{poss}', 'her' if c.gender == 'girl' else 'his')}",
         f"# embellish  : level={c.detail_level}  " + (" / ".join(c.embellish_tags) if c.embellish_tags else "(なし)"),
         f"# silhouette : {D.SILHOUETTES[c.silhouette]['jp'] if c.silhouette else '-'} ({c.silhouette})   shape: {D.SHAPES[c.shape_lang]['jp'] if c.shape_lang else '-'} ({c.shape_lang})   density zones: {', '.join(c.zones) or '-'}",
         f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
