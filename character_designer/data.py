@@ -1858,7 +1858,7 @@ MOTIFS = {
         "jp": "王冠",
         "syn": ["王冠", "王族", "ロイヤル", "王", "crown", "royal", "royalty", "regal"],
         "features_primary": [],
-        "features_optional": ["small {accent} crown", "royal {sub} sash across the chest", "ermine-trimmed cape collar", "{accent} scepter-shaped brooch"],
+        "features_optional": ["small {accent} crown", "ceremonial {sub} sash across the chest", "ermine-trimmed cape collar", "{accent} scepter-shaped brooch"],
         "palettes": [("crimson", "gold", "white"), ("royal blue", "gold", "white"), ("purple", "gold", "white")],
         "patterns": ["crown motif", "fleur-de-lis pattern", "filigree motif", "lion motif", "damask pattern", "checkered pattern", "laurel motif", "star pattern"],
         "props": [],
