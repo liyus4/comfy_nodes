@@ -32,6 +32,7 @@ class Spec:
     gender: Optional[str] = None       # "girl" / "boy"
     motif: Optional[str] = None
     role: Optional[str] = None
+    role2: Optional[str] = None       # 指示文に服装系統が2つあれば2つ目（融合用）
     archetype: Optional[str] = None
     exposure: Optional[str] = None
     hair_color: Optional[str] = None
@@ -127,6 +128,8 @@ def parse_brief(brief: str) -> Spec:
         for r in _lookup(tok, {k: v["syn"] for k, v in D.ROLES.items()}):
             if spec.role is None:
                 spec.role = r
+            elif spec.role2 is None and r != spec.role:
+                spec.role2 = r
             matched = True
         for a in _lookup(tok, {k: v["syn"] for k, v in D.ARCHETYPES.items()}):
             if spec.archetype is None:
@@ -242,6 +245,8 @@ class Character:
     consistency: str = "full"   # "strict" = booru タグ骨格・2色・不安定要素なし / "full" = 詳細説明文
     emphasis: float = 1.6       # strict での重み（主役の服・記号・目の形）。1.0 以下で無効。Anima は SDXL より強めが必要
     eye_intensity: str = "normal"   # 目の形の強弱 slight / normal / strong
+    role2: str = ""                 # 融合した2つ目の服装系統（無ければ空）
+    exposure_tags: List[str] = field(default_factory=list)  # 高露出のときの露出部位タグ
     pattern_base: str = ""      # スタイル修飾なしの模様名
     print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
     outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
@@ -339,6 +344,66 @@ def _expand_items(items, variant: float, keep: Dict[str, bool], rng: random.Rand
     return out
 
 
+_SLOT_RE = None
+
+
+def _slot_patterns():
+    global _SLOT_RE
+    if _SLOT_RE is None:
+        _SLOT_RE = [(slot, [re.compile(r"(?<![a-z])" + re.escape(k) + r"(?![a-z])") for k in kws]) for slot, kws in D.OUTFIT_SLOTS]
+    return _SLOT_RE
+
+
+def classify_slot(item: str) -> str:
+    """服装アイテムを部位スロットに分類する（最初に一致したもの。どれにも当たらなければ accessory）"""
+    low = item.lower()
+    for slot, pats in _slot_patterns():
+        if any(p.search(low) for p in pats):
+            return slot
+    return "accessory"
+
+
+def fuse_outfits(base: List[str], flavor: List[str], rng: random.Random) -> List[str]:
+    """
+    2系統の服装を矛盾なく融合する。
+      - base（土台）はそのまま。主役の服・丈・袖・露出の切り方は土台が決める
+      - flavor（風味）からは頭・顔・手・首・羽織り・腰・識別タグ・小物だけを、スロットが空いていれば取り込む
+      - 頭・羽織り・足・脚は一定確率で flavor 側が土台側を置き換える（どちらが主か seed で揺らぐ）
+      - 上半身・下半身・全身・袖・説明タグは flavor から取らない（ここが矛盾の元）
+    """
+    out = list(base)
+    taken: Dict[str, List[int]] = {}
+    for i, it in enumerate(base):
+        taken.setdefault(classify_slot(it), []).append(i)
+    if "full" in taken:
+        taken.setdefault("top", []); taken.setdefault("bottom", [])
+    counts: Dict[str, int] = {}
+    replaced = set()
+    for it in flavor:
+        slot = classify_slot(it)
+        limit = D.FUSION_TAKE.get(slot)
+        if not limit or counts.get(slot, 0) >= limit:
+            continue
+        if it in out:
+            continue
+        if taken.get(slot):
+            prob = D.FUSION_OVERRIDE.get(slot, 0.0)
+            if 0 in taken[slot]:
+                prob = 0.0  # 先頭＝主役の服は置き換えない
+            if slot not in replaced and prob and rng.random() < prob:
+                # 土台側の同スロットを flavor 側で置き換える
+                for idx in taken[slot]:
+                    out[idx] = ""
+                replaced.add(slot)
+            elif slot in ("identity", "accessory", "neck"):
+                pass  # 複数可
+            else:
+                continue
+        out.append(it)
+        counts[slot] = counts.get(slot, 0) + 1
+    return [x for x in out if x]
+
+
 def _role_available(role: str, gender: str) -> bool:
     role = D.ROLE_ALIASES.get(role, role)
     if role not in D.ROLES:
@@ -370,6 +435,7 @@ def generate(
     consistency: str = "strict",
     emphasis: float = 1.6,
     eye_shape: str = "auto",
+    role2: str = "none",
 ) -> Character:
     strict = consistency == "strict"
     rng = random.Random(seed)
@@ -434,6 +500,20 @@ def generate(
         role_key = _pick(rng, pool)
     role = D.ROLES[role_key]
 
+    # --- 融合する2つ目の服装系統 -----------------------------------------
+    if role2 in D.ROLES:
+        role2_key = role2
+    elif role2 == "random":
+        pool2 = [r for r in _all_roles(gender) if r != role_key and r not in excluded["role"]] or [r for r in _all_roles(gender) if r != role_key]
+        role2_key = _pick(rng, pool2)
+    elif role2 == "none" and spec.role2 and spec.role2 != role_key and _role_available(spec.role2, gender):
+        role2_key = spec.role2
+    else:
+        role2_key = None
+    if role2_key == role_key:
+        role2_key = None
+    role_b = D.ROLES[role2_key] if role2_key else None
+
     # --- 性格アーキタイプ -------------------------------------------------
     if personality != "auto":
         arch_key = personality
@@ -470,6 +550,8 @@ def generate(
         palette_pool = list(motif["palettes"])
     else:
         palette_pool = list(motif["palettes"]) * 2 + list(arch["palettes"]) + list(role.get("palettes", []))
+        if role_b:
+            palette_pool += list(role_b.get("palettes", []))
     main, sub, accent = _pick(rng, palette_pool)
     if spec.theme_color:
         main = spec.theme_color
@@ -631,6 +713,11 @@ def generate(
     variant = rng.random()          # 選択肢の位置（説明文版・タグ版で共有）
     keep: Dict[str, bool] = {}      # 任意小物の採用判断（同上）
     outfit_detail = [_fill(o, slots).replace("print print", "print") for o in _expand_items(outfit_src, variant, keep, rng)]
+    fuse_seed = rng.random()        # 融合の置き換え判断（説明文版・タグ版で共有）
+    if role_b:
+        src_b = role_b["male"][exp] if (gender == "boy" and "male" in role_b) else role_b["outfits"][exp]
+        detail_b = [_fill(o, slots).replace("print print", "print") for o in _expand_items(src_b, variant, dict(keep), random.Random(int(fuse_seed * 1e9)))]
+        outfit_detail = fuse_outfits(outfit_detail, detail_b, random.Random(int(fuse_seed * 1e9) + 1))
     if arch.get("footwear"):
         outfit_detail = [o for o in outfit_detail if not any(k in o for k in D.FOOTWEAR_KEYWORDS)]
         outfit_detail.append(_fill(arch["footwear"], slots))
@@ -638,6 +725,10 @@ def generate(
         # booru の正規タグ列（先頭が主役の服）
         tag_src = OT.OUTFIT_TAGS[role_key]["male" if gender == "boy" else "female"][exp]
         outfit = [_fill(t, slots_strict) for t in _expand_items(tag_src, variant, keep, rng)]
+        if role_b:
+            tag_b = OT.OUTFIT_TAGS[role2_key]["male" if gender == "boy" else "female"][exp]
+            tags_b = [_fill(t, slots_strict) for t in _expand_items(tag_b, variant, dict(keep), random.Random(int(fuse_seed * 1e9)))]
+            outfit = fuse_outfits(outfit, tags_b, random.Random(int(fuse_seed * 1e9) + 1))
         if arch.get("footwear_tags"):
             outfit = [t for t in outfit if not any(k in t for k in D.FOOTWEAR_KEYWORDS)]
             outfit += [_fill(t, slots_strict) for t in arch["footwear_tags"]]
@@ -657,7 +748,16 @@ def generate(
         accessories.append("fang")
 
     # --- シグネチャ小物（1つだけ） -----------------------------------------
-    prop = _fill(_pick(rng, list(motif["props"]) + list(role.get("props", []))) or "", fill_slots)
+    prop_pool = list(motif["props"]) + list(role.get("props", [])) + (list(role_b.get("props", [])) if role_b else [])
+    prop = _fill(_pick(rng, prop_pool) or "", fill_slots)
+
+    # 高露出: 露出アンカー（モデルが穏当に描きがちなので明示する）
+    exposure_tags: List[str] = []
+    if exp == "high":
+        pool_x = D.EXPOSURE_HIGH_EXTRAS_MALE if gender == "boy" else D.EXPOSURE_HIGH_EXTRAS
+        outfit_text = " ".join(outfit + outfit_detail).lower()
+        pool_x = [t for t in pool_x if t not in outfit_text]
+        exposure_tags = [D.EXPOSURE_HIGH_ANCHOR] + _sample(rng, pool_x, 2)
 
     # strict: 模様は booru に print タグがあるものだけ出す
     print_tag = (motif.get("signature_print") or D.BOORU_PRINT.get(base_pattern, "")) if strict else ""
@@ -677,6 +777,7 @@ def generate(
         extras=[], unrecognized=spec.extras, excluded=excluded, prompt_style=prompt_style, expression_pose=expression_pose,
         consistency=consistency, emphasis=emphasis, pattern_base=base_pattern, print_tag=print_tag,
         outfit_detail=outfit_detail, omitted=omitted, eye_choice=chosen, eye_intensity=eye_intensity,
+        role2=role2_key or "", exposure_tags=exposure_tags,
     )
 
 
@@ -719,6 +820,13 @@ def _eye_sentence(c: Character, pron: str, poss: str) -> str:
     if extras:
         parts.append(", ".join(extras))
     return ", ".join(parts) + "."
+
+
+def _exposure_sentence(c: Character, pron: str, poss: str) -> str:
+    if c.exposure != "high" or not c.exposure_tags:
+        return ""
+    parts = ", ".join(c.exposure_tags[1:]) if len(c.exposure_tags) > 1 else "a lot of skin"
+    return f"{poss.capitalize()} outfit is extremely revealing, showing {parts}."
 
 
 def _persona_sentence(c: Character, pron: str, poss: str) -> str:
@@ -784,6 +892,7 @@ def build_positive(c: Character) -> str:
             parts.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim{pat}.")
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
+        parts.append(_exposure_sentence(c, pron, poss))
         parts.append(_eye_sentence(c, pron, poss))
         parts.append(_persona_sentence(c, pron, poss))
         parts = [p for p in parts if p]
@@ -809,6 +918,9 @@ def build_positive(c: Character) -> str:
         if c.outfit:
             tags.append(_w(c.outfit[0], c.emphasis))
             tags += c.outfit[1:]
+        if c.exposure_tags:
+            tags.append(_w(c.exposure_tags[0], round(c.emphasis * 0.9, 2)))
+            tags += c.exposure_tags[1:]
         tags += c.accessories
         signature = _signature_tags(c)
         tags += [_w(t, round(c.emphasis * 0.9, 2)) for t in signature]
@@ -825,11 +937,12 @@ def build_positive(c: Character) -> str:
         tags.append(f"{c.accent} trim")
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.features
     tags += c.outfit
+    tags += c.exposure_tags
     tags += c.accessories
     tags += _signature_tags(c)
     if c.prop:
@@ -884,6 +997,8 @@ def build_negative(c: Character) -> str:
         neg += _alt_color_negatives(c)
     if c.exposure == "modest":
         neg += ["cleavage", "navel", "bare shoulders", "midriff", "nude"]
+    elif c.exposure == "high":
+        neg += list(D.EXPOSURE_HIGH_NEGATIVE) + ["nude", "nipples"]
     else:
         neg += ["nude", "nipples"]
     return ", ".join(_dedupe(neg))
@@ -923,7 +1038,7 @@ def build_sheet(c: Character) -> str:
         f"# seed       : {c.seed}",
         f"# brief      : {c.brief.strip().replace(chr(10), ' / ') if c.brief.strip() else '(なし)'}",
         f"# concept    : {concept}",
-        f"# motif      : {motif['jp']} ({c.motif})   role: {role['jp']} ({c.role})   gender: {c.gender}",
+        f"# motif      : {motif['jp']} ({c.motif})   role: {role['jp']} ({c.role})" + (f" × {D.ROLES[c.role2]['jp']} ({c.role2}) [融合]" if c.role2 else "") + f"   gender: {c.gender}",
         f"# personality: {arch['jp']} ({c.archetype})",
         f"#   -> {arch['design_jp']}",
         f"# palette    : main={c.main} / sub={c.sub} / accent={c.accent}   pattern={c.pattern}   material={c.material}",
