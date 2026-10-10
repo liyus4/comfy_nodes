@@ -811,6 +811,9 @@ def generate(
     # --- シグネチャ小物（1つだけ） -----------------------------------------
     prop_pool = list(motif["props"]) + list(role.get("props", [])) + (list(role_b.get("props", [])) if role_b else [])
     prop = _fill(_pick(rng, prop_pool) or "", fill_slots)
+    # 手持ち小物は "holding" で手に固定する（背景に単独で置かれるのを防ぐ）
+    if prop and not any(w in prop.lower() for w in D.PROP_ANCHORED_WORDS):
+        prop = "holding " + prop
 
     # 高露出: 露出アンカー（モデルが穏当に描きがちなので明示する）
     exposure_tags: List[str] = []
@@ -890,6 +893,15 @@ def _exposure_sentence(c: Character, pron: str, poss: str) -> str:
     return f"{poss.capitalize()} outfit is extremely revealing, showing {parts}."
 
 
+def _theme_sentence(c: Character, pron: str, poss: str) -> str:
+    """モチーフは衣装の装飾として表現し、別の物体として置かせない"""
+    if not c.theme:
+        return ""
+    name = D.MOTIFS[c.theme]["jp"] if False else c.theme.replace("_", " ")
+    pat = c.print_tag or c.pattern_base
+    return f"The {name} motif is worked into {poss} outfit as {pat} and matching accessories, not as separate objects."
+
+
 def _persona_sentence(c: Character, pron: str, poss: str) -> str:
     sig = D.ARCH_SIGNATURE.get(c.archetype)
     if not sig or not sig.get("persona"):
@@ -953,6 +965,7 @@ def build_positive(c: Character) -> str:
             parts.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim{pat}.")
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
+        parts.append(_theme_sentence(c, pron, poss))
         parts.append(_exposure_sentence(c, pron, poss))
         parts.append(_eye_sentence(c, pron, poss))
         parts.append(_persona_sentence(c, pron, poss))
@@ -998,7 +1011,7 @@ def build_positive(c: Character) -> str:
         tags.append(f"{c.accent} trim")
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _theme_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.features
@@ -1055,6 +1068,8 @@ def build_negative(c: Character) -> str:
             neg.append("empty eyes")
         # 不安定要素は negative でも抑える
         neg += ["facial mark", "face paint", "body markings"]
+        # モチーフの小物が背景に単独で置かれるのを抑える
+        neg += ["floating objects", "scattered objects", "objects in background"]
         neg += _alt_color_negatives(c)
     if c.exposure == "modest":
         neg += ["cleavage", "navel", "bare shoulders", "midriff", "nude"]
