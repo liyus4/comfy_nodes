@@ -54,6 +54,19 @@ COLOR_WORDS = {
     "gray": ["灰", "グレー", "gray", "grey"],
 }
 
+# ノードのドロップダウン用: 服の色 / 髪の色 の日本語ラベル
+COLOR_JP = {
+    "black": "黒", "white": "白", "crimson": "赤", "wine red": "ワインレッド", "royal blue": "青", "navy": "紺", "sky blue": "水色",
+    "teal": "青緑", "emerald green": "緑", "mint": "ミント", "gold": "金", "silver": "銀", "pastel pink": "ピンク", "hot pink": "ショッキングピンク",
+    "purple": "紫", "dark purple": "濃紫", "lavender": "ラベンダー", "orange": "オレンジ", "yellow": "黄", "brown": "茶", "cream": "クリーム", "gray": "灰",
+}
+HAIR_COLOR_JP = {
+    "black hair": "黒髪", "white hair": "白髪", "silver hair": "銀髪", "gray hair": "灰色髪", "platinum blonde hair": "プラチナブロンド", "blonde hair": "金髪",
+    "light brown hair": "明るい茶髪", "brown hair": "茶髪", "dark brown hair": "暗い茶髪", "red hair": "赤髪", "dark red hair": "暗い赤髪", "orange hair": "オレンジ髪",
+    "pink hair": "ピンク髪", "hot pink hair": "ショッキングピンク髪", "purple hair": "紫髪", "dark purple hair": "濃紫髪", "lavender hair": "ラベンダー髪",
+    "blue hair": "青髪", "dark blue hair": "紺髪", "light blue hair": "水色髪", "teal hair": "青緑髪", "green hair": "緑髪", "dark green hair": "深緑髪", "mint green hair": "ミント髪",
+}
+
 # テーマカラー -> 髪色タグ（「髪か瞳にテーマカラーを乗せる」ルール用）
 COLOR_TO_HAIR = {
     "black": "black hair", "white": "white hair", "crimson": "red hair",

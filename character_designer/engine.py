@@ -477,6 +477,8 @@ def generate(
     eye_shape: str = "auto",
     role2: str = "none",
     theme: str = "auto",
+    main_color: str = "auto",
+    hair_color: str = "auto",
 ) -> Character:
     strict = consistency == "strict"
     rng = random.Random(seed)
@@ -491,6 +493,11 @@ def generate(
             spec.motif = motif
     if theme in D.THEMES:
         spec.theme = theme
+    # 服の色 / 髪の色のドロップダウン（auto 以外は指示文より優先）
+    if main_color != "auto" and main_color in D.COLOR_JP:
+        spec.theme_color = main_color
+    if hair_color != "auto" and hair_color in D.HAIR_COLOR_JP:
+        spec.hair_color = hair_color
     if role != "auto" and role in D.ROLES:
         spec.role = role
 
