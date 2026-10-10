@@ -100,7 +100,9 @@ class CharacterDesignerNode:
                     "placeholder": "出したくない語（例: 水着, バニー, 高露出, ヤンデレ）",
                     "tooltip": "ランダム選択のプールからモチーフ/服装/性格/露出を外します。明示した指定の方が優先",
                 }),
-                "モチーフ": (_jp_choices(data.MOTIFS), {"default": "自動", "tooltip": "自動以外は指示文より優先"}),
+                "種族": (_jp_choices(data.RACES), {"default": "自動", "tooltip": "体の記号（耳・角・肌）と配色の軸。自動以外は指示文より優先"}),
+                "モチーフ": (["自動", "なし"] + _jp_choices(data.THEMES)[1:], {"default": "自動",
+                             "tooltip": "模様・小物・差し色の軸（星・炎・月…）。自動は35%で付く。自動以外は指示文より優先"}),
                 "服装": (_jp_choices(data.ROLES), {"default": "自動", "tooltip": "自動以外は指示文より優先"}),
                 "服装2": (["なし", "ランダム"] + _jp_choices(data.ROLES)[1:], {"default": "なし",
                           "tooltip": "2つ目の服装系統と融合（服装を土台に、頭・顔・手・首・羽織り・小物を取り込む）。指示文に系統を2つ書いても融合します"}),
@@ -140,7 +142,7 @@ class CharacterDesignerNode:
         # data.py / engine.py を編集したら、同じ入力でもキャッシュを使わず再実行させる
         return str(sorted(_source_mtimes().items()))
 
-    def design(self, 指示文, 除外, モチーフ, 服装, 服装2, 性格, シード, 意外性, 露出, 出力形式, 再現性, 強調, 表情ポーズ, 目の形, 固定, キャラシート):
+    def design(self, 指示文, 除外, 種族, モチーフ, 服装, 服装2, 性格, シード, 意外性, 露出, 出力形式, 再現性, 強調, 表情ポーズ, 目の形, 固定, キャラシート):
         _reload_if_changed()
 
         if 固定 and キャラシート.strip():
@@ -154,7 +156,8 @@ class CharacterDesignerNode:
                 twist=TWIST_JP.get(意外性, "auto"),
                 exposure=EXPOSURE_JP.get(露出, "auto"),
                 personality=_jp_key(性格),
-                motif=_jp_key(モチーフ),
+                motif=_jp_key(種族),
+                theme="none" if モチーフ == "なし" else _jp_key(モチーフ),
                 role=_jp_key(服装),
                 role2="random" if 服装2 == "ランダム" else ("none" if 服装2 == "なし" else _jp_key(服装2)),
                 exclude=除外,

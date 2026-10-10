@@ -30,7 +30,8 @@ TWISTS = ("auto", "classic", "surprise")
 @dataclass
 class Spec:
     gender: Optional[str] = None       # "girl" / "boy"
-    motif: Optional[str] = None
+    motif: Optional[str] = None        # 種族（race）
+    theme: Optional[str] = None        # モチーフ（theme）
     role: Optional[str] = None
     role2: Optional[str] = None       # 指示文に服装系統が2つあれば2つ目（融合用）
     archetype: Optional[str] = None
@@ -95,18 +96,31 @@ def _extract_multiword(brief: str) -> Tuple[str, List[str]]:
     """
     text = brief or ""
     found = []
-    phrases = set()
-    for table in _all_tables():
-        for syns in table.values():
-            for s in syns:
-                if " " in s:
-                    phrases.add(s)
-    for phrase in sorted(phrases, key=len, reverse=True):
-        pat = re.compile(r"(?<![a-z0-9])" + re.escape(phrase) + r"(?![a-z0-9])", re.IGNORECASE)
+    if " " not in text:
+        return text, found
+    for phrase, pat in _multiword_patterns():
         if pat.search(text):
             text = pat.sub(phrase.replace(" ", "_"), text)
             found.append(phrase)
     return text, found
+
+
+_MULTIWORD = None
+
+
+def _multiword_patterns():
+    """空白を含む同義語の正規表現を一度だけコンパイルして使い回す（辞書が大きいので毎回コンパイルすると非常に遅い）"""
+    global _MULTIWORD
+    if _MULTIWORD is None:
+        phrases = set()
+        for table in _all_tables():
+            for syns in table.values():
+                for s in syns:
+                    if " " in s:
+                        phrases.add(s)
+        _MULTIWORD = [(ph, re.compile(r"(?<![a-z0-9])" + re.escape(ph) + r"(?![a-z0-9])", re.IGNORECASE))
+                      for ph in sorted(phrases, key=len, reverse=True)]
+    return _MULTIWORD
 
 
 def parse_brief(brief: str) -> Spec:
@@ -122,7 +136,10 @@ def parse_brief(brief: str) -> Spec:
             spec.gender = g
             matched = True
         for m in _lookup(tok, {k: v["syn"] for k, v in D.MOTIFS.items()}):
-            if spec.motif is None:
+            if D.MOTIFS[m].get("kind") == "theme":
+                if spec.theme is None:
+                    spec.theme = m
+            elif spec.motif is None:
                 spec.motif = m
             matched = True
         for r in _lookup(tok, {k: v["syn"] for k, v in D.ROLES.items()}):
@@ -247,6 +264,7 @@ class Character:
     eye_intensity: str = "normal"   # 目の形の強弱 slight / normal / strong
     role2: str = ""                 # 融合した2つ目の服装系統（無ければ空）
     exposure_tags: List[str] = field(default_factory=list)  # 高露出のときの露出部位タグ
+    theme: str = ""                 # モチーフ（テーマ）のキー（無ければ空）
     pattern_base: str = ""      # スタイル修飾なしの模様名
     print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
     outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
@@ -404,6 +422,28 @@ def fuse_outfits(base: List[str], flavor: List[str], rng: random.Random) -> List
     return [x for x in out if x]
 
 
+def merge_race_theme(race: dict, theme: Optional[dict]) -> dict:
+    """種族（体の記号・肌・配色の軸）にテーマ（模様・小物・差し色の軸）を重ねた「合成モチーフ」を作る"""
+    m = dict(race)
+    m["theme_features"] = []
+    if not theme:
+        return m
+    m["theme_features"] = list(theme.get("features_primary", [])) + list(theme.get("features_optional", []))
+    if not race.get("palette_only"):
+        m["palettes"] = list(race["palettes"]) * 2 + list(theme["palettes"]) * 2
+    m["patterns"] = list(theme["patterns"]) or list(race["patterns"])
+    m["props"] = list(race["props"]) + list(theme["props"])
+    for key in ("classic_roles", "gap_roles", "classic_arch", "gap_arch", "hair_colors", "eye_colors"):
+        merged = list(race.get(key, []))
+        merged += [x for x in theme.get(key, []) if x not in merged]
+        m[key] = merged
+    if not race.get("signature_print") and theme.get("signature_print"):
+        m["signature_print"] = theme["signature_print"]
+    if not race.get("pupils") and theme.get("pupils"):
+        m["pupils"] = theme["pupils"]
+    return m
+
+
 def _role_available(role: str, gender: str) -> bool:
     role = D.ROLE_ALIASES.get(role, role)
     if role not in D.ROLES:
@@ -436,6 +476,7 @@ def generate(
     emphasis: float = 1.6,
     eye_shape: str = "auto",
     role2: str = "none",
+    theme: str = "auto",
 ) -> Character:
     strict = consistency == "strict"
     rng = random.Random(seed)
@@ -444,7 +485,12 @@ def generate(
 
     # ドロップダウン指定（auto 以外）は brief より優先
     if motif != "auto" and motif in D.MOTIFS:
-        spec.motif = motif
+        if D.MOTIFS[motif].get("kind") == "theme":
+            spec.theme = motif
+        else:
+            spec.motif = motif
+    if theme in D.THEMES:
+        spec.theme = theme
     if role != "auto" and role in D.ROLES:
         spec.role = role
 
@@ -457,7 +503,17 @@ def generate(
     else:
         weights = {k: w for k, w in D.MOTIF_WEIGHTS.items() if k not in excluded["motif"]} or dict(D.MOTIF_WEIGHTS)
         motif_key = _weighted_pick(rng, weights)
-    motif = D.MOTIFS[motif_key]
+    # --- テーマ（モチーフ）: 指定 > "none" > 確率で付与 -----------------------
+    if spec.theme:
+        theme_key = spec.theme
+    elif theme == "none":
+        theme_key = None
+    elif rng.random() < D.THEME_PROB:
+        pool_t = [k for k in D.THEMES if k not in excluded["motif"]] or list(D.THEMES)
+        theme_key = _pick(rng, pool_t)
+    else:
+        theme_key = None
+    motif = merge_race_theme(D.MOTIFS[motif_key], D.MOTIFS[theme_key] if theme_key else None)
 
     # --- ギャップ（意外性）判定 ------------------------------------------
     role_fixed = spec.role is not None
@@ -703,6 +759,11 @@ def generate(
         features.append(primary)
     n_opt = 1 if strict else rng.randint(1, 2)
     features += _sample(rng, [f for f in optional_pool if f != primary], n_opt)
+    theme_pool = list(motif.get("theme_features", []))
+    if strict:
+        omitted += [_fill(f, slots) for f in theme_pool if _unstable(f)]
+        theme_pool = [f for f in theme_pool if not _unstable(f)]
+    features += _sample(rng, theme_pool, 1 if strict else rng.randint(1, 2))
     features = [_fill(f, fill_slots) for f in features]
 
     # --- 服装 -------------------------------------------------------------
@@ -777,7 +838,7 @@ def generate(
         extras=[], unrecognized=spec.extras, excluded=excluded, prompt_style=prompt_style, expression_pose=expression_pose,
         consistency=consistency, emphasis=emphasis, pattern_base=base_pattern, print_tag=print_tag,
         outfit_detail=outfit_detail, omitted=omitted, eye_choice=chosen, eye_intensity=eye_intensity,
-        role2=role2_key or "", exposure_tags=exposure_tags,
+        role2=role2_key or "", exposure_tags=exposure_tags, theme=theme_key or "",
     )
 
 
@@ -1038,7 +1099,7 @@ def build_sheet(c: Character) -> str:
         f"# seed       : {c.seed}",
         f"# brief      : {c.brief.strip().replace(chr(10), ' / ') if c.brief.strip() else '(なし)'}",
         f"# concept    : {concept}",
-        f"# motif      : {motif['jp']} ({c.motif})   role: {role['jp']} ({c.role})" + (f" × {D.ROLES[c.role2]['jp']} ({c.role2}) [融合]" if c.role2 else "") + f"   gender: {c.gender}",
+        f"# race       : {motif['jp']} ({c.motif})   motif: " + (f"{D.MOTIFS[c.theme]['jp']} ({c.theme})" if c.theme else "(なし)") + f"   role: {role['jp']} ({c.role})" + (f" × {D.ROLES[c.role2]['jp']} ({c.role2}) [融合]" if c.role2 else "") + f"   gender: {c.gender}",
         f"# personality: {arch['jp']} ({c.archetype})",
         f"#   -> {arch['design_jp']}",
         f"# palette    : main={c.main} / sub={c.sub} / accent={c.accent}   pattern={c.pattern}   material={c.material}",
