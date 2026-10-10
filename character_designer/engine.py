@@ -34,6 +34,7 @@ class Spec:
     theme: Optional[str] = None        # モチーフ（theme）
     role: Optional[str] = None
     role2: Optional[str] = None       # 指示文に服装系統が2つあれば2つ目（融合用）
+    handheld: Optional[str] = None    # 指示文の手持ち（剣・杖・本…）
     archetype: Optional[str] = None
     exposure: Optional[str] = None
     hair_color: Optional[str] = None
@@ -55,12 +56,24 @@ def _syn_hits(token: str, syns: List[str]) -> bool:
     for s in syns:
         s_low = s.lower()
         if s_low.isascii():
-            if re.search(r"(?<![a-z0-9])" + re.escape(s_low) + r"(?![a-z0-9])", low):
+            if _ascii_syn_re(s_low).search(low):
                 return True
         else:
             if s_low in low:
                 return True
     return False
+
+
+_SYN_RE_CACHE: Dict[str, "re.Pattern"] = {}
+
+
+def _ascii_syn_re(s_low: str) -> "re.Pattern":
+    """ASCII 同義語の単語境界つき正規表現をキャッシュする（同義語が多く re の内部キャッシュ(512)を溢れるため）"""
+    pat = _SYN_RE_CACHE.get(s_low)
+    if pat is None:
+        pat = re.compile(r"(?<![a-z0-9])" + re.escape(s_low) + r"(?![a-z0-9])")
+        _SYN_RE_CACHE[s_low] = pat
+    return pat
 
 
 def _lookup(token: str, table: Dict[str, List[str]]) -> List[str]:
@@ -86,6 +99,7 @@ def _all_tables() -> List[Dict[str, List[str]]]:
         D.HAIR_STYLE_WORDS,
         {k: v["syn"] for k, v in D.TRAIT_WORDS.items()},
         {str(k): v for k, v in D.EYE_WORDS.items()},
+        {k: v["syn"] for k, v in D.HANDHELDS.items()},
     ]
 
 
@@ -171,6 +185,10 @@ def parse_brief(brief: str) -> Spec:
             matched = True
         for cat_tag in _lookup(tok, {k: v for k, v in D.EYE_WORDS.items()}):
             spec.eye_tags[cat_tag[0]] = cat_tag[1]
+            matched = True
+        for h in _lookup(tok, {k: v["syn"] for k, v in D.HANDHELDS.items()}):
+            if spec.handheld is None:
+                spec.handheld = h
             matched = True
 
         # 単色ワード（赤・青…）は、他に何も一致しなかった時だけテーマカラーとして扱う
@@ -265,6 +283,8 @@ class Character:
     role2: str = ""                 # 融合した2つ目の服装系統（無ければ空）
     exposure_tags: List[str] = field(default_factory=list)  # 高露出のときの露出部位タグ
     theme: str = ""                 # モチーフ（テーマ）のキー（無ければ空）
+    handheld_tags: List[str] = field(default_factory=list)  # 手持ちの booru タグ（先頭に重み）
+    body_sentences: List[str] = field(default_factory=list)  # 体型指定の文章
     pattern_base: str = ""      # スタイル修飾なしの模様名
     print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
     outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
@@ -444,6 +464,32 @@ def merge_race_theme(race: dict, theme: Optional[dict]) -> dict:
     return m
 
 
+def build_handheld(key: str, rng: random.Random, slots: Dict[str, str]) -> Tuple[List[str], str]:
+    """手持ち（武器・小道具）を seed で決めて、booru タグ列と形状を固定する文章を返す"""
+    spec = D.HANDHELDS[key]
+    type_desc, type_tag = _pick(rng, spec["types"])
+    parts = [_fill(_pick(rng, opts), slots) for opts in spec["slots"].values()]
+    hold_desc, hold_tag = _pick(rng, spec["holds"])
+    hold_desc = _fill(hold_desc, slots)
+    tags = []
+    for t in list(spec["tags"]) + type_tag.split(", ") + hold_tag.split(", "):
+        if t not in tags:
+            tags.append(t)
+    desc = f"{type_desc} with {', '.join(parts)}, {hold_desc}"
+    return tags, desc
+
+
+def _dedupe(items: List[str]) -> List[str]:
+    seen = set()
+    out = []
+    for it in items:
+        key = it.strip().lower()
+        if key and key not in seen:
+            seen.add(key)
+            out.append(it.strip())
+    return out
+
+
 def _role_available(role: str, gender: str) -> bool:
     role = D.ROLE_ALIASES.get(role, role)
     if role not in D.ROLES:
@@ -479,6 +525,10 @@ def generate(
     theme: str = "auto",
     main_color: str = "auto",
     hair_color: str = "auto",
+    handheld: str = "none",
+    bust: str = "auto",
+    height: str = "auto",
+    build: str = "auto",
 ) -> Character:
     strict = consistency == "strict"
     rng = random.Random(seed)
@@ -515,7 +565,7 @@ def generate(
         theme_key = spec.theme
     elif theme == "none":
         theme_key = None
-    elif rng.random() < D.THEME_PROB:
+    elif theme == "random" or rng.random() < D.THEME_PROB:
         pool_t = [k for k in D.THEMES if k not in excluded["motif"]] or list(D.THEMES)
         theme_key = _pick(rng, pool_t)
     else:
@@ -752,6 +802,24 @@ def generate(
         body = [b for b in body if "breasts" not in b] + motif_body
     if arch_key == "mesugaki" and "petite" not in body:
         body.insert(0, "petite")
+    # --- 体型の指定（指定が無ければ従来どおり推奨のまま） ---------------------
+    body_sentences: List[str] = []
+    if height in D.HEIGHT_LEVELS:
+        tags_h, nl_h = D.HEIGHT_LEVELS[height]
+        body = [b for b in body if b not in D.BODY_HEIGHT_TAGS] + tags_h
+        if nl_h:
+            body_sentences.append(f"{'She' if gender == 'girl' else 'He'} is {nl_h}.")
+    if build in D.BUILD_LEVELS:
+        tags_b, nl_b = D.BUILD_LEVELS[build]
+        body = [b for b in body if b not in D.BODY_BUILD_TAGS] + tags_b
+        if nl_b:
+            body_sentences.append(f"{'Her' if gender == 'girl' else 'His'} build is {nl_b}.")
+    if gender == "girl" and bust != "auto":
+        level = next((lv for lv in D.BUST_LEVELS if lv[0] == bust or lv[0].split(" ")[0] == str(bust)), None)
+        if level:
+            body = [b for b in body if b not in D.BODY_BUST_TAGS] + list(level[1])
+            body_sentences.append(f"Her breasts are {level[2]}.")
+    body = _dedupe(body)
 
     # --- モチーフの記号 ---------------------------------------------------
     features = []
@@ -816,11 +884,25 @@ def generate(
         accessories.append("fang")
 
     # --- シグネチャ小物（1つだけ） -----------------------------------------
-    prop_pool = list(motif["props"]) + list(role.get("props", [])) + (list(role_b.get("props", [])) if role_b else [])
-    prop = _fill(_pick(rng, prop_pool) or "", fill_slots)
-    # 手持ち小物は "holding" で手に固定する（背景に単独で置かれるのを防ぐ）
-    if prop and not any(w in prop.lower() for w in D.PROP_ANCHORED_WORDS):
-        prop = "holding " + prop
+    # --- 手持ち（武器・小道具）。既定では何も持たない --------------------------
+    prop = ""
+    handheld_tags: List[str] = []
+    handheld_key = None
+    if handheld == "random":
+        handheld_key = _pick(rng, list(D.HANDHELDS))
+    elif handheld in D.HANDHELDS:
+        handheld_key = handheld
+    elif handheld == "none" and spec.handheld:
+        handheld_key = spec.handheld
+    if handheld_key:
+        handheld_tags, prop = build_handheld(handheld_key, rng, slots)
+    elif handheld == "role":
+        # 服装の小道具（巫女の御幣、ナースの注射器など）
+        prop_pool = list(role.get("props", [])) + (list(role_b.get("props", [])) if role_b else [])
+        prop = _fill(_pick(rng, prop_pool) or "", fill_slots)
+        if prop and not any(w in prop.lower() for w in D.PROP_ANCHORED_WORDS):
+            prop = "holding " + prop
+        handheld_tags = [prop] if prop else []
 
     # 高露出: 露出アンカー（モデルが穏当に描きがちなので明示する）
     exposure_tags: List[str] = []
@@ -848,24 +930,14 @@ def generate(
         extras=[], unrecognized=spec.extras, excluded=excluded, prompt_style=prompt_style, expression_pose=expression_pose,
         consistency=consistency, emphasis=emphasis, pattern_base=base_pattern, print_tag=print_tag,
         outfit_detail=outfit_detail, omitted=omitted, eye_choice=chosen, eye_intensity=eye_intensity,
-        role2=role2_key or "", exposure_tags=exposure_tags, theme=theme_key or "",
+        role2=role2_key or "", exposure_tags=exposure_tags, theme=theme_key or "", handheld_tags=handheld_tags,
+        body_sentences=body_sentences,
     )
 
 
 # ---------------------------------------------------------------------------
 # プロンプト組み立て
 # ---------------------------------------------------------------------------
-
-def _dedupe(items: List[str]) -> List[str]:
-    seen = set()
-    out = []
-    for it in items:
-        key = it.strip().lower()
-        if key and key not in seen:
-            seen.add(key)
-            out.append(it.strip())
-    return out
-
 
 def _w(tag: str, weight: float) -> str:
     """ComfyUI 形式の重み付け (tag:1.6)。weight が 1.0 以下なら素のタグ"""
@@ -907,6 +979,14 @@ def _theme_sentence(c: Character, pron: str, poss: str) -> str:
     name = D.MOTIFS[c.theme]["jp"] if False else c.theme.replace("_", " ")
     pat = c.print_tag or c.pattern_base
     return f"The {name} motif is worked into {poss} outfit as {pat} and matching accessories, not as separate objects."
+
+
+def _handheld_sentence(c: Character, pron: str, poss: str) -> str:
+    if not c.prop:
+        return ""
+    if c.handheld_tags and c.handheld_tags[0] == c.prop:
+        return ""  # 服装の小道具はタグそのもの
+    return f"{pron} holds a {c.prop}."
 
 
 def _persona_sentence(c: Character, pron: str, poss: str) -> str:
@@ -962,7 +1042,7 @@ def build_positive(c: Character) -> str:
         if c.accessories:
             parts.append(f"{pron} also has {'; '.join(c.accessories)}.")
         if c.prop:
-            parts.append(f"{poss.capitalize()} signature item is {c.prop}.")
+            parts.append(f"{pron} holds a {c.prop}.")
         if c.expression_pose == "both":
             parts.append(f"Expression and pose: {c.expression}; {c.pose}.")
         elif c.expression_pose == "expression_only":
@@ -972,6 +1052,7 @@ def build_positive(c: Character) -> str:
             parts.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim{pat}.")
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
+        parts += c.body_sentences
         parts.append(_theme_sentence(c, pron, poss))
         parts.append(_exposure_sentence(c, pron, poss))
         parts.append(_eye_sentence(c, pron, poss))
@@ -1005,8 +1086,9 @@ def build_positive(c: Character) -> str:
         tags += c.accessories
         signature = _signature_tags(c)
         tags += [_w(t, round(c.emphasis * 0.9, 2)) for t in signature]
-        if c.prop:
-            tags.append(c.prop)
+        if c.handheld_tags:
+            tags.append(_w(c.handheld_tags[0], round(c.emphasis * 0.9, 2)))
+            tags += c.handheld_tags[1:]
         # 表情に署名タグと同じ語が含まれていれば重複を除く（"sadistic smirk, looking down at viewer" など）
         expression = ", ".join(x for x in c.expression.split(", ") if x not in signature) or c.expression
         if c.expression_pose == "both":
@@ -1018,7 +1100,7 @@ def build_positive(c: Character) -> str:
         tags.append(f"{c.accent} trim")
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _theme_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.features
@@ -1026,7 +1108,9 @@ def build_positive(c: Character) -> str:
     tags += c.exposure_tags
     tags += c.accessories
     tags += _signature_tags(c)
-    if c.prop:
+    if c.handheld_tags:
+        tags += c.handheld_tags
+    if c.prop and c.prop not in c.handheld_tags:
         tags.append(c.prop)
     if c.expression_pose == "both":
         tags += [c.expression, c.pose]
@@ -1077,6 +1161,10 @@ def build_negative(c: Character) -> str:
         neg += ["facial mark", "face paint", "body markings"]
         # モチーフの小物が背景に単独で置かれるのを抑える
         neg += ["floating objects", "scattered objects", "objects in background"]
+        # 手持ちが無いときは、装飾が手持ち化しないよう抑える（署名に手持ちがある性格は除く）
+        sig = _signature_tags(c)
+        if not c.handheld_tags and not any(s in D.SIGNATURE_HANDHELDS for s in sig) and "holding own head" not in " ".join(c.features):
+            neg += list(D.HANDHELD_NEGATIVE)
         neg += _alt_color_negatives(c)
     if c.exposure == "modest":
         neg += ["cleavage", "navel", "bare shoulders", "midriff", "nude"]
@@ -1125,7 +1213,7 @@ def build_sheet(c: Character) -> str:
         f"# personality: {arch['jp']} ({c.archetype})",
         f"#   -> {arch['design_jp']}",
         f"# palette    : main={c.main} / sub={c.sub} / accent={c.accent}   pattern={c.pattern}   material={c.material}",
-        f"# signature  : {c.prop or '(なし)'}",
+        f"# handheld   : {c.prop or '(なし)'}",
         f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
         f"# eyes       : {' / '.join(c.eyes)}   intensity={c.eye_intensity}   emphasis={c.emphasis}",
         f"# consistency: {c.consistency}" + ("（booru タグ骨格 / 色は main+accent の2色 / 不安定要素は省略）" if c.consistency == "strict" else "（詳細説明文）"),

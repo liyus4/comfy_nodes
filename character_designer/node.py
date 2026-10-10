@@ -101,12 +101,17 @@ class CharacterDesignerNode:
                     "tooltip": "ランダム選択のプールからモチーフ/服装/性格/露出を外します。明示した指定の方が優先",
                 }),
                 "種族": (_jp_choices(data.RACES), {"default": "自動", "tooltip": "体の記号（耳・角・肌）と配色の軸。自動以外は指示文より優先"}),
-                "モチーフ": (["自動", "なし"] + _jp_choices(data.THEMES)[1:], {"default": "自動",
-                             "tooltip": "模様・小物・差し色の軸（星・炎・月…）。自動は35%で付く。自動以外は指示文より優先"}),
+                "モチーフ": (["自動", "なし", "ランダム"] + _jp_choices(data.THEMES)[1:], {"default": "自動",
+                             "tooltip": "模様・小物・差し色の軸。自動=指示文の指定 > 35%で付く / なし=付けない / ランダム=必ず付く / 指定"}),
                 "服装": (_jp_choices(data.ROLES), {"default": "自動", "tooltip": "自動以外は指示文より優先"}),
                 "服装2": (["なし", "ランダム"] + _jp_choices(data.ROLES)[1:], {"default": "なし",
                           "tooltip": "2つ目の服装系統と融合（服装を土台に、頭・顔・手・首・羽織り・小物を取り込む）。指示文に系統を2つ書いても融合します"}),
                 "性格": (_jp_choices(data.ARCHETYPES), {"default": "自動", "tooltip": "自動以外は指示文より優先"}),
+                "手持ち": (["なし", "ランダム", "服装の小道具"] + [f"{v['jp']} ({k})" for k, v in data.HANDHELDS.items()], {"default": "なし",
+                           "tooltip": "武器・小道具。種類・刃や柄の色・飾り・持ち方まで seed で固定。なし=何も持たない（装飾が手持ち化しないよう negative も入る）"}),
+                "胸": (["自動"] + [lv[0] for lv in data.BUST_LEVELS], {"default": "自動", "tooltip": "0=flat chest … 5=gigantic、6以降は重みと文章でさらに大きく。自動は種族・性格の推奨"}),
+                "身長": (["自動"] + list(data.HEIGHT_LEVELS), {"default": "自動"}),
+                "体型": (["自動"] + list(data.BUILD_LEVELS), {"default": "自動", "tooltip": "華奢/細身/普通/むっちり/ぽっちゃり/筋肉質。自動は種族・性格の推奨"}),
                 "服の色": (["自動"] + [f"{jp} ({k})" for k, jp in data.COLOR_JP.items()], {"default": "自動",
                            "tooltip": "服のメインカラー。自動は種族・性格・服装の推奨パレットから。指定時も縁色などは推奨から補完"}),
                 "髪の色": (["自動"] + [f"{jp} ({k})" for k, jp in data.HAIR_COLOR_JP.items()], {"default": "自動",
@@ -146,7 +151,7 @@ class CharacterDesignerNode:
         # data.py / engine.py を編集したら、同じ入力でもキャッシュを使わず再実行させる
         return str(sorted(_source_mtimes().items()))
 
-    def design(self, 指示文, 除外, 種族, モチーフ, 服装, 服装2, 性格, 服の色, 髪の色, シード, 意外性, 露出, 出力形式, 再現性, 強調, 表情ポーズ, 目の形, 固定, キャラシート):
+    def design(self, 指示文, 除外, 種族, モチーフ, 服装, 服装2, 性格, 手持ち, 胸, 身長, 体型, 服の色, 髪の色, シード, 意外性, 露出, 出力形式, 再現性, 強調, 表情ポーズ, 目の形, 固定, キャラシート):
         _reload_if_changed()
 
         if 固定 and キャラシート.strip():
@@ -161,10 +166,14 @@ class CharacterDesignerNode:
                 exposure=EXPOSURE_JP.get(露出, "auto"),
                 personality=_jp_key(性格),
                 motif=_jp_key(種族),
-                theme="none" if モチーフ == "なし" else _jp_key(モチーフ),
+                theme={"なし": "none", "ランダム": "random"}.get(モチーフ) or _jp_key(モチーフ),
                 role=_jp_key(服装),
                 role2="random" if 服装2 == "ランダム" else ("none" if 服装2 == "なし" else _jp_key(服装2)),
                 exclude=除外,
+                handheld={"なし": "none", "ランダム": "random", "服装の小道具": "role"}.get(手持ち) or _jp_key(手持ち),
+                bust=胸 if 胸 != "自動" else "auto",
+                height=身長 if 身長 != "自動" else "auto",
+                build=体型 if 体型 != "自動" else "auto",
                 main_color=_jp_key(服の色),
                 hair_color=_jp_key(髪の色),
                 prompt_style=STYLE_JP.get(出力形式, "tags"),
