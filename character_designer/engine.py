@@ -501,7 +501,7 @@ def _dedupe(items: List[str]) -> List[str]:
 
 def build_embellishments(level: int, outfit: List[str], gender: str, exposure: str, shape: str, tech_affinity: bool,
                          features_text: str, rng: random.Random, slots: Dict[str, str],
-                         zones: Optional[List[str]] = None) -> Tuple[List[str], List[str], str]:
+                         zones: Optional[List[str]] = None, shape_lang: str = "", damage_affinity: bool = False) -> Tuple[List[str], List[str], str]:
     """
     装飾レイヤー。服装の部位スロットと衝突しないようにアドオンを選ぶ。
     返り値: (タグ列, 文章の断片, 象徴的な一点のタグ)
@@ -524,6 +524,8 @@ def build_embellishments(level: int, outfit: List[str], gender: str, exposure: s
         if entry.get("shape") and not shape:
             return False
         if entry.get("requires") and entry["requires"] not in outfit_text:
+            return False
+        if entry.get("shape_not") and shape_lang in entry["shape_not"]:
             return False
         slot = entry["slot"]
         if slot in used:
@@ -556,6 +558,8 @@ def build_embellishments(level: int, outfit: List[str], gender: str, exposure: s
     weights = dict(D.EMBELLISH_WEIGHTS)
     if tech_affinity:
         weights["tech"] = 4
+    if damage_affinity:
+        weights["damage"] = 4
     # 非対称化を1つは優先的に入れる（VTuber 的な「読める」シルエット）
     order = ["asymmetry"] + rng.choices(list(weights), weights=list(weights.values()), k=n_small * 3)
 
@@ -1025,7 +1029,8 @@ def generate(
     emb_rng = random.Random(seed * 7919 + 17)
     embellish_tags, embellish_nl, iconic_tag = build_embellishments(
         detail_level, outfit, gender, exp, shape, tech_aff, " ".join(features).lower(), emb_rng, fill_slots,
-        zones if detail_level >= 1 else None)
+        zones if detail_level >= 1 else None, shape_key,
+        (motif_key in D.DAMAGE_AFFINITY) or (theme_key in D.DAMAGE_AFFINITY) or (arch_key in D.DAMAGE_AFFINITY))
     if strict:
         # 説明文版（シートのメモ）にも同じ内容を足しておく
         outfit_detail = outfit_detail + embellish_tags
@@ -1119,8 +1124,8 @@ def _eye_sentence(c: Character, pron: str, poss: str) -> str:
 def _exposure_sentence(c: Character, pron: str, poss: str) -> str:
     if c.exposure != "high" or not c.exposure_tags:
         return ""
-    parts = ", ".join(c.exposure_tags)
-    return f"{poss.capitalize()} outfit shows a lot of skin: {parts}."
+    spots = [D.EXPOSURE_SPOT_NL.get(t, t) for t in c.exposure_tags]
+    return f"The exposure is focused on {' and '.join(spots)}; the rest of {poss} body stays covered."
 
 
 def _theme_sentence(c: Character, pron: str, poss: str) -> str:
@@ -1130,6 +1135,12 @@ def _theme_sentence(c: Character, pron: str, poss: str) -> str:
     name = D.MOTIFS[c.theme]["jp"] if False else c.theme.replace("_", " ")
     pat = c.print_tag or c.pattern_base
     return f"The {name} motif is worked into {poss} outfit as {pat} and matching accessories, not as separate objects."
+
+
+def _color_sentence(c: Character, pron: str, poss: str) -> str:
+    """調査: 70/25/5 の比率、残りは無彩色と金銀、瞳だけ彩度を上げる"""
+    return (f"Color ratio: {c.main} about 70%, {c.sub} about 25%, {c.accent} about 5% as trim; any remaining areas are white, black or metallic. "
+            f"{poss.capitalize()} eyes are the most saturated color in the design.")
 
 
 def _silhouette_sentence(c: Character, pron: str, poss: str) -> str:
@@ -1239,6 +1250,7 @@ def build_positive(c: Character) -> str:
             parts.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim{pat}.")
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
+        parts.append(_color_sentence(c, pron, poss))
         parts.append(_embellish_sentence(c, pron, poss))
         parts.append(_silhouette_sentence(c, pron, poss))
         parts.append(_hair_sentence(c, pron, poss))
@@ -1294,7 +1306,7 @@ def build_positive(c: Character) -> str:
         tags.append(f"{c.accent} trim")
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.features
