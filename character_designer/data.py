@@ -153,7 +153,7 @@ GENDER_WORDS = {
 EXPOSURE_WORDS = {
     "high": ["高露出", "露出高", "露出多", "露出度高", "セクシー", "エロ", "sexy", "revealing", "skimpy"],
     "modest": ["低露出", "露出少", "露出控えめ", "控えめ", "露出なし", "modest", "conservative"],
-    "standard": ["普通の露出", "standard exposure"],
+    "standard": ["標準露出", "標準", "普通の露出", "普通", "standard exposure", "normal exposure"],
 }
 
 # ---------------------------------------------------------------------------
