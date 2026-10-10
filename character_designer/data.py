@@ -4109,6 +4109,54 @@ EMBELLISHMENTS = {
         {"tags": ["mechanical ears", "{main} mechanical ear covers with {accent} lights"], "nl": "mechanical ear covers with {accent} lights", "slot": "ears"},
     ],
 }
+# 髪の個性（装飾量に連動）。silhouette=形、color=配色、tie=結び方（土台の髪型に結びがあれば入れない）
+HAIR_SPECIAL = {
+    "silhouette": [
+        {"tags": ["hair wings"], "nl": "hair shaped into wing-like tufts at the sides"},
+        {"tags": ["heart ahoge"], "nl": "a heart-shaped ahoge"},
+        {"tags": ["huge ahoge"], "nl": "one huge ahoge standing up"},
+        {"tags": ["hair cones"], "nl": "hair gathered into two cone shapes"},
+        {"tags": ["hair rings", "{accent} hair rings"], "nl": "{accent} rings threaded onto the hair"},
+        {"tags": ["hair tubes", "{accent} hair tubes"], "nl": "{accent} tubes holding the hair strands"},
+        {"tags": ["hair bell", "{accent} hair bells"], "nl": "small {accent} bells tied into the hair"},
+        {"tags": ["braided sidelocks"], "nl": "braided sidelocks"},
+        {"tags": ["floating hair"], "nl": "hair floating as if weightless"},
+        {"tags": ["absurdly long hair"], "nl": "absurdly long hair trailing on the ground", "length": True},
+        {"tags": ["hair spread out"], "nl": "hair spread out behind"},
+        {"tags": ["ringlets", "{accent} ribbons on the ringlets"], "nl": "ringlets tied with {accent} ribbons"},
+        {"tags": ["hair over shoulder"], "nl": "hair draped forward over one shoulder"},
+        {"tags": ["x hair ornament", "{accent} x-shaped hair ornament"], "nl": "an x-shaped {accent} hair ornament"},
+        {"tags": ["hair bobbles", "{accent} hair bobbles"], "nl": "{accent} hair bobbles"},
+        {"tags": ["{shape}-shaped {accent} hair ornament"], "nl": "a {shape}-shaped {accent} hair ornament", "shape": True},
+    ],
+    "color": [
+        {"tags": ["split-color hair", "{hair_base} and {sub_hair} split-color hair"], "nl": "hair split down the middle into {hair_base} and {sub_hair}"},
+        {"tags": ["two-tone hair", "{sub_hair} two-tone hair"], "nl": "two-tone hair mixing {hair_base} with {sub_hair}"},
+        {"tags": ["gradient hair", "gradient to {accent_hair} at the tips"], "nl": "hair fading to {accent_hair} at the tips"},
+        {"tags": ["colored inner hair", "{accent_hair} inner hair"], "nl": "{accent_hair} inner hair"},
+        {"tags": ["colored tips", "{accent_hair} tips"], "nl": "{accent_hair} colored tips"},
+        {"tags": ["streaked hair", "{accent_hair} streaks"], "nl": "{accent_hair} streaks through the hair"},
+        {"tags": ["single colored sidelock", "one {accent_hair} sidelock"], "nl": "a single {accent_hair} sidelock"},
+        {"tags": ["dyed bangs", "{accent_hair} bangs"], "nl": "bangs dyed {accent_hair}"},
+        {"tags": ["multicolored hair", "{hair_base} with {sub_hair} and {accent_hair} strands"], "nl": "multicolored strands of {sub_hair} and {accent_hair}"},
+    ],
+    "tie": [
+        {"tags": ["folded ponytail"], "nl": "a folded ponytail"},
+        {"tags": ["multi-tied hair"], "nl": "hair tied in several sections down its length"},
+        {"tags": ["twin drills"], "nl": "twin drill curls"},
+        {"tags": ["crown braid"], "nl": "a crown braid"},
+        {"tags": ["half updo"], "nl": "a half updo"},
+        {"tags": ["high ponytail", "hair tube"], "nl": "a high ponytail held by a hair tube"},
+        {"tags": ["low twintails"], "nl": "low twintails"},
+        {"tags": ["side braid"], "nl": "a thick side braid"},
+        {"tags": ["double bun", "hair bun covers"], "nl": "double buns with covers"},
+    ],
+}
+HAIR_TIE_KEYWORDS = ["twintail", "ponytail", "bun", "braid", "drill", "updo", "tail", "twin"]
+# 装飾量 -> (silhouette, color, tie) の個数
+HAIR_SPECIAL_LEVELS = {0: (0, 0, 0), 1: (0, 1, 0), 2: (1, 1, 0), 3: (2, 1, 1)}
+HAIR_SPECIAL_PROB = {1: 0.6, 2: 0.9, 3: 1.0}  # 色の特徴を付ける確率
+
 # 装飾量 -> (小さなアドオンの数, 象徴的な一点を付けるか)
 EMBELLISH_LEVELS = {0: (0, False), 1: (2, False), 2: (3, True), 3: (5, True)}
 # カテゴリの重み（テックは種族/モチーフが機械系なら engine が上げる）

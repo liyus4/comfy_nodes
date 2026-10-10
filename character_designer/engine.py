@@ -289,6 +289,7 @@ class Character:
     embellish_nl: List[str] = field(default_factory=list)    # 装飾レイヤーの文章断片
     iconic_tag: str = ""                                     # 象徴的な一点（重み付き）
     detail_level: int = 0
+    hair_special_nl: List[str] = field(default_factory=list)  # 髪の個性の文章断片
     pattern_base: str = ""      # スタイル修飾なしの模様名
     print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
     outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
@@ -559,6 +560,39 @@ def build_embellishments(level: int, outfit: List[str], gender: str, exposure: s
         if cands:
             apply(_pick(rng, cands))
     return out_tags, nl_parts, iconic_tag
+
+
+def build_hair_special(level: int, hair: List[str], hair_color: str, palette: Tuple[str, str, str], shape: str,
+                       rng: random.Random) -> Tuple[List[str], List[str]]:
+    """髪の個性（装飾量に連動）。土台の髪型と結び方が衝突しないよう判定する"""
+    n_sil, n_col, n_tie = D.HAIR_SPECIAL_LEVELS.get(level, (0, 0, 0))
+    if not (n_sil or n_col or n_tie):
+        return [], []
+    base = " ".join(hair).lower()
+    main, sub, accent = palette
+    def hair_of(color):
+        return D.COLOR_TO_HAIR.get(color, color + " hair").replace(" hair", "")
+    fill = {"main": main, "sub": sub, "accent": accent, "shape": shape or "star",
+            "hair_base": hair_color.replace(" hair", ""), "sub_hair": hair_of(sub), "accent_hair": hair_of(accent)}
+    if fill["sub_hair"] == fill["hair_base"]:
+        fill["sub_hair"] = hair_of(accent)
+    if fill["accent_hair"] == fill["hair_base"]:
+        fill["accent_hair"] = hair_of(sub)
+    tags: List[str] = []
+    nl: List[str] = []
+    def take(cat, n, allow):
+        cands = [x for x in D.HAIR_SPECIAL[cat] if allow(x)]
+        for x in _sample(rng, cands, n):
+            tags.extend(_fill(t, fill) for t in x["tags"])
+            nl.append(_fill(x["nl"], fill))
+    has_tie = any(k in base for k in D.HAIR_TIE_KEYWORDS)
+    is_short = "short" in base or "bob" in base
+    take("silhouette", n_sil, lambda x: not (x.get("shape") and not shape) and not (x.get("length") and is_short))
+    if n_col and rng.random() < D.HAIR_SPECIAL_PROB.get(level, 0):
+        take("color", n_col, lambda x: True)
+    if n_tie and not has_tie and not is_short:
+        take("tie", n_tie, lambda x: True)
+    return tags, nl
 
 
 def _role_available(role: str, gender: str) -> bool:
@@ -965,6 +999,8 @@ def generate(
     if strict:
         # 説明文版（シートのメモ）にも同じ内容を足しておく
         outfit_detail = outfit_detail + embellish_tags
+    hair_special_tags, hair_special_nl = build_hair_special(detail_level, hair, hair_color, palette, shape, random.Random(seed * 104729 + 3))
+    hair = hair + hair_special_tags
 
     # --- 手持ち（武器・小道具）。既定では何も持たない --------------------------
     prop = ""
@@ -1014,7 +1050,7 @@ def generate(
         outfit_detail=outfit_detail, omitted=omitted, eye_choice=chosen, eye_intensity=eye_intensity,
         role2=role2_key or "", exposure_tags=exposure_tags, theme=theme_key or "", handheld_tags=handheld_tags,
         body_sentences=body_sentences, embellish_tags=embellish_tags, embellish_nl=embellish_nl, iconic_tag=iconic_tag,
-        detail_level=detail_level,
+        detail_level=detail_level, hair_special_nl=hair_special_nl,
     )
 
 
@@ -1062,6 +1098,12 @@ def _theme_sentence(c: Character, pron: str, poss: str) -> str:
     name = D.MOTIFS[c.theme]["jp"] if False else c.theme.replace("_", " ")
     pat = c.print_tag or c.pattern_base
     return f"The {name} motif is worked into {poss} outfit as {pat} and matching accessories, not as separate objects."
+
+
+def _hair_sentence(c: Character, pron: str, poss: str) -> str:
+    if not c.hair_special_nl:
+        return ""
+    return f"{poss.capitalize()} hair has {'; '.join(c.hair_special_nl)}."
 
 
 def _embellish_sentence(c: Character, pron: str, poss: str) -> str:
@@ -1154,6 +1196,7 @@ def build_positive(c: Character) -> str:
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
         parts.append(_embellish_sentence(c, pron, poss))
+        parts.append(_hair_sentence(c, pron, poss))
         parts += c.body_sentences
         parts.append(_theme_sentence(c, pron, poss))
         parts.append(_exposure_sentence(c, pron, poss))
@@ -1205,7 +1248,7 @@ def build_positive(c: Character) -> str:
         tags.append(f"{c.accent} trim")
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _embellish_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _embellish_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.features
