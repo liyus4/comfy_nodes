@@ -290,6 +290,10 @@ class Character:
     iconic_tag: str = ""                                     # 象徴的な一点（重み付き）
     detail_level: int = 0
     hair_special_nl: List[str] = field(default_factory=list)  # 髪の個性の文章断片
+    silhouette: str = ""
+    shape_lang: str = ""
+    zones: List[str] = field(default_factory=list)
+    silhouette_tags: List[str] = field(default_factory=list)
     pattern_base: str = ""      # スタイル修飾なしの模様名
     print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
     outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
@@ -496,7 +500,8 @@ def _dedupe(items: List[str]) -> List[str]:
 
 
 def build_embellishments(level: int, outfit: List[str], gender: str, exposure: str, shape: str, tech_affinity: bool,
-                         features_text: str, rng: random.Random, slots: Dict[str, str]) -> Tuple[List[str], List[str], str]:
+                         features_text: str, rng: random.Random, slots: Dict[str, str],
+                         zones: Optional[List[str]] = None) -> Tuple[List[str], List[str], str]:
     """
     装飾レイヤー。服装の部位スロットと衝突しないようにアドオンを選ぶ。
     返り値: (タグ列, 文章の断片, 象徴的な一点のタグ)
@@ -553,17 +558,25 @@ def build_embellishments(level: int, outfit: List[str], gender: str, exposure: s
         weights["tech"] = 4
     # 非対称化を1つは優先的に入れる（VTuber 的な「読める」シルエット）
     order = ["asymmetry"] + rng.choices(list(weights), weights=list(weights.values()), k=n_small * 3)
+
+    def in_zone(entry) -> bool:
+        return not zones or D.SLOT_ZONE.get(entry["slot"], "torso") in zones
+
     for cat in order:
         if len(nl_parts) - (1 if iconic_tag else 0) >= n_small:
             break
         cands = [x for x in D.EMBELLISHMENTS[cat] if usable(x)]
-        if cands:
+        # 情報量ゾーン: 集めるゾーンのアドオンを優先（無ければ他から）
+        zoned = [x for x in cands if in_zone(x)]
+        if zoned:
+            apply(_pick(rng, zoned))
+        elif cands and rng.random() < 0.3:
             apply(_pick(rng, cands))
     return out_tags, nl_parts, iconic_tag
 
 
 def build_hair_special(level: int, hair: List[str], hair_color: str, palette: Tuple[str, str, str], shape: str,
-                       rng: random.Random) -> Tuple[List[str], List[str]]:
+                       rng: random.Random, prefer: Optional[List[str]] = None) -> Tuple[List[str], List[str]]:
     """髪の個性（装飾量に連動）。土台の髪型と結び方が衝突しないよう判定する"""
     n_sil, n_col, n_tie = D.HAIR_SPECIAL_LEVELS.get(level, (0, 0, 0))
     if not (n_sil or n_col or n_tie):
@@ -582,6 +595,11 @@ def build_hair_special(level: int, hair: List[str], hair_color: str, palette: Tu
     nl: List[str] = []
     def take(cat, n, allow):
         cands = [x for x in D.HAIR_SPECIAL[cat] if allow(x)]
+        # シルエットに合う語を含む候補を優先（半分の確率）
+        if prefer and rng.random() < 0.5:
+            pref = [x for x in cands if any(p in " ".join(x["tags"]).lower() for p in prefer)]
+            if pref:
+                cands = pref
         for x in _sample(rng, cands, n):
             tags.extend(_fill(t, fill) for t in x["tags"])
             nl.append(_fill(x["nl"], fill))
@@ -635,6 +653,8 @@ def generate(
     height: str = "auto",
     build: str = "auto",
     detail_level: int = 2,
+    silhouette: str = "auto",
+    shape_lang: str = "auto",
 ) -> Character:
     strict = consistency == "strict"
     rng = random.Random(seed)
@@ -990,16 +1010,27 @@ def generate(
         accessories.append("fang")
 
     # --- シグネチャ小物（1つだけ） -----------------------------------------
+    # --- シルエット設計・シェイプ言語・情報量ゾーン ---------------------------
+    sil_rng = random.Random(seed * 31337 + 5)
+    sil_key = silhouette if silhouette in D.SILHOUETTES else _pick(sil_rng, list(D.SILHOUETTES))
+    sil = D.SILHOUETTES[sil_key]
+    zones = list(sil["zones"])
+    shape_key = shape_lang if shape_lang in D.SHAPES else D.ARCH_SHAPE.get(arch_key, "round")
+    shape_spec = D.SHAPES[shape_key]
+    silhouette_tags = list(sil["tags"]) + (list(shape_spec["tags"]) if detail_level >= 1 else [])
+
     # --- 装飾レイヤー（独自性） -------------------------------------------------
     shape = D.SHAPE_WORDS.get(theme_key or "", "") or D.SHAPE_WORDS.get(motif_key, "")
     tech_aff = (motif_key in D.TECH_AFFINITY) or (theme_key in D.TECH_AFFINITY)
     emb_rng = random.Random(seed * 7919 + 17)
     embellish_tags, embellish_nl, iconic_tag = build_embellishments(
-        detail_level, outfit, gender, exp, shape, tech_aff, " ".join(features).lower(), emb_rng, fill_slots)
+        detail_level, outfit, gender, exp, shape, tech_aff, " ".join(features).lower(), emb_rng, fill_slots,
+        zones if detail_level >= 1 else None)
     if strict:
         # 説明文版（シートのメモ）にも同じ内容を足しておく
         outfit_detail = outfit_detail + embellish_tags
-    hair_special_tags, hair_special_nl = build_hair_special(detail_level, hair, hair_color, palette, shape, random.Random(seed * 104729 + 3))
+    hair_special_tags, hair_special_nl = build_hair_special(detail_level, hair, hair_color, palette, shape, random.Random(seed * 104729 + 3),
+                                                            prefer=sil.get("hair", []))
     hair = hair + hair_special_tags
 
     # --- 手持ち（武器・小道具）。既定では何も持たない --------------------------
@@ -1051,6 +1082,7 @@ def generate(
         role2=role2_key or "", exposure_tags=exposure_tags, theme=theme_key or "", handheld_tags=handheld_tags,
         body_sentences=body_sentences, embellish_tags=embellish_tags, embellish_nl=embellish_nl, iconic_tag=iconic_tag,
         detail_level=detail_level, hair_special_nl=hair_special_nl,
+        silhouette=sil_key, shape_lang=shape_key, zones=zones, silhouette_tags=silhouette_tags,
     )
 
 
@@ -1098,6 +1130,18 @@ def _theme_sentence(c: Character, pron: str, poss: str) -> str:
     name = D.MOTIFS[c.theme]["jp"] if False else c.theme.replace("_", " ")
     pat = c.print_tag or c.pattern_base
     return f"The {name} motif is worked into {poss} outfit as {pat} and matching accessories, not as separate objects."
+
+
+def _silhouette_sentence(c: Character, pron: str, poss: str) -> str:
+    if not c.silhouette:
+        return ""
+    parts = [D.SILHOUETTES[c.silhouette]["nl"].capitalize() + "."]
+    if c.detail_level >= 1 and c.shape_lang:
+        parts.append(D.SHAPES[c.shape_lang]["nl"].capitalize() + ".")
+    if c.detail_level >= 1 and c.zones:
+        rest = [z for z in D.ZONE_JP if z not in c.zones]
+        parts.append(f"Design density is concentrated at the {' and '.join(D.ZONE_JP[z] for z in c.zones)}; the {', '.join(D.ZONE_JP[z] for z in rest)} are kept plain as visual rest areas.")
+    return " ".join(parts)
 
 
 def _hair_sentence(c: Character, pron: str, poss: str) -> str:
@@ -1196,6 +1240,7 @@ def build_positive(c: Character) -> str:
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
         parts.append(_embellish_sentence(c, pron, poss))
+        parts.append(_silhouette_sentence(c, pron, poss))
         parts.append(_hair_sentence(c, pron, poss))
         parts += c.body_sentences
         parts.append(_theme_sentence(c, pron, poss))
@@ -1227,6 +1272,7 @@ def build_positive(c: Character) -> str:
             tags += c.outfit[1:]
         for t in c.embellish_tags:
             tags.append(_w(t, c.emphasis) if t == c.iconic_tag else t)
+        tags += c.silhouette_tags
         if c.exposure_tags:
             tags.append(_w(c.exposure_tags[0], round(c.emphasis * 0.9, 2)))
             tags += c.exposure_tags[1:]
@@ -1248,12 +1294,13 @@ def build_positive(c: Character) -> str:
         tags.append(f"{c.accent} trim")
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _embellish_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.features
     tags += c.outfit
     tags += c.embellish_tags
+    tags += c.silhouette_tags
     tags += c.exposure_tags
     tags += c.accessories
     tags += _signature_tags(c)
@@ -1310,6 +1357,9 @@ def build_negative(c: Character) -> str:
         neg += ["facial mark", "face paint", "body markings"]
         # モチーフの小物が背景に単独で置かれるのを抑える
         neg += ["floating objects", "scattered objects", "objects in background"]
+        # シェイプ言語の反対の形を抑える
+        if c.detail_level >= 1 and c.shape_lang:
+            neg += list(D.SHAPES[c.shape_lang]["neg"])
         # 手持ちが無いときは、装飾が手持ち化しないよう抑える（署名に手持ちがある性格は除く）
         sig = _signature_tags(c)
         if not c.handheld_tags and not any(s in D.SIGNATURE_HANDHELDS for s in sig) and "holding own head" not in " ".join(c.features):
@@ -1364,6 +1414,7 @@ def build_sheet(c: Character) -> str:
         f"# palette    : main={c.main} / sub={c.sub} / accent={c.accent}   pattern={c.pattern}   material={c.material}",
         f"# handheld   : {c.prop or '(なし)'}",
         f"# embellish  : level={c.detail_level}  " + (" / ".join(c.embellish_tags) if c.embellish_tags else "(なし)"),
+        f"# silhouette : {D.SILHOUETTES[c.silhouette]['jp'] if c.silhouette else '-'} ({c.silhouette})   shape: {D.SHAPES[c.shape_lang]['jp'] if c.shape_lang else '-'} ({c.shape_lang})   density zones: {', '.join(c.zones) or '-'}",
         f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
         f"# eyes       : {' / '.join(c.eyes)}   intensity={c.eye_intensity}   emphasis={c.emphasis}",
         f"# consistency: {c.consistency}" + ("（booru タグ骨格 / 色は main+accent の2色 / 不安定要素は省略）" if c.consistency == "strict" else "（詳細説明文）"),

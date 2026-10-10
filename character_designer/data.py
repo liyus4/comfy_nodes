@@ -4158,6 +4158,48 @@ HAIR_SPECIAL_LEVELS = {0: (0, 0, 0), 1: (0, 1, 0), 2: (1, 1, 0), 3: (2, 1, 1)}
 HAIR_SPECIAL_PROB = {1: 0.6, 2: 0.9, 3: 1.0}  # 色の特徴を付ける確率
 
 # 装飾量 -> (小さなアドオンの数, 象徴的な一点を付けるか)
+# ---------------------------------------------------------------------------
+# シルエット設計（調査: 第一印象の7割はシルエット。ボリュームの偏りで輪郭を作る）
+#   tags: 常に入るタグ, nl: 文章, zones: 情報量を集めるゾーン, hair: 髪の個性で優先するタグ語
+# ---------------------------------------------------------------------------
+SILHOUETTES = {
+    "top_heavy": {"jp": "上重心", "tags": ["voluminous hair", "wide sleeves"], "zones": ["head", "torso"],
+                  "nl": "top-heavy silhouette: big voluminous hair and wide sleeves up top, slim and simple below the waist", "hair": ["huge", "wings", "cones", "spread"]},
+    "bottom_heavy": {"jp": "下重心", "tags": ["voluminous skirt", "long coat"], "zones": ["waist", "legs"],
+                     "nl": "bottom-heavy silhouette: a voluminous skirt and long hem spreading out below, kept simple at the shoulders", "hair": ["braid", "low"]},
+    "vertical": {"jp": "縦長", "tags": ["very long hair", "long cape"], "zones": ["head", "legs"],
+                 "nl": "tall vertical silhouette: very long hair, a long cape and trailing ribbons stretching the figure upward", "hair": ["absurdly long", "trailing", "multi-tied"]},
+    "wide": {"jp": "横広", "tags": ["wide sleeves", "large pauldrons"], "zones": ["torso", "arms"],
+             "nl": "wide silhouette: broad shoulders, large pauldrons and wide sleeves spreading sideways, slim legs", "hair": ["wings", "twin drills", "cones"]},
+}
+# シェイプ言語（丸=親しみ、四角=安定、三角=鋭さ）。性格ごとの既定と、形容・negative
+SHAPES = {
+    "round": {"jp": "丸", "tags": ["rounded design", "soft curves"], "neg": ["spikes", "sharp edges", "angular design"],
+              "nl": "shape language: rounded forms and soft curves everywhere, no sharp spikes"},
+    "square": {"jp": "四角", "tags": ["blocky design", "straight lines"], "neg": ["spikes", "frills"],
+               "nl": "shape language: blocky, solid forms with straight lines and square edges"},
+    "sharp": {"jp": "鋭角", "tags": ["sharp angular design", "spiky accents"], "neg": ["rounded design", "frills"],
+              "nl": "shape language: sharp angular forms with pointed, spiky accents"},
+}
+ARCH_SHAPE = {
+    "amaama": "round", "ottori": "round", "dojikko": "round", "genki": "round", "seiso": "round", "juujun": "round", "fushigi": "round",
+    "okubyou": "round", "uchiki": "round", "jirai": "round",
+    "iinchou": "square", "nekketsu": "square", "aneki": "square", "bokukko": "square", "jishinka": "square", "kuudere": "square",
+    "tsundere": "sharp", "mesugaki": "sharp", "sadistic": "sharp", "yandere": "sharp", "chuuni": "sharp", "ojousama": "sharp",
+    "oneesan": "sharp", "gal": "sharp", "haraguro": "sharp", "dokuzetsu": "sharp",
+}
+# 部位スロット -> 情報量ゾーン（装飾を集めるゾーンの判定）
+SLOT_ZONE = {
+    "head": "head", "hair_accessory": "head", "ears": "head", "face": "head", "earring": "head",
+    "neck": "torso", "neck_ring": "torso", "harness": "torso", "shoulder": "torso", "chest_ornament": "torso", "clasp": "torso",
+    "torso_layer": "torso", "cut_shoulder": "torso", "cut_back": "torso", "cut_side": "torso", "cut_chest": "torso", "lacing": "torso",
+    "back": "torso", "outer": "torso", "underlayer": "torso", "glow": "torso", "holo": "torso", "descriptor": "torso",
+    "waist_belts": "waist", "waist_cape": "waist", "buckle": "waist", "overskirt": "waist", "thigh": "waist",
+    "legs": "legs", "calf": "legs", "shin": "legs", "knee": "legs", "feet_armor": "legs", "led": "legs", "tail": "legs",
+    "hands": "arms", "arm": "arms", "sleeves": "arms", "undersleeve": "arms",
+}
+ZONE_JP = {"head": "head", "torso": "chest and shoulders", "waist": "waist and hips", "legs": "legs", "arms": "arms"}
+
 EMBELLISH_LEVELS = {0: (0, False), 1: (2, False), 2: (3, True), 3: (5, True)}
 # カテゴリの重み（テックは種族/モチーフが機械系なら engine が上げる）
 EMBELLISH_WEIGHTS = {"asymmetry": 3, "straps": 3, "hardware": 3, "layering": 2, "cutouts": 1, "tech": 1}
