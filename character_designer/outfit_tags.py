@@ -280,14 +280,14 @@ OUTFIT_TAGS = {
     },
     "ninja": {
         "female": {
-            "modest": ["{main} ninja outfit", "ninja", "{main} arm guards", "{sub} scarf", "{main} boots", "{sub} sash"],
-            "standard": ["{main} ninja outfit", "ninja", "sleeveless", "fishnets", "{main} shorts", "{sub} sash", "{main} arm guards", "{sub} scarf", "{main} thigh boots"],
-            "high": ["{main} ninja outfit", "ninja", "sideless outfit", "cleavage", "fishnets", "{main} micro shorts", "{sub} sash", "{main} arm guards", "{sub} scarf", "{main} thigh boots"],
+            "modest": ["{main} ninja outfit", "ninja", "{main} hood", "{main} face mask", "mask", "{main} bracer", "shin guards", "tabi", "{sub} sash"],
+            "standard": ["{main} ninja outfit", "ninja", "short sleeves", "chainmail", "hood down", "{main} bracer", "{main} shorts", "{sub} sash", "shin guards", "tabi"],
+            "high": ["{main} ninja outfit", "ninja", "cleavage", "bare shoulders", "chainmail", "hood down", "{main} bracer", "{main} micro shorts", "{sub} sash", "{main} thighhighs", "tabi"],
         },
         "male": {
-            "modest": ["{main} ninja outfit", "ninja", "{main} arm guards", "{sub} scarf", "{main} boots"],
-            "standard": ["{main} ninja outfit", "ninja", "sleeveless", "fishnets", "{main} pants", "{sub} sash", "{main} arm guards", "{sub} scarf"],
-            "high": ["{main} open vest", "ninja", "fishnets", "bare pectorals", "{main} pants", "{sub} sash", "{main} arm guards", "{sub} scarf"],
+            "modest": ["{main} ninja outfit", "ninja", "{main} hood", "{main} face mask", "mask", "{main} bracer", "shin guards", "tabi"],
+            "standard": ["{main} ninja outfit", "ninja", "chainmail", "hood down", "{main} bracer", "{main} pants", "{sub} sash", "tabi"],
+            "high": ["{main} ninja outfit", "ninja", "open clothes", "bare pectorals", "chainmail", "hood down", "{main} bracer", "{main} pants", "{sub} sash", "tabi"],
         },
     },
     "jester_outfit": {
