@@ -4017,6 +4017,104 @@ HANDHELD_NEGATIVE = ["holding object", "handheld object", "holding weapon"]
 # 性格の署名に含まれる手持ち（これがある性格では HANDHELD_NEGATIVE を入れない）
 SIGNATURE_HANDHELDS = ["riding crop"]
 
+# ---------------------------------------------------------------------------
+# 装飾レイヤー（ゲーム/VTuber 的な独自性）。服装の上に「装飾量」に応じて重ねる
+#   SHAPE_WORDS : 種族・モチーフ -> 装備の形状語（"{shape}-shaped gauntlet" のように合成）
+#   EMBELLISHMENTS : カテゴリ -> アドオン。tags=booru タグ（{main}/{sub}/{accent}/{shape} 可）、nl=文章、
+#                    slot=衝突判定用の部位、replace=服の同部位を置き換える、big=象徴的な一点、
+#                    exposure=許可する露出（None=全部）、male=男性キャラで使えるか、shape=形状語が必要か
+# ---------------------------------------------------------------------------
+SHAPE_WORDS = {
+    "demon": "bat-wing", "angel": "feather", "vampire": "bat", "cat": "cat-paw", "fox": "fox-fire", "wolf": "claw", "rabbit": "rabbit-ear",
+    "dragon": "dragon-claw", "mermaid": "fin", "fairy": "leaf", "ghost": "wisp", "android": "gear", "oni": "oni-horn", "reaper": "skull",
+    "sheep": "spiral-horn", "goddess": "laurel", "cow": "bell", "dog": "bone", "tiger": "claw", "snake": "serpent", "shark": "fin",
+    "harpy": "feather", "slime": "droplet", "zombie": "bone", "elf": "leaf", "dark_elf": "crescent", "dwarf": "hammer", "goblin": "fang",
+    "doll": "key", "alien": "saucer", "mouse": "round-ear", "bear": "paw", "deer": "antler", "horse": "horseshoe", "bee": "honeycomb",
+    "spider": "spider", "bat": "bat-wing", "tanuki": "leaf", "dullahan": "skull",
+    "witch": "crescent", "star": "star", "flower": "petal", "yukionna": "snowflake", "fire": "flame", "butterfly": "butterfly-wing",
+    "jester": "diamond", "moon": "crescent", "sun": "sun", "thunder": "lightning-bolt", "ocean": "wave", "forest": "leaf", "sweets": "candy",
+    "music": "music-note", "gem": "crystal", "clockwork": "gear", "poison": "skull", "rain": "raindrop", "cloud": "cloud", "sakura": "petal",
+    "rose": "rose", "feather": "feather", "chain": "chain-link", "thorn": "thorn", "key": "key", "rainbow": "prism", "holy_light": "cross",
+    "shadow": "eye", "candle": "flame", "royal": "crown", "neon": "hexagon", "heart": "heart", "skull": "skull",
+}
+
+EMBELLISHMENTS = {
+    "asymmetry": [
+        {"tags": ["single thighhigh", "asymmetrical legwear"], "nl": "only {poss} left leg wears a thighhigh", "slot": "legs", "replace": True},
+        {"tags": ["single glove", "asymmetrical gloves"], "nl": "a single {accent} glove on {poss} left hand", "slot": "hands", "replace": True},
+        {"tags": ["single detached sleeve", "asymmetrical sleeves"], "nl": "a single detached {sub} sleeve on {poss} right arm", "slot": "sleeves"},
+        {"tags": ["single pauldron"], "nl": "a single {accent} pauldron on {poss} left shoulder", "slot": "shoulder"},
+        {"tags": ["asymmetrical clothes", "single bare shoulder"], "nl": "the outfit is cut asymmetrically, leaving one shoulder bare", "slot": "descriptor", "exposure": ["standard", "high"]},
+        {"tags": ["mismatched legwear"], "nl": "{poss} legwear is mismatched, one {main} and one {sub}", "slot": "legs"},
+        {"tags": ["single earring", "{accent} single long earring"], "nl": "a single long {accent} earring on the left ear", "slot": "earring"},
+    ],
+    "straps": [
+        {"tags": ["thigh strap", "{main} leather thigh strap"], "nl": "a {main} leather strap buckled around {poss} right thigh", "slot": "thigh"},
+        {"tags": ["arm strap", "{main} arm strap"], "nl": "a {main} strap buckled around {poss} upper arm", "slot": "arm"},
+        {"tags": ["chest belt", "{main} chest harness with {accent} buckle"], "nl": "a {main} harness belt across {poss} chest with a {accent} buckle", "slot": "harness"},
+        {"tags": ["multiple belts", "{main} belts with {accent} buckles"], "nl": "several {main} belts layered at {poss} waist", "slot": "waist_belts"},
+        {"tags": ["waist cape", "{sub} waist cape"], "nl": "a {sub} waist cape hanging from {poss} belt", "slot": "waist_cape"},
+        {"tags": ["leg strap", "{main} leg straps"], "nl": "{main} straps wrapped around {poss} calves", "slot": "calf"},
+        {"tags": ["o-ring", "{accent} o-ring on the collar"], "nl": "a {accent} o-ring at {poss} collar", "slot": "neck_ring"},
+        {"tags": ["garter straps", "{main} garter straps on the arm"], "nl": "garter-like {main} straps on {poss} upper arm", "slot": "arm"},
+    ],
+    "hardware": [
+        {"tags": ["gauntlets", "{shape}-shaped {accent} gauntlet on the right arm"], "nl": "a {shape}-shaped {accent} gauntlet on {poss} right arm", "slot": "hands", "replace": True, "shape": True},
+        {"tags": ["single pauldron", "{shape}-shaped {accent} pauldron on the left shoulder"], "nl": "a {shape}-shaped {accent} pauldron on {poss} left shoulder", "slot": "shoulder", "shape": True},
+        {"tags": ["greaves", "{shape}-shaped {accent} greaves"], "nl": "{shape}-shaped {accent} greaves on {poss} shins", "slot": "shin", "shape": True},
+        {"tags": ["belt buckle", "{shape}-shaped {accent} belt buckle"], "nl": "a {shape}-shaped {accent} belt buckle", "slot": "buckle", "shape": True},
+        {"tags": ["{shape}-shaped {accent} chest ornament"], "nl": "a {shape}-shaped {accent} ornament on {poss} chest", "slot": "chest_ornament", "shape": True},
+        {"tags": ["{shape}-shaped {accent} headpiece"], "nl": "a {shape}-shaped {accent} headpiece", "slot": "head", "shape": True},
+        {"tags": ["{shape}-shaped {accent} clasp on the cape"], "nl": "the cape is held by a {shape}-shaped {accent} clasp", "slot": "clasp", "shape": True, "requires": "cape"},
+        {"tags": ["{shape}-shaped {accent} knee guards"], "nl": "{shape}-shaped {accent} knee guards", "slot": "knee", "shape": True},
+    ],
+    "layering": [
+        {"tags": ["jacket on shoulders", "{sub} jacket draped over the shoulders"], "nl": "a {sub} jacket draped over {poss} shoulders", "slot": "outer"},
+        {"tags": ["overskirt", "{sub} overskirt"], "nl": "a {sub} overskirt layered on top", "slot": "overskirt", "male": False},
+        {"tags": ["hooded cape", "{sub} short hooded cape"], "nl": "a short {sub} hooded cape", "slot": "outer"},
+        {"tags": ["corset", "{sub} corset over the outfit"], "nl": "a {sub} corset worn over the outfit", "slot": "torso_layer", "male": False},
+        {"tags": ["{main} bodysuit underneath", "bodysuit under clothes"], "nl": "a {main} bodysuit worn under the outfit", "slot": "underlayer"},
+        {"tags": ["fur-trimmed half cape", "{sub} half cape over one shoulder"], "nl": "a fur-trimmed {sub} half cape over one shoulder", "slot": "outer"},
+        {"tags": ["layered sleeves", "{sub} undersleeves"], "nl": "{sub} undersleeves showing beneath the outer sleeves", "slot": "undersleeve"},
+    ],
+    "cutouts": [
+        {"tags": ["shoulder cutout"], "nl": "cutouts at the shoulders", "slot": "cut_shoulder", "exposure": ["standard"]},
+        {"tags": ["back cutout"], "nl": "a cutout on the back", "slot": "cut_back", "exposure": ["standard"]},
+        {"tags": ["side cutout"], "nl": "cutouts at the sides", "slot": "cut_side", "exposure": ["standard"]},
+        {"tags": ["clothing cutout", "zipper"], "nl": "a zipper cutout on the chest", "slot": "cut_chest", "exposure": ["standard"]},
+        {"tags": ["cross-laced clothes", "{accent} lacing"], "nl": "{accent} cross-lacing up the front", "slot": "lacing"},
+        {"tags": ["showgirl skirt"], "nl": "a showgirl skirt open at the front", "slot": "overskirt", "exposure": ["standard", "high"], "male": False},
+    ],
+    "iconic": [
+        {"tags": ["huge bow", "oversized {sub} ribbon on the back"], "nl": "an oversized {sub} ribbon on {poss} back", "slot": "back", "big": True},
+        {"tags": ["oversized headphones", "{sub} oversized headphones with {accent} lights"], "nl": "oversized {sub} headphones with {accent} lights", "slot": "head", "big": True},
+        {"tags": ["floating ring behind the body", "{accent} floating halo ring behind the back"], "nl": "a large {accent} ring floating behind {poss} back", "slot": "back", "big": True},
+        {"tags": ["oversized sleeves", "{sub} oversized sleeves past the hands"], "nl": "oversized {sub} sleeves hanging past {poss} hands", "slot": "sleeves", "big": True},
+        {"tags": ["mechanical tail", "{main} mechanical tail with {accent} lights"], "nl": "a {main} mechanical tail with {accent} lights", "slot": "tail", "big": True},
+        {"tags": ["oversized hood", "{sub} oversized hood with {accent} lining"], "nl": "an oversized {sub} hood with {accent} lining", "slot": "head", "big": True},
+        {"tags": ["oversized scarf", "huge {sub} scarf"], "nl": "a huge {sub} scarf trailing behind", "slot": "neck", "big": True},
+        {"tags": ["oversized collar", "giant {sub} collar"], "nl": "a giant {sub} collar framing {poss} face", "slot": "neck", "big": True},
+        {"tags": ["huge hair bow", "oversized {sub} hair ribbon"], "nl": "an oversized {sub} hair ribbon", "slot": "hair_accessory", "big": True},
+        {"tags": ["single oversized sleeve", "oversized {sub} sleeve on the left arm only"], "nl": "one oversized {sub} sleeve on the left arm only", "slot": "sleeves", "big": True},
+        {"tags": ["giant {shape}-shaped {accent} ornament on the back"], "nl": "a giant {shape}-shaped {accent} ornament mounted on {poss} back", "slot": "back", "big": True, "shape": True},
+        {"tags": ["oversized {shape}-shaped {accent} gauntlets"], "nl": "oversized {shape}-shaped {accent} gauntlets", "slot": "hands", "replace": True, "big": True, "shape": True},
+        {"tags": ["extra long {sub} twin tails of fabric", "long ribbons trailing from the back"], "nl": "two very long {sub} ribbons trailing from {poss} back", "slot": "back", "big": True},
+    ],
+    "tech": [
+        {"tags": ["glowing", "glowing {accent} lines on the outfit"], "nl": "glowing {accent} lines run along the outfit", "slot": "glow"},
+        {"tags": ["mechanical arm", "{main} mechanical left arm with {accent} lights"], "nl": "{poss} left arm is mechanical with {accent} lights", "slot": "hands", "replace": True},
+        {"tags": ["{accent} holographic panels on the sleeves"], "nl": "holographic {accent} panels on the sleeves", "slot": "holo"},
+        {"tags": ["{accent} LED trim along the hem"], "nl": "{accent} LED trim along the hem", "slot": "led"},
+        {"tags": ["visor", "{accent} translucent visor"], "nl": "a translucent {accent} visor over {poss} eyes", "slot": "face"},
+        {"tags": ["mechanical ears", "{main} mechanical ear covers with {accent} lights"], "nl": "mechanical ear covers with {accent} lights", "slot": "ears"},
+    ],
+}
+# 装飾量 -> (小さなアドオンの数, 象徴的な一点を付けるか)
+EMBELLISH_LEVELS = {0: (0, False), 1: (2, False), 2: (3, True), 3: (5, True)}
+# カテゴリの重み（テックは種族/モチーフが機械系なら engine が上げる）
+EMBELLISH_WEIGHTS = {"asymmetry": 3, "straps": 3, "hardware": 3, "layering": 2, "cutouts": 1, "tech": 1}
+TECH_AFFINITY = {"android", "alien", "neon", "clockwork", "thunder"}
+
 # 小物（持ち物）が体に固定されていると見なす語。含まれなければ engine が "holding " を前置して手に持たせる
 PROP_ANCHORED_WORDS = ["worn", "on the", "around", "collar", "necklace", "pendant", "mask", "hair", "perched", "strapped",
                        "at the hip", "on a chain", "held", "holding", "floating", "hanging", "in the mouth", "under the arm",

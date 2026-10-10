@@ -285,6 +285,10 @@ class Character:
     theme: str = ""                 # モチーフ（テーマ）のキー（無ければ空）
     handheld_tags: List[str] = field(default_factory=list)  # 手持ちの booru タグ（先頭に重み）
     body_sentences: List[str] = field(default_factory=list)  # 体型指定の文章
+    embellish_tags: List[str] = field(default_factory=list)  # 装飾レイヤーのタグ
+    embellish_nl: List[str] = field(default_factory=list)    # 装飾レイヤーの文章断片
+    iconic_tag: str = ""                                     # 象徴的な一点（重み付き）
+    detail_level: int = 0
     pattern_base: str = ""      # スタイル修飾なしの模様名
     print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
     outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
@@ -490,6 +494,73 @@ def _dedupe(items: List[str]) -> List[str]:
     return out
 
 
+def build_embellishments(level: int, outfit: List[str], gender: str, exposure: str, shape: str, tech_affinity: bool,
+                         features_text: str, rng: random.Random, slots: Dict[str, str]) -> Tuple[List[str], List[str], str]:
+    """
+    装飾レイヤー。服装の部位スロットと衝突しないようにアドオンを選ぶ。
+    返り値: (タグ列, 文章の断片, 象徴的な一点のタグ)
+    """
+    n_small, want_iconic = D.EMBELLISH_LEVELS.get(level, (0, False))
+    if n_small == 0 and not want_iconic:
+        return [], [], ""
+    taken = {classify_slot(t) for t in outfit}
+    used: set = set()
+    out_tags: List[str] = []
+    nl_parts: List[str] = []
+    iconic_tag = ""
+    outfit_text = " ".join(outfit).lower()
+
+    def usable(entry) -> bool:
+        if entry.get("male") is False and gender == "boy":
+            return False
+        if entry.get("exposure") and exposure not in entry["exposure"]:
+            return False
+        if entry.get("shape") and not shape:
+            return False
+        if entry.get("requires") and entry["requires"] not in outfit_text:
+            return False
+        slot = entry["slot"]
+        if slot in used:
+            return False
+        if slot in taken and not entry.get("replace"):
+            return False
+        if slot == "tail" and "tail" in features_text:
+            return False
+        if slot == "head" and ("hood" in outfit_text or "hat" in outfit_text or "veil" in outfit_text):
+            return False
+        return True
+
+    def apply(entry):
+        nonlocal outfit
+        slot = entry["slot"]
+        if entry.get("replace") and slot in taken:
+            # 服の同部位を置き換える（先頭＝主役の服は残す）
+            outfit[:] = [t for i, t in enumerate(outfit) if i == 0 or classify_slot(t) != slot]
+        used.add(slot)
+        fill = dict(slots, shape=shape or "ornate")
+        out_tags.extend(_fill(t, fill) for t in entry["tags"])
+        nl_parts.append(_fill(entry["nl"], fill))  # {poss} は _SafeDict により残る
+
+    if want_iconic:
+        cands = [x for x in D.EMBELLISHMENTS["iconic"] if usable(x)]
+        if cands:
+            entry = _pick(rng, cands)
+            apply(entry)
+            iconic_tag = _fill(entry["tags"][-1], dict(slots, shape=shape or "ornate"))
+    weights = dict(D.EMBELLISH_WEIGHTS)
+    if tech_affinity:
+        weights["tech"] = 4
+    # 非対称化を1つは優先的に入れる（VTuber 的な「読める」シルエット）
+    order = ["asymmetry"] + rng.choices(list(weights), weights=list(weights.values()), k=n_small * 3)
+    for cat in order:
+        if len(nl_parts) - (1 if iconic_tag else 0) >= n_small:
+            break
+        cands = [x for x in D.EMBELLISHMENTS[cat] if usable(x)]
+        if cands:
+            apply(_pick(rng, cands))
+    return out_tags, nl_parts, iconic_tag
+
+
 def _role_available(role: str, gender: str) -> bool:
     role = D.ROLE_ALIASES.get(role, role)
     if role not in D.ROLES:
@@ -529,6 +600,7 @@ def generate(
     bust: str = "auto",
     height: str = "auto",
     build: str = "auto",
+    detail_level: int = 2,
 ) -> Character:
     strict = consistency == "strict"
     rng = random.Random(seed)
@@ -884,6 +956,16 @@ def generate(
         accessories.append("fang")
 
     # --- シグネチャ小物（1つだけ） -----------------------------------------
+    # --- 装飾レイヤー（独自性） -------------------------------------------------
+    shape = D.SHAPE_WORDS.get(theme_key or "", "") or D.SHAPE_WORDS.get(motif_key, "")
+    tech_aff = (motif_key in D.TECH_AFFINITY) or (theme_key in D.TECH_AFFINITY)
+    emb_rng = random.Random(seed * 7919 + 17)
+    embellish_tags, embellish_nl, iconic_tag = build_embellishments(
+        detail_level, outfit, gender, exp, shape, tech_aff, " ".join(features).lower(), emb_rng, fill_slots)
+    if strict:
+        # 説明文版（シートのメモ）にも同じ内容を足しておく
+        outfit_detail = outfit_detail + embellish_tags
+
     # --- 手持ち（武器・小道具）。既定では何も持たない --------------------------
     prop = ""
     handheld_tags: List[str] = []
@@ -931,7 +1013,8 @@ def generate(
         consistency=consistency, emphasis=emphasis, pattern_base=base_pattern, print_tag=print_tag,
         outfit_detail=outfit_detail, omitted=omitted, eye_choice=chosen, eye_intensity=eye_intensity,
         role2=role2_key or "", exposure_tags=exposure_tags, theme=theme_key or "", handheld_tags=handheld_tags,
-        body_sentences=body_sentences,
+        body_sentences=body_sentences, embellish_tags=embellish_tags, embellish_nl=embellish_nl, iconic_tag=iconic_tag,
+        detail_level=detail_level,
     )
 
 
@@ -981,12 +1064,30 @@ def _theme_sentence(c: Character, pron: str, poss: str) -> str:
     return f"The {name} motif is worked into {poss} outfit as {pat} and matching accessories, not as separate objects."
 
 
+def _embellish_sentence(c: Character, pron: str, poss: str) -> str:
+    """装飾レイヤーの文章: 象徴的な一点を先に、残りを列挙"""
+    if not c.embellish_nl:
+        return ""
+    parts = [p.replace("{poss}", poss) for p in c.embellish_nl]
+    out = []
+    if c.iconic_tag:
+        out.append(f"{poss.capitalize()} iconic design element is {parts[0]}.")
+        parts = parts[1:]
+    if parts:
+        out.append(f"Design details: {'; '.join(parts)}.")
+    return " ".join(out)
+
+
+def _article(phrase: str) -> str:
+    return "an" if phrase[:1].lower() in "aeiou" else "a"
+
+
 def _handheld_sentence(c: Character, pron: str, poss: str) -> str:
     if not c.prop:
         return ""
     if c.handheld_tags and c.handheld_tags[0] == c.prop:
         return ""  # 服装の小道具はタグそのもの
-    return f"{pron} holds a {c.prop}."
+    return f"{pron} holds {_article(c.prop)} {c.prop}."
 
 
 def _persona_sentence(c: Character, pron: str, poss: str) -> str:
@@ -1042,7 +1143,7 @@ def build_positive(c: Character) -> str:
         if c.accessories:
             parts.append(f"{pron} also has {'; '.join(c.accessories)}.")
         if c.prop:
-            parts.append(f"{pron} holds a {c.prop}.")
+            parts.append(f"{pron} holds {_article(c.prop)} {c.prop}.")
         if c.expression_pose == "both":
             parts.append(f"Expression and pose: {c.expression}; {c.pose}.")
         elif c.expression_pose == "expression_only":
@@ -1052,6 +1153,7 @@ def build_positive(c: Character) -> str:
             parts.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim{pat}.")
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
+        parts.append(_embellish_sentence(c, pron, poss))
         parts += c.body_sentences
         parts.append(_theme_sentence(c, pron, poss))
         parts.append(_exposure_sentence(c, pron, poss))
@@ -1080,12 +1182,15 @@ def build_positive(c: Character) -> str:
         if c.outfit:
             tags.append(_w(c.outfit[0], c.emphasis))
             tags += c.outfit[1:]
+        for t in c.embellish_tags:
+            tags.append(_w(t, c.emphasis) if t == c.iconic_tag else t)
         if c.exposure_tags:
             tags.append(_w(c.exposure_tags[0], round(c.emphasis * 0.9, 2)))
             tags += c.exposure_tags[1:]
         tags += c.accessories
         signature = _signature_tags(c)
-        tags += [_w(t, round(c.emphasis * 0.9, 2)) for t in signature]
+        present = {t.lower() for t in tags}
+        tags += [_w(t, round(c.emphasis * 0.9, 2)) for t in signature if t.lower() not in present]
         if c.handheld_tags:
             tags.append(_w(c.handheld_tags[0], round(c.emphasis * 0.9, 2)))
             tags += c.handheld_tags[1:]
@@ -1100,11 +1205,12 @@ def build_positive(c: Character) -> str:
         tags.append(f"{c.accent} trim")
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _embellish_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.features
     tags += c.outfit
+    tags += c.embellish_tags
     tags += c.exposure_tags
     tags += c.accessories
     tags += _signature_tags(c)
@@ -1214,6 +1320,7 @@ def build_sheet(c: Character) -> str:
         f"#   -> {arch['design_jp']}",
         f"# palette    : main={c.main} / sub={c.sub} / accent={c.accent}   pattern={c.pattern}   material={c.material}",
         f"# handheld   : {c.prop or '(なし)'}",
+        f"# embellish  : level={c.detail_level}  " + (" / ".join(c.embellish_tags) if c.embellish_tags else "(なし)"),
         f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
         f"# eyes       : {' / '.join(c.eyes)}   intensity={c.eye_intensity}   emphasis={c.emphasis}",
         f"# consistency: {c.consistency}" + ("（booru タグ骨格 / 色は main+accent の2色 / 不安定要素は省略）" if c.consistency == "strict" else "（詳細説明文）"),

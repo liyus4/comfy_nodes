@@ -107,6 +107,8 @@ class CharacterDesignerNode:
                 "服装2": (["なし", "ランダム"] + _jp_choices(data.ROLES)[1:], {"default": "なし",
                           "tooltip": "2つ目の服装系統と融合（服装を土台に、頭・顔・手・首・羽織り・小物を取り込む）。指示文に系統を2つ書いても融合します"}),
                 "性格": (_jp_choices(data.ARCHETYPES), {"default": "自動", "tooltip": "自動以外は指示文より優先"}),
+                "装飾量": (["0 なし", "1 控えめ", "2 標準", "3 盛る"], {"default": "2 標準",
+                           "tooltip": "服装の上に重ねる独自性（非対称化・ベルト/ストラップ・モチーフ形状の装備・レイヤリング・切り抜き・象徴的な一点・テック）。2以上で象徴的な一点が付く"}),
                 "手持ち": (["なし", "ランダム", "服装の小道具"] + [f"{v['jp']} ({k})" for k, v in data.HANDHELDS.items()], {"default": "なし",
                            "tooltip": "武器・小道具。種類・刃や柄の色・飾り・持ち方まで seed で固定。なし=何も持たない（装飾が手持ち化しないよう negative も入る）"}),
                 "胸": (["自動"] + [lv[0] for lv in data.BUST_LEVELS], {"default": "自動", "tooltip": "0=flat chest … 5=gigantic、6以降は重みと文章でさらに大きく。自動は種族・性格の推奨"}),
@@ -151,7 +153,7 @@ class CharacterDesignerNode:
         # data.py / engine.py を編集したら、同じ入力でもキャッシュを使わず再実行させる
         return str(sorted(_source_mtimes().items()))
 
-    def design(self, 指示文, 除外, 種族, モチーフ, 服装, 服装2, 性格, 手持ち, 胸, 身長, 体型, 服の色, 髪の色, シード, 意外性, 露出, 出力形式, 再現性, 強調, 表情ポーズ, 目の形, 固定, キャラシート):
+    def design(self, 指示文, 除外, 種族, モチーフ, 服装, 服装2, 性格, 装飾量, 手持ち, 胸, 身長, 体型, 服の色, 髪の色, シード, 意外性, 露出, 出力形式, 再現性, 強調, 表情ポーズ, 目の形, 固定, キャラシート):
         _reload_if_changed()
 
         if 固定 and キャラシート.strip():
@@ -171,6 +173,7 @@ class CharacterDesignerNode:
                 role2="random" if 服装2 == "ランダム" else ("none" if 服装2 == "なし" else _jp_key(服装2)),
                 exclude=除外,
                 handheld={"なし": "none", "ランダム": "random", "服装の小道具": "role"}.get(手持ち) or _jp_key(手持ち),
+                detail_level=int(str(装飾量).split(" ")[0]),
                 bust=胸 if 胸 != "自動" else "auto",
                 height=身長 if 身長 != "自動" else "auto",
                 build=体型 if 体型 != "自動" else "auto",
