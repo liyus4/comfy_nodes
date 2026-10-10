@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 import numpy as np
 from PIL import Image
@@ -28,7 +29,10 @@ class BrowserDownloadImageNode:
             "required": {
                 "images": ("IMAGE",),
                 # ダウンロードされるファイル名の先頭。連番と .png が後ろに付きます
+                # %date:yyyy-MM-dd-hh-mm-ss% など ComfyUI 標準の置換記法も使えます
                 "filename_prefix": ("STRING", {"default": "ComfyUI"}),
+                # ON にすると filename_prefix の後ろに実行時刻 _YYYYMMDD_HHMMSS を付けます
+                "add_timestamp": ("BOOLEAN", {"default": True}),
             },
             "hidden": {"prompt": "PROMPT", "extra_pnginfo": "EXTRA_PNGINFO"},
         }
@@ -38,7 +42,9 @@ class BrowserDownloadImageNode:
     CATEGORY = "Test/Example Nodes"
     OUTPUT_NODE = True
 
-    def download(self, images, filename_prefix="ComfyUI", prompt=None, extra_pnginfo=None):
+    def download(self, images, filename_prefix="ComfyUI", add_timestamp=True, prompt=None, extra_pnginfo=None):
+        if add_timestamp:
+            filename_prefix = f"{filename_prefix}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         full_output_folder, filename, counter, subfolder, _ = folder_paths.get_save_image_path(
             filename_prefix, self.output_dir, images[0].shape[1], images[0].shape[0]
         )
