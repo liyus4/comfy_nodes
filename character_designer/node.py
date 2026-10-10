@@ -86,8 +86,8 @@ class CharacterDesignerNode:
                 "prompt_style": (["tags", "natural"], {"default": "tags"}),
                 # strict = booru タグ骨格・2色・不安定要素なし（再現性重視） / full = 詳細説明文
                 "consistency": (list(engine.CONSISTENCY), {"default": "strict"}),
-                # strict で主役の服と記号に (tag:1.2) の重みを付ける
-                "emphasis": ("BOOLEAN", {"default": True}),
+                # strict での重み (tag:1.6)。Anima は SDXL より強い重みが必要（公式例 (chibi:2)）。1.0 以下で無効
+                "emphasis": ("FLOAT", {"default": 1.6, "min": 0.0, "max": 3.0, "step": 0.1}),
                 # 表情はキャラのデフォルト顔として含め、ポーズは状況側の責務なので既定では含めない
                 "expression_pose": (["expression_only", "both", "none"], {"default": "expression_only"}),
                 # 目の形を固定（auto なら brief の指定 > 性格プロファイル）

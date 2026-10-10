@@ -240,7 +240,8 @@ class Character:
     prompt_style: str
     expression_pose: str        # "expression_only" / "both" / "none"
     consistency: str = "full"   # "strict" = booru タグ骨格・2色・不安定要素なし / "full" = 詳細説明文
-    emphasis: bool = True       # strict で主役の服と記号に (tag:1.2) の重みを付ける
+    emphasis: float = 1.6       # strict での重み（主役の服・記号・目の形）。1.0 以下で無効。Anima は SDXL より強めが必要
+    eye_intensity: str = "normal"   # 目の形の強弱 slight / normal / strong
     pattern_base: str = ""      # スタイル修飾なしの模様名
     print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
     outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
@@ -367,7 +368,7 @@ def generate(
     role: str = "auto",
     exclude: str = "",
     consistency: str = "strict",
-    emphasis: bool = True,
+    emphasis: float = 1.6,
     eye_shape: str = "auto",
 ) -> Character:
     strict = consistency == "strict"
@@ -568,7 +569,12 @@ def generate(
         cands = profile.get(cat)
         if cands and rng.random() < D.EYE_PROBS[cat]:
             chosen[cat] = _pick(rng, cands)
-    eye_order = ("shape", "lid", "pupils", "highlights", "lashes", "brows", "makeup", "details")
+    if "size" not in spec.eye_tags and rng.random() < 0.5:
+        chosen["size"] = _pick(rng, D.EYE_SIZES)
+    elif "size" in spec.eye_tags:
+        chosen["size"] = spec.eye_tags["size"]
+    eye_intensity = rng.choices([k for k, _, _ in D.EYE_INTENSITY], weights=D.EYE_INTENSITY_WEIGHTS, k=1)[0]
+    eye_order = ("shape", "size", "lid", "pupils", "highlights", "lashes", "brows", "makeup", "details")
     eyes += [_fill(chosen[cat], slots) for cat in eye_order if cat in chosen]
 
     # --- 肌・体型 ---------------------------------------------------------
@@ -670,7 +676,7 @@ def generate(
         accessories=accessories, prop=prop, expression=expression, pose=pose,
         extras=[], unrecognized=spec.extras, excluded=excluded, prompt_style=prompt_style, expression_pose=expression_pose,
         consistency=consistency, emphasis=emphasis, pattern_base=base_pattern, print_tag=print_tag,
-        outfit_detail=outfit_detail, omitted=omitted, eye_choice=chosen,
+        outfit_detail=outfit_detail, omitted=omitted, eye_choice=chosen, eye_intensity=eye_intensity,
     )
 
 
@@ -689,9 +695,42 @@ def _dedupe(items: List[str]) -> List[str]:
     return out
 
 
-def _w(tag: str, weight: float, enabled: bool) -> str:
-    """ComfyUI 形式の重み付け (tag:1.2)"""
-    return f"({tag}:{weight})" if enabled and tag else tag
+def _w(tag: str, weight: float) -> str:
+    """ComfyUI 形式の重み付け (tag:1.6)。weight が 1.0 以下なら素のタグ"""
+    if not tag or weight <= 1.0:
+        return tag
+    return f"({tag}:{round(weight, 2)})"
+
+
+def _eye_weight(c: Character) -> float:
+    factor = next((f for k, f, _ in D.EYE_INTENSITY if k == c.eye_intensity), 1.0)
+    return round(c.emphasis * factor, 2)
+
+
+def _eye_sentence(c: Character, pron: str, poss: str) -> str:
+    """目の形を自然文で補強する（画風に固定されがちな目の形を言葉で押す）"""
+    shape = c.eye_choice.get("shape")
+    if not shape:
+        return ""
+    adverb = next((a for k, _, a in D.EYE_INTENSITY if k == c.eye_intensity), "")
+    desc = D.EYE_SHAPE_NL.get(shape, shape)
+    parts = [f"{poss.capitalize()} eyes are {adverb + ' ' if adverb else ''}{desc}"]
+    extras = [c.eye_choice[k] for k in ("size", "lid", "highlights") if k in c.eye_choice]
+    if extras:
+        parts.append(", ".join(extras))
+    return ", ".join(parts) + "."
+
+
+def _persona_sentence(c: Character, pron: str, poss: str) -> str:
+    sig = D.ARCH_SIGNATURE.get(c.archetype)
+    if not sig or not sig.get("persona"):
+        return ""
+    return sig["persona"].replace("{pron}", pron).replace("{poss}", poss)
+
+
+def _signature_tags(c: Character) -> List[str]:
+    sig = D.ARCH_SIGNATURE.get(c.archetype)
+    return list(sig["tags"]) if sig else []
 
 
 def _primary_noun(tag: str) -> str:
@@ -745,6 +784,9 @@ def build_positive(c: Character) -> str:
             parts.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim{pat}.")
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
+        parts.append(_eye_sentence(c, pron, poss))
+        parts.append(_persona_sentence(c, pron, poss))
+        parts = [p for p in parts if p]
         if c.unrecognized:
             parts.append(" ".join(c.unrecognized))
         return " ".join(parts)
@@ -752,33 +794,44 @@ def build_positive(c: Character) -> str:
     tags: List[str] = []
     tags += c.body
     tags += c.hair
-    tags += c.eyes
+    if strict:
+        # 目の形には強弱に応じた重み（Anima は SDXL より強い重みが必要）
+        shape = c.eye_choice.get("shape")
+        tags += [_w(t, _eye_weight(c)) if t == shape else t for t in c.eyes]
+    else:
+        tags += c.eyes
     tags.append(c.skin)
     if strict:
-        # 記号 -> 主役の服（重み付き）-> 残りの服 -> 小物 -> 持ち物 -> 表情 -> 模様 -> 縁色 -> 短い自然文
+        # 記号 -> 主役の服（重み付き）-> 残りの服 -> 小物 -> 署名タグ -> 持ち物 -> 表情 -> 模様 -> 縁色 -> 自然文（服・目・性格）
         if c.features:
-            tags.append(_w(c.features[0], 1.15, c.emphasis))
+            tags.append(_w(c.features[0], round(c.emphasis * 0.9, 2)))
             tags += c.features[1:]
         if c.outfit:
-            tags.append(_w(c.outfit[0], 1.2, c.emphasis))
+            tags.append(_w(c.outfit[0], c.emphasis))
             tags += c.outfit[1:]
         tags += c.accessories
+        signature = _signature_tags(c)
+        tags += [_w(t, round(c.emphasis * 0.9, 2)) for t in signature]
         if c.prop:
             tags.append(c.prop)
+        # 表情に署名タグと同じ語が含まれていれば重複を除く（"sadistic smirk, looking down at viewer" など）
+        expression = ", ".join(x for x in c.expression.split(", ") if x not in signature) or c.expression
         if c.expression_pose == "both":
-            tags += [c.expression, c.pose]
+            tags += [expression, c.pose]
         elif c.expression_pose == "expression_only":
-            tags.append(c.expression)
+            tags.append(expression)
         if c.print_tag:
             tags.append(c.print_tag)
         tags.append(f"{c.accent} trim")
         tags += c.unrecognized
-        tags.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.")
-        return ", ".join(_dedupe(tags))
+        # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
+        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.features
     tags += c.outfit
     tags += c.accessories
+    tags += _signature_tags(c)
     if c.prop:
         tags.append(c.prop)
     if c.expression_pose == "both":
@@ -814,6 +867,10 @@ def build_negative(c: Character) -> str:
     if "colored skin" in c.skin:
         neg += ["fair skin", "pale skin"]
     if c.consistency == "strict":
+        # 目: 反対の形を（重み付きで）抑える
+        shape = c.eye_choice.get("shape")
+        if shape and shape in D.EYE_OPPOSITE:
+            neg.append(_w(D.EYE_OPPOSITE[shape], round(max(c.emphasis * 0.8, 1.0), 2)))
         # 目: 選ばなかった特殊瞳孔・反対のハイライトを抑える
         if "pupils" not in c.eye_choice:
             neg += ["slit pupils", "heart-shaped pupils"]
@@ -872,6 +929,7 @@ def build_sheet(c: Character) -> str:
         f"# palette    : main={c.main} / sub={c.sub} / accent={c.accent}   pattern={c.pattern}   material={c.material}",
         f"# signature  : {c.prop or '(なし)'}",
         f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
+        f"# eyes       : {' / '.join(c.eyes)}   intensity={c.eye_intensity}   emphasis={c.emphasis}",
         f"# consistency: {c.consistency}" + ("（booru タグ骨格 / 色は main+accent の2色 / 不安定要素は省略）" if c.consistency == "strict" else "（詳細説明文）"),
         f"# design     : {design_note}",
     ]

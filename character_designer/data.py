@@ -389,7 +389,7 @@ ARCHETYPES = {
         "hair_styles": ["long straight hair", "high ponytail", "long wavy hair"],
         "hair_colors": ["black hair", "silver hair", "dark red hair", "blonde hair"],
         "palettes": [("black", "crimson", "gold"), ("black", "purple", "silver"), ("wine red", "black", "gold")],
-        "expression": ["sadistic smirk, looking down on viewer", "cold smile", "amused smirk"],
+        "expression": ["evil smile, looking down at viewer", "sadistic smirk, looking down at viewer", "condescending smile, narrowed eyes"],
         "pose": ["hand on hip, one foot forward", "arms crossed, chin raised", "holding a riding crop"],
         "body": ["tall"],
         "accessories": ["{main} choker with a {accent} ring", "{accent} earrings"],
@@ -2844,6 +2844,48 @@ EYE_PROFILES = {
     "dokuzetsu": {"shape": ["jitome"], "lid": ["half-closed eyes"]},
     "aneki":     {"shape": ["tsurime"], "lashes": ["long eyelashes"], "makeup": ["eyeliner"]},
 }
+# 目の形の自然文での言い換え（Anima の Qwen エンコーダ向け。タグだけでは画風に負けるので文章で補強する）
+EYE_SHAPE_NL = {
+    "tsurime": "upturned, slanted eyes with sharp outer corners",
+    "tareme": "downturned, droopy eyes with soft outer corners",
+    "jitome": "flat, half-lidded deadpan eyes",
+    "sanpaku": "sanpaku eyes with sclera visible below the iris",
+}
+# 反対の形（negative に入れる）
+EYE_OPPOSITE = {"tsurime": "tareme", "tareme": "tsurime", "jitome": "wide-eyed", "sanpaku": "tareme"}
+# 目の大きさ・輪郭の軸（形とは独立に組み合わせる）
+EYE_SIZES = ["large round eyes", "almond-shaped eyes", "narrow eyes", "small eyes"]
+# 形の強弱: (キー, 重み係数, 自然文の副詞)
+EYE_INTENSITY = [("slight", 0.85, "slightly"), ("normal", 1.0, ""), ("strong", 1.15, "strongly")]
+EYE_INTENSITY_WEIGHTS = [25, 45, 30]
+
+# 性格の「署名」: 常に入るタグと、性格を表す自然文（{pron}=She/He, {poss}=her/his）
+ARCH_SIGNATURE = {
+    "tsundere":  {"tags": ["tsundere"], "persona": "{pron} is a tsundere: proud and sharp-tongued on the surface, blushing and flustered underneath."},
+    "amaama":    {"tags": [], "persona": "{pron} is sweet and affectionate, with a soft, doting smile and gentle body language."},
+    "mesugaki":  {"tags": ["smug", "fang"], "persona": "{pron} is a bratty, cocky little tease who looks down on the viewer with a smug grin."},
+    "seiso":     {"tags": [], "persona": "{pron} is pure and graceful, with a serene, well-mannered air."},
+    "jirai":     {"tags": ["bandaged wrist"], "persona": "{pron} is a jirai-kei girl: fragile, clingy and a little unhinged, with tired made-up eyes."},
+    "uchiki":    {"tags": ["dandere"], "persona": "{pron} is timid and withdrawn, hiding behind {poss} hair and avoiding eye contact."},
+    "kuudere":   {"tags": ["kuudere"], "persona": "{pron} is cool and composed, with a calm, unreadable expression."},
+    "yandere":   {"tags": ["yandere"], "persona": "{pron} is a yandere: sweetly smiling with hollow, obsessive eyes."},
+    "genki":     {"tags": [], "persona": "{pron} is bright and energetic, bursting with cheerful motion."},
+    "ojousama":  {"tags": [], "persona": "{pron} is a haughty young lady of high class, chin raised with refined confidence."},
+    "oneesan":   {"tags": [], "persona": "{pron} is a mature, teasing older-sister type with relaxed, knowing eyes."},
+    "gal":       {"tags": ["gyaru"], "persona": "{pron} is a flashy, outgoing gyaru with heavy makeup and a playful attitude."},
+    "chuuni":    {"tags": ["eyepatch"], "persona": "{pron} is a chuunibyou who strikes dramatic poses and believes in {poss} hidden powers."},
+    "bokukko":   {"tags": [], "persona": "{pron} is a boyish, sporty tomboy with a confident grin."},
+    "dojikko":   {"tags": [], "persona": "{pron} is a clumsy, flustered airhead, always a step from tripping."},
+    "sadistic":  {"tags": ["riding crop", "evil smile", "looking down at viewer"], "persona": "{pron} is a cruel, dominant sadist who looks down on the viewer with a cold, condescending smile, holding a riding crop."},
+    "haraguro":  {"tags": [], "persona": "{pron} wears a perfect polite smile that hides a scheming, two-faced nature."},
+    "fushigi":   {"tags": [], "persona": "{pron} is an eccentric, spacey dreamer whose gaze drifts somewhere far away."},
+    "iinchou":   {"tags": ["glasses"], "persona": "{pron} is a strict, diligent class representative who pushes up {poss} glasses disapprovingly."},
+    "ottori":    {"tags": [], "persona": "{pron} is gentle and laid-back, moving slowly with a relaxed, sleepy smile."},
+    "nekketsu":  {"tags": [], "persona": "{pron} is hot-blooded and passionate, eyes burning with determination."},
+    "dokuzetsu": {"tags": [], "persona": "{pron} is sharp-tongued and sarcastic, watching the viewer with unimpressed, half-lidded eyes."},
+    "aneki":     {"tags": [], "persona": "{pron} is a bold big-sister leader type with a loud laugh and commanding presence."},
+}
+
 # 各カテゴリを出す確率（shape は常に出す）
 EYE_PROBS = {"lid": 0.5, "pupils": 0.5, "highlights": 0.6, "lashes": 0.5, "brows": 0.4, "makeup": 0.7, "details": 0.5}
 
