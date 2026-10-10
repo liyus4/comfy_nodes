@@ -4389,6 +4389,226 @@ FACE_MARKS = [
     {"key": "stitch", "jp": "縫い目", "tags": ["stitched face", "stitches across the cheek"], "nl": "stitches across {poss} cheek"},
 ]
 
+# ---------------------------------------------------------------------------
+# 導出型コンセプト（一貫性）。各要素に「雰囲気の記述子」を持たせ、錨（種族・モチーフ・服装）から
+# コンセプトを導出して、残りの選択を相性で重み付けする（除外はしないので多様性は保つ）
+# ---------------------------------------------------------------------------
+MOODS = ["night", "light", "fire", "ice", "water", "nature", "sky", "tech", "magic", "holy", "dark", "royal", "military", "street",
+         "cute", "sexy", "elegant", "wild", "wafu", "ruin", "sweet", "sick", "music", "play"]
+MOOD_JP = {"night": "夜の", "light": "光の", "fire": "炎の", "ice": "氷の", "water": "海の", "nature": "森の", "sky": "空の", "tech": "電脳の",
+           "magic": "魔法の", "holy": "聖なる", "dark": "闇の", "royal": "王家の", "military": "鋼の", "street": "街の", "cute": "愛らしい",
+           "sexy": "妖艶な", "elegant": "優雅な", "wild": "野性の", "wafu": "和の", "ruin": "廃墟の", "sweet": "甘い", "sick": "病んだ",
+           "music": "旋律の", "play": "悪戯な"}
+MOOD_EN = {"night": "the night", "light": "light", "fire": "flame", "ice": "frost", "water": "the sea", "nature": "the forest", "sky": "the sky",
+           "tech": "the machine age", "magic": "magic", "holy": "the sacred", "dark": "darkness", "royal": "the crown", "military": "steel",
+           "street": "the streets", "cute": "charm", "sexy": "allure", "elegant": "grace", "wild": "the wild", "wafu": "old Japan",
+           "ruin": "the ruins", "sweet": "sweetness", "sick": "sickness", "music": "melody", "play": "mischief"}
+
+RACE_MOOD = {
+    "demon": ["dark", "sexy", "magic", "night"], "angel": ["holy", "light", "sky"], "vampire": ["night", "dark", "elegant", "sexy"],
+    "cat": ["cute", "play", "street"], "fox": ["wafu", "magic", "elegant"], "wolf": ["wild", "nature", "night"], "rabbit": ["cute", "sweet", "play"],
+    "dragon": ["fire", "royal", "wild", "magic"], "mermaid": ["water", "elegant", "magic"], "fairy": ["nature", "magic", "cute", "light"],
+    "ghost": ["night", "dark", "wafu", "ruin"], "android": ["tech"], "oni": ["wafu", "wild", "fire"], "reaper": ["dark", "night", "ruin"],
+    "sheep": ["cute", "sweet", "nature"], "goddess": ["holy", "light", "royal", "elegant"], "cow": ["cute", "nature", "sweet"],
+    "dog": ["cute", "play", "street"], "tiger": ["wild", "fire", "military"], "snake": ["sexy", "dark", "magic"], "shark": ["water", "wild", "play"],
+    "harpy": ["sky", "nature", "wild"], "slime": ["cute", "play", "magic", "water"], "zombie": ["ruin", "sick", "dark"],
+    "elf": ["nature", "elegant", "magic", "light"], "dark_elf": ["dark", "sexy", "elegant", "night"], "dwarf": ["tech", "wild", "fire"],
+    "goblin": ["street", "play", "wild", "ruin"], "doll": ["elegant", "sick", "cute", "ruin"], "alien": ["tech", "sky", "play"],
+    "mouse": ["cute", "sweet", "street"], "bear": ["nature", "cute", "wild"], "deer": ["nature", "holy", "elegant"], "horse": ["military", "play", "royal"],
+    "bee": ["nature", "sweet", "play"], "spider": ["dark", "sexy", "ruin"], "bat": ["night", "dark", "play"], "tanuki": ["wafu", "play", "nature"],
+    "dullahan": ["dark", "military", "ruin", "night"], "human": [],
+}
+THEME_MOOD = {
+    "witch": ["magic", "night", "dark"], "star": ["night", "sky", "magic", "light"], "flower": ["nature", "elegant", "cute"], "yukionna": ["ice", "wafu", "elegant"],
+    "fire": ["fire", "wild"], "butterfly": ["elegant", "nature", "sexy"], "jester": ["play", "dark"], "moon": ["night", "magic", "elegant"],
+    "sun": ["light", "fire", "holy"], "thunder": ["tech", "wild", "fire"], "ocean": ["water", "sky", "play"], "forest": ["nature", "magic"],
+    "sweets": ["sweet", "cute"], "music": ["music", "play", "elegant"], "gem": ["elegant", "royal", "light", "magic"], "clockwork": ["tech", "elegant", "magic"],
+    "poison": ["dark", "sick", "magic"], "rain": ["water", "sick", "night"], "cloud": ["sky", "light", "cute"], "sakura": ["wafu", "elegant", "cute"],
+    "rose": ["elegant", "sexy", "royal"], "feather": ["light", "holy", "elegant"], "chain": ["dark", "military", "sexy", "sick"], "thorn": ["dark", "nature", "elegant"],
+    "key": ["magic", "elegant", "play"], "rainbow": ["light", "play", "cute"], "holy_light": ["holy", "light", "royal"], "shadow": ["dark", "night"],
+    "candle": ["night", "holy", "ruin"], "royal": ["royal", "elegant"], "neon": ["tech", "street", "night"], "heart": ["cute", "sweet", "sexy"],
+    "skull": ["dark", "ruin", "street"], "face_mark": ["play", "sick", "street"], "medical": ["sick", "cute"], "gamer": ["tech", "play", "street"],
+    "cosmetics": ["sexy", "elegant", "street"], "emblem": ["royal", "military", "holy", "magic"], "liquid": ["sweet", "sexy"], "stencil": ["street", "ruin", "play"],
+}
+ROLE_MOOD = {
+    "succubus": ["sexy", "dark", "night"], "sister": ["holy", "elegant"], "maid": ["cute", "elegant"], "school_uniform": ["street", "cute"],
+    "gothic_lolita": ["dark", "elegant", "cute", "night"], "shrine_miko": ["wafu", "holy"], "kimono": ["wafu", "elegant"], "knight": ["military", "royal", "holy"],
+    "witch_robe": ["magic", "night"], "nurse": ["sick", "cute"], "idol": ["music", "cute", "light"], "magical_girl": ["magic", "cute", "light"],
+    "office_lady": ["street", "elegant"], "casual_street": ["street", "play"], "swimsuit": ["water", "sexy", "play"], "bunny_girl": ["sexy", "play", "night"],
+    "military": ["military"], "princess_dress": ["royal", "elegant"], "cheongsam": ["elegant", "sexy"], "bodysuit": ["tech"], "sportswear": ["play", "street", "wild"],
+    "pirate": ["water", "wild", "street"], "ninja": ["wafu", "dark", "military"], "jester_outfit": ["play", "dark"], "loungewear": ["cute", "sweet"],
+    "teacher": ["elegant", "street"], "dancer": ["sexy", "elegant", "music"], "delinquent": ["street", "wild"], "saint": ["holy", "light", "elegant"],
+    "goddess_dress": ["holy", "royal", "elegant", "light"], "cow_suit": ["cute", "sexy", "nature"], "hero": ["military", "light", "wild"],
+    "steampunk": ["tech", "elegant", "ruin"], "merchant": ["street", "play", "nature"], "pontiff": ["holy", "royal"], "demon_lord": ["dark", "royal", "military"],
+    "thief": ["dark", "street", "night"], "archer": ["nature", "wild", "military"], "samurai": ["wafu", "military"], "police": ["military", "street"],
+    "chef": ["sweet", "street"], "cheerleader": ["play", "cute", "street"], "race_queen": ["tech", "sexy", "street"], "western": ["wild", "street"],
+    "waitress": ["cute", "sweet", "street"], "flight_attendant": ["sky", "elegant", "street"], "fortune_teller": ["magic", "night", "elegant"],
+}
+ARCH_MOOD = {
+    "tsundere": ["fire", "play", "cute"], "amaama": ["sweet", "cute"], "mesugaki": ["play", "street", "sexy"], "seiso": ["holy", "elegant", "light"],
+    "jirai": ["sick", "night", "cute"], "uchiki": ["cute", "night", "sick"], "kuudere": ["ice", "elegant", "tech"], "yandere": ["dark", "sick", "night"],
+    "genki": ["light", "play", "street"], "ojousama": ["royal", "elegant"], "oneesan": ["sexy", "elegant", "night"], "gal": ["street", "play", "sexy"],
+    "chuuni": ["dark", "magic", "play"], "bokukko": ["wild", "play", "street"], "dojikko": ["cute", "play", "sweet"], "sadistic": ["dark", "sexy", "royal"],
+    "juujun": ["holy", "cute", "sweet"], "haraguro": ["dark", "elegant", "royal"], "fushigi": ["magic", "sky", "play"], "iinchou": ["military", "elegant", "street"],
+    "ottori": ["nature", "sweet", "cute"], "nekketsu": ["fire", "wild", "military"], "dokuzetsu": ["ice", "street", "dark"], "aneki": ["wild", "street", "military"],
+    "okubyou": ["cute", "sick", "nature"], "jishinka": ["royal", "fire", "light"],
+}
+COLOR_MOOD = {
+    "black": ["dark", "night", "elegant", "street"], "white": ["holy", "light", "cute", "ice"], "crimson": ["fire", "royal", "sexy"], "scarlet": ["fire", "wild"],
+    "wine red": ["sexy", "elegant", "night"], "royal blue": ["royal", "sky", "water"], "navy": ["night", "military", "water"], "sky blue": ["sky", "water", "light", "cute"],
+    "teal": ["water", "tech"], "emerald green": ["nature", "magic"], "olive green": ["military", "nature"], "dark green": ["nature", "dark"],
+    "mint": ["sweet", "cute", "ice"], "gold": ["royal", "holy", "light"], "silver": ["ice", "tech", "elegant"], "pastel pink": ["cute", "sweet"],
+    "hot pink": ["play", "street", "sexy"], "purple": ["magic", "dark", "sexy"], "dark purple": ["dark", "night", "magic"], "lavender": ["magic", "cute", "elegant"],
+    "orange": ["fire", "play", "light"], "yellow": ["light", "play", "tech"], "brown": ["nature", "street", "wild"], "cream": ["sweet", "holy", "elegant"],
+    "gray": ["tech", "ruin", "street"],
+}
+SIL_MOOD = {"top_heavy": ["cute", "play", "sweet"], "bottom_heavy": ["elegant", "royal", "holy"], "vertical": ["dark", "elegant", "holy", "night"], "wide": ["military", "wild", "tech"]}
+SHAPE_MOOD = {"round": ["cute", "sweet", "sick", "nature"], "square": ["military", "tech", "street"], "sharp": ["dark", "sexy", "fire", "wild"]}
+EMB_CAT_MOOD = {"damage": ["ruin", "sick", "street", "wild"], "straps": ["street", "sexy", "military", "dark"], "hardware": ["military", "tech", "royal"],
+                "layering": ["elegant", "street", "royal"], "cutouts": ["sexy"], "tech": ["tech"], "asymmetry": ["street", "play", "dark"]}
+HANDHELD_MOOD = {"sword": ["military", "royal", "holy"], "katana": ["wafu", "military"], "staff": ["magic", "holy", "nature"], "wand": ["magic", "cute"],
+                 "grimoire": ["magic", "dark"], "bow": ["nature", "wild"], "spear": ["military", "wild"], "scythe": ["dark", "ruin"], "dagger": ["street", "dark"],
+                 "gun": ["tech", "street", "military"], "shield": ["military", "holy"], "umbrella": ["elegant", "water", "wafu"], "fan": ["wafu", "elegant"],
+                 "instrument": ["music"], "lantern": ["night", "ruin"], "whip": ["sexy", "dark"]}
+MASCOT_MOOD = {"familiar": ["nature", "magic", "cute"], "spirit": ["magic", "holy", "night"], "drone": ["tech"], "plush": ["cute", "sweet", "sick"], "bird": ["nature", "sky"]}
+ERA_MOOD = {"fantasy": ["magic", "holy", "royal", "military", "nature"], "modern": ["street", "cute", "music", "play"], "scifi": ["tech"], "wafu": ["wafu"]}
+# コンセプト名の「役割」部分（女, 男）
+ROLE_TITLE = {
+    "succubus": ("淫魔", "淫魔"), "sister": ("シスター", "神父"), "maid": ("メイド", "執事"), "school_uniform": ("女学生", "学生"), "gothic_lolita": ("令嬢", "貴公子"),
+    "shrine_miko": ("巫女", "神主"), "kimono": ("大和撫子", "和装の君"), "knight": ("戦姫", "騎士"), "witch_robe": ("魔女", "魔術師"), "nurse": ("看護師", "医師"),
+    "idol": ("歌姫", "アイドル"), "magical_girl": ("魔法少女", "魔法少年"), "office_lady": ("秘書", "社員"), "casual_street": ("街娘", "街の少年"),
+    "swimsuit": ("水辺の娘", "水辺の少年"), "bunny_girl": ("バニー", "バニーボーイ"), "military": ("将校", "将校"), "princess_dress": ("姫", "王子"),
+    "cheongsam": ("チャイナ娘", "拳士"), "bodysuit": ("パイロット", "パイロット"), "sportswear": ("アスリート", "アスリート"), "pirate": ("海賊", "海賊"),
+    "ninja": ("くノ一", "忍"), "jester_outfit": ("道化師", "道化師"), "loungewear": ("眠り姫", "眠り王子"), "teacher": ("先生", "先生"), "dancer": ("踊り子", "踊り手"),
+    "delinquent": ("スケバン", "番長"), "saint": ("聖女", "聖人"), "goddess_dress": ("女神", "神"), "cow_suit": ("牧場娘", "牧童"), "hero": ("勇者", "勇者"),
+    "steampunk": ("技師", "技師"), "merchant": ("商人", "商人"), "pontiff": ("教皇", "教皇"), "demon_lord": ("女王", "魔王"), "thief": ("怪盗", "怪盗"),
+    "archer": ("狩人", "狩人"), "samurai": ("女侍", "侍"), "police": ("婦警", "警官"), "chef": ("料理人", "料理人"), "cheerleader": ("チア", "チア"),
+    "race_queen": ("レーサー", "レーサー"), "western": ("ガンマン", "ガンマン"), "waitress": ("給仕", "給仕"), "flight_attendant": ("客室乗務員", "パイロット"),
+    "fortune_teller": ("占い師", "占い師"),
+}
+ROLE_TITLE_EN = {
+    "succubus": "temptress", "sister": "nun", "maid": "maid", "school_uniform": "student", "gothic_lolita": "young lady", "shrine_miko": "shrine maiden",
+    "kimono": "lady", "knight": "knight", "witch_robe": "witch", "nurse": "nurse", "idol": "songstress", "magical_girl": "magical girl", "office_lady": "secretary",
+    "casual_street": "girl next door", "swimsuit": "swimmer", "bunny_girl": "bunny", "military": "officer", "princess_dress": "princess", "cheongsam": "lady",
+    "bodysuit": "pilot", "sportswear": "athlete", "pirate": "pirate", "ninja": "shinobi", "jester_outfit": "jester", "loungewear": "sleeper", "teacher": "teacher",
+    "dancer": "dancer", "delinquent": "delinquent", "saint": "saint", "goddess_dress": "goddess", "cow_suit": "farm girl", "hero": "hero", "steampunk": "engineer",
+    "merchant": "merchant", "pontiff": "pontiff", "demon_lord": "queen", "thief": "thief", "archer": "hunter", "samurai": "samurai", "police": "officer",
+    "chef": "chef", "cheerleader": "cheerleader", "race_queen": "racer", "western": "gunslinger", "waitress": "waitress", "flight_attendant": "attendant",
+    "fortune_teller": "oracle",
+}
+# 一貫性の強さ -> 相性の重み倍率
+COHERENCE_LEVELS = {"none": 0.0, "weak": 0.6, "normal": 1.2, "strong": 2.5}
+
+# ---------------------------------------------------------------------------
+# 導出型コンセプト（一貫性）。各要素に「雰囲気の記述子」を持たせ、錨（種族・モチーフ・服装）から
+# コンセプトを導出して、残りの選択を相性で重み付けする（除外はしないので多様性は保つ）
+# ---------------------------------------------------------------------------
+MOODS = ["night", "light", "fire", "ice", "water", "nature", "sky", "tech", "magic", "holy", "dark", "royal", "military", "street",
+         "cute", "sexy", "elegant", "wild", "wafu", "ruin", "sweet", "sick", "music", "play"]
+MOOD_JP = {"night": "夜の", "light": "光の", "fire": "炎の", "ice": "氷の", "water": "海の", "nature": "森の", "sky": "空の", "tech": "電脳の",
+           "magic": "魔法の", "holy": "聖なる", "dark": "闇の", "royal": "王家の", "military": "鋼の", "street": "街の", "cute": "愛らしい",
+           "sexy": "妖艶な", "elegant": "優雅な", "wild": "野性の", "wafu": "和の", "ruin": "廃墟の", "sweet": "甘い", "sick": "病んだ",
+           "music": "旋律の", "play": "悪戯な"}
+MOOD_EN = {"night": "the night", "light": "light", "fire": "flame", "ice": "frost", "water": "the sea", "nature": "the forest", "sky": "the sky",
+           "tech": "the machine age", "magic": "magic", "holy": "the sacred", "dark": "darkness", "royal": "the crown", "military": "steel",
+           "street": "the streets", "cute": "charm", "sexy": "allure", "elegant": "grace", "wild": "the wild", "wafu": "old Japan",
+           "ruin": "the ruins", "sweet": "sweetness", "sick": "sickness", "music": "melody", "play": "mischief"}
+
+RACE_MOOD = {
+    "demon": ["dark", "sexy", "magic", "night"], "angel": ["holy", "light", "sky"], "vampire": ["night", "dark", "elegant", "sexy"],
+    "cat": ["cute", "play", "street"], "fox": ["wafu", "magic", "elegant"], "wolf": ["wild", "nature", "night"], "rabbit": ["cute", "sweet", "play"],
+    "dragon": ["fire", "royal", "wild", "magic"], "mermaid": ["water", "elegant", "magic"], "fairy": ["nature", "magic", "cute", "light"],
+    "ghost": ["night", "dark", "wafu", "ruin"], "android": ["tech"], "oni": ["wafu", "wild", "fire"], "reaper": ["dark", "night", "ruin"],
+    "sheep": ["cute", "sweet", "nature"], "goddess": ["holy", "light", "royal", "elegant"], "cow": ["cute", "nature", "sweet"],
+    "dog": ["cute", "play", "street"], "tiger": ["wild", "fire", "military"], "snake": ["sexy", "dark", "magic"], "shark": ["water", "wild", "play"],
+    "harpy": ["sky", "nature", "wild"], "slime": ["cute", "play", "magic", "water"], "zombie": ["ruin", "sick", "dark"],
+    "elf": ["nature", "elegant", "magic", "light"], "dark_elf": ["dark", "sexy", "elegant", "night"], "dwarf": ["tech", "wild", "fire"],
+    "goblin": ["street", "play", "wild", "ruin"], "doll": ["elegant", "sick", "cute", "ruin"], "alien": ["tech", "sky", "play"],
+    "mouse": ["cute", "sweet", "street"], "bear": ["nature", "cute", "wild"], "deer": ["nature", "holy", "elegant"], "horse": ["military", "play", "royal"],
+    "bee": ["nature", "sweet", "play"], "spider": ["dark", "sexy", "ruin"], "bat": ["night", "dark", "play"], "tanuki": ["wafu", "play", "nature"],
+    "dullahan": ["dark", "military", "ruin", "night"], "human": [],
+}
+THEME_MOOD = {
+    "witch": ["magic", "night", "dark"], "star": ["night", "sky", "magic", "light"], "flower": ["nature", "elegant", "cute"], "yukionna": ["ice", "wafu", "elegant"],
+    "fire": ["fire", "wild"], "butterfly": ["elegant", "nature", "sexy"], "jester": ["play", "dark"], "moon": ["night", "magic", "elegant"],
+    "sun": ["light", "fire", "holy"], "thunder": ["tech", "wild", "fire"], "ocean": ["water", "sky", "play"], "forest": ["nature", "magic"],
+    "sweets": ["sweet", "cute"], "music": ["music", "play", "elegant"], "gem": ["elegant", "royal", "light", "magic"], "clockwork": ["tech", "elegant", "magic"],
+    "poison": ["dark", "sick", "magic"], "rain": ["water", "sick", "night"], "cloud": ["sky", "light", "cute"], "sakura": ["wafu", "elegant", "cute"],
+    "rose": ["elegant", "sexy", "royal"], "feather": ["light", "holy", "elegant"], "chain": ["dark", "military", "sexy", "sick"], "thorn": ["dark", "nature", "elegant"],
+    "key": ["magic", "elegant", "play"], "rainbow": ["light", "play", "cute"], "holy_light": ["holy", "light", "royal"], "shadow": ["dark", "night"],
+    "candle": ["night", "holy", "ruin"], "royal": ["royal", "elegant"], "neon": ["tech", "street", "night"], "heart": ["cute", "sweet", "sexy"],
+    "skull": ["dark", "ruin", "street"], "face_mark": ["play", "sick", "street"], "medical": ["sick", "cute"], "gamer": ["tech", "play", "street"],
+    "cosmetics": ["sexy", "elegant", "street"], "emblem": ["royal", "military", "holy", "magic"], "liquid": ["sweet", "sexy"], "stencil": ["street", "ruin", "play"],
+}
+ROLE_MOOD = {
+    "succubus": ["sexy", "dark", "night"], "sister": ["holy", "elegant"], "maid": ["cute", "elegant"], "school_uniform": ["street", "cute"],
+    "gothic_lolita": ["dark", "elegant", "cute", "night"], "shrine_miko": ["wafu", "holy"], "kimono": ["wafu", "elegant"], "knight": ["military", "royal", "holy"],
+    "witch_robe": ["magic", "night"], "nurse": ["sick", "cute"], "idol": ["music", "cute", "light"], "magical_girl": ["magic", "cute", "light"],
+    "office_lady": ["street", "elegant"], "casual_street": ["street", "play"], "swimsuit": ["water", "sexy", "play"], "bunny_girl": ["sexy", "play", "night"],
+    "military": ["military"], "princess_dress": ["royal", "elegant"], "cheongsam": ["elegant", "sexy"], "bodysuit": ["tech"], "sportswear": ["play", "street", "wild"],
+    "pirate": ["water", "wild", "street"], "ninja": ["wafu", "dark", "military"], "jester_outfit": ["play", "dark"], "loungewear": ["cute", "sweet"],
+    "teacher": ["elegant", "street"], "dancer": ["sexy", "elegant", "music"], "delinquent": ["street", "wild"], "saint": ["holy", "light", "elegant"],
+    "goddess_dress": ["holy", "royal", "elegant", "light"], "cow_suit": ["cute", "sexy", "nature"], "hero": ["military", "light", "wild"],
+    "steampunk": ["tech", "elegant", "ruin"], "merchant": ["street", "play", "nature"], "pontiff": ["holy", "royal"], "demon_lord": ["dark", "royal", "military"],
+    "thief": ["dark", "street", "night"], "archer": ["nature", "wild", "military"], "samurai": ["wafu", "military"], "police": ["military", "street"],
+    "chef": ["sweet", "street"], "cheerleader": ["play", "cute", "street"], "race_queen": ["tech", "sexy", "street"], "western": ["wild", "street"],
+    "waitress": ["cute", "sweet", "street"], "flight_attendant": ["sky", "elegant", "street"], "fortune_teller": ["magic", "night", "elegant"],
+}
+ARCH_MOOD = {
+    "tsundere": ["fire", "play", "cute"], "amaama": ["sweet", "cute"], "mesugaki": ["play", "street", "sexy"], "seiso": ["holy", "elegant", "light"],
+    "jirai": ["sick", "night", "cute"], "uchiki": ["cute", "night", "sick"], "kuudere": ["ice", "elegant", "tech"], "yandere": ["dark", "sick", "night"],
+    "genki": ["light", "play", "street"], "ojousama": ["royal", "elegant"], "oneesan": ["sexy", "elegant", "night"], "gal": ["street", "play", "sexy"],
+    "chuuni": ["dark", "magic", "play"], "bokukko": ["wild", "play", "street"], "dojikko": ["cute", "play", "sweet"], "sadistic": ["dark", "sexy", "royal"],
+    "juujun": ["holy", "cute", "sweet"], "haraguro": ["dark", "elegant", "royal"], "fushigi": ["magic", "sky", "play"], "iinchou": ["military", "elegant", "street"],
+    "ottori": ["nature", "sweet", "cute"], "nekketsu": ["fire", "wild", "military"], "dokuzetsu": ["ice", "street", "dark"], "aneki": ["wild", "street", "military"],
+    "okubyou": ["cute", "sick", "nature"], "jishinka": ["royal", "fire", "light"],
+}
+COLOR_MOOD = {
+    "black": ["dark", "night", "elegant", "street"], "white": ["holy", "light", "cute", "ice"], "crimson": ["fire", "royal", "sexy"], "scarlet": ["fire", "wild"],
+    "wine red": ["sexy", "elegant", "night"], "royal blue": ["royal", "sky", "water"], "navy": ["night", "military", "water"], "sky blue": ["sky", "water", "light", "cute"],
+    "teal": ["water", "tech"], "emerald green": ["nature", "magic"], "olive green": ["military", "nature"], "dark green": ["nature", "dark"],
+    "mint": ["sweet", "cute", "ice"], "gold": ["royal", "holy", "light"], "silver": ["ice", "tech", "elegant"], "pastel pink": ["cute", "sweet"],
+    "hot pink": ["play", "street", "sexy"], "purple": ["magic", "dark", "sexy"], "dark purple": ["dark", "night", "magic"], "lavender": ["magic", "cute", "elegant"],
+    "orange": ["fire", "play", "light"], "yellow": ["light", "play", "tech"], "brown": ["nature", "street", "wild"], "cream": ["sweet", "holy", "elegant"],
+    "gray": ["tech", "ruin", "street"],
+}
+SIL_MOOD = {"top_heavy": ["cute", "play", "sweet"], "bottom_heavy": ["elegant", "royal", "holy"], "vertical": ["dark", "elegant", "holy", "night"], "wide": ["military", "wild", "tech"]}
+SHAPE_MOOD = {"round": ["cute", "sweet", "sick", "nature"], "square": ["military", "tech", "street"], "sharp": ["dark", "sexy", "fire", "wild"]}
+EMB_CAT_MOOD = {"damage": ["ruin", "sick", "street", "wild"], "straps": ["street", "sexy", "military", "dark"], "hardware": ["military", "tech", "royal"],
+                "layering": ["elegant", "street", "royal"], "cutouts": ["sexy"], "tech": ["tech"], "asymmetry": ["street", "play", "dark"]}
+HANDHELD_MOOD = {"sword": ["military", "royal", "holy"], "katana": ["wafu", "military"], "staff": ["magic", "holy", "nature"], "wand": ["magic", "cute"],
+                 "grimoire": ["magic", "dark"], "bow": ["nature", "wild"], "spear": ["military", "wild"], "scythe": ["dark", "ruin"], "dagger": ["street", "dark"],
+                 "gun": ["tech", "street", "military"], "shield": ["military", "holy"], "umbrella": ["elegant", "water", "wafu"], "fan": ["wafu", "elegant"],
+                 "instrument": ["music"], "lantern": ["night", "ruin"], "whip": ["sexy", "dark"]}
+MASCOT_MOOD = {"familiar": ["nature", "magic", "cute"], "spirit": ["magic", "holy", "night"], "drone": ["tech"], "plush": ["cute", "sweet", "sick"], "bird": ["nature", "sky"]}
+ERA_MOOD = {"fantasy": ["magic", "holy", "royal", "military", "nature"], "modern": ["street", "cute", "music", "play"], "scifi": ["tech"], "wafu": ["wafu"]}
+# コンセプト名の「役割」部分（女, 男）
+ROLE_TITLE = {
+    "succubus": ("淫魔", "淫魔"), "sister": ("シスター", "神父"), "maid": ("メイド", "執事"), "school_uniform": ("女学生", "学生"), "gothic_lolita": ("令嬢", "貴公子"),
+    "shrine_miko": ("巫女", "神主"), "kimono": ("大和撫子", "和装の君"), "knight": ("戦姫", "騎士"), "witch_robe": ("魔女", "魔術師"), "nurse": ("看護師", "医師"),
+    "idol": ("歌姫", "アイドル"), "magical_girl": ("魔法少女", "魔法少年"), "office_lady": ("秘書", "社員"), "casual_street": ("街娘", "街の少年"),
+    "swimsuit": ("水辺の娘", "水辺の少年"), "bunny_girl": ("バニー", "バニーボーイ"), "military": ("将校", "将校"), "princess_dress": ("姫", "王子"),
+    "cheongsam": ("チャイナ娘", "拳士"), "bodysuit": ("パイロット", "パイロット"), "sportswear": ("アスリート", "アスリート"), "pirate": ("海賊", "海賊"),
+    "ninja": ("くノ一", "忍"), "jester_outfit": ("道化師", "道化師"), "loungewear": ("眠り姫", "眠り王子"), "teacher": ("先生", "先生"), "dancer": ("踊り子", "踊り手"),
+    "delinquent": ("スケバン", "番長"), "saint": ("聖女", "聖人"), "goddess_dress": ("女神", "神"), "cow_suit": ("牧場娘", "牧童"), "hero": ("勇者", "勇者"),
+    "steampunk": ("技師", "技師"), "merchant": ("商人", "商人"), "pontiff": ("教皇", "教皇"), "demon_lord": ("女王", "魔王"), "thief": ("怪盗", "怪盗"),
+    "archer": ("狩人", "狩人"), "samurai": ("女侍", "侍"), "police": ("婦警", "警官"), "chef": ("料理人", "料理人"), "cheerleader": ("チア", "チア"),
+    "race_queen": ("レーサー", "レーサー"), "western": ("ガンマン", "ガンマン"), "waitress": ("給仕", "給仕"), "flight_attendant": ("客室乗務員", "パイロット"),
+    "fortune_teller": ("占い師", "占い師"),
+}
+ROLE_TITLE_EN = {
+    "succubus": "temptress", "sister": "nun", "maid": "maid", "school_uniform": "student", "gothic_lolita": "young lady", "shrine_miko": "shrine maiden",
+    "kimono": "lady", "knight": "knight", "witch_robe": "witch", "nurse": "nurse", "idol": "songstress", "magical_girl": "magical girl", "office_lady": "secretary",
+    "casual_street": "girl next door", "swimsuit": "swimmer", "bunny_girl": "bunny", "military": "officer", "princess_dress": "princess", "cheongsam": "lady",
+    "bodysuit": "pilot", "sportswear": "athlete", "pirate": "pirate", "ninja": "shinobi", "jester_outfit": "jester", "loungewear": "sleeper", "teacher": "teacher",
+    "dancer": "dancer", "delinquent": "delinquent", "saint": "saint", "goddess_dress": "goddess", "cow_suit": "farm girl", "hero": "hero", "steampunk": "engineer",
+    "merchant": "merchant", "pontiff": "pontiff", "demon_lord": "queen", "thief": "thief", "archer": "hunter", "samurai": "samurai", "police": "officer",
+    "chef": "chef", "cheerleader": "cheerleader", "race_queen": "racer", "western": "gunslinger", "waitress": "waitress", "flight_attendant": "attendant",
+    "fortune_teller": "oracle",
+}
+# 一貫性の強さ -> 相性の重み倍率
+COHERENCE_LEVELS = {"none": 0.0, "weak": 0.6, "normal": 1.2, "strong": 2.5}
+
 EMBELLISH_LEVELS = {0: (0, False), 1: (2, False), 2: (3, True), 3: (5, True)}
 # カテゴリの重み（テックは種族/モチーフが機械系なら engine が上げる）
 EMBELLISH_WEIGHTS = {"asymmetry": 3, "straps": 3, "hardware": 3, "layering": 2, "cutouts": 1, "tech": 1, "damage": 1}

@@ -300,6 +300,10 @@ class Character:
     mascot_nl: str = ""
     face_mark_tags: List[str] = field(default_factory=list)
     face_mark_nl: str = ""
+    concept_jp: str = ""
+    concept_en: str = ""
+    moods: List[str] = field(default_factory=list)
+    coherence: str = "normal"
     pattern_base: str = ""      # スタイル修飾なしの模様名
     print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
     outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
@@ -507,7 +511,8 @@ def _dedupe(items: List[str]) -> List[str]:
 
 def build_embellishments(level: int, outfit: List[str], gender: str, exposure: str, shape: str, tech_affinity: bool,
                          features_text: str, rng: random.Random, slots: Dict[str, str],
-                         zones: Optional[List[str]] = None, shape_lang: str = "", damage_affinity: bool = False) -> Tuple[List[str], List[str], str]:
+                         zones: Optional[List[str]] = None, shape_lang: str = "", damage_affinity: bool = False,
+                         concept_weights: Optional[Dict[str, float]] = None) -> Tuple[List[str], List[str], str]:
     """
     装飾レイヤー。服装の部位スロットと衝突しないようにアドオンを選ぶ。
     返り値: (タグ列, 文章の断片, 象徴的な一点のタグ)
@@ -566,6 +571,9 @@ def build_embellishments(level: int, outfit: List[str], gender: str, exposure: s
         weights["tech"] = 4
     if damage_affinity:
         weights["damage"] = 4
+    if concept_weights:
+        for k in weights:
+            weights[k] = weights[k] * concept_weights.get(k, 1.0)
     # 非対称化を1つは優先的に入れる（VTuber 的な「読める」シルエット）
     order = ["asymmetry"] + rng.choices(list(weights), weights=list(weights.values()), k=n_small * 3)
 
@@ -625,6 +633,26 @@ def build_hair_special(level: int, hair: List[str], hair_color: str, palette: Tu
     return tags, nl
 
 
+def _affinity(moods, concept: Dict[str, float]) -> float:
+    return sum(concept.get(m, 0.0) for m in (moods or []))
+
+
+def _coherent_pick(rng: random.Random, items, moods_of, concept: Dict[str, float], strength: float, base: float = 1.0):
+    """コンセプトとの相性で重み付けして1つ選ぶ（除外はしない）。strength=0 なら一様"""
+    items = list(items)
+    if not items:
+        return None
+    if strength <= 0 or not concept:
+        return rng.choice(items)
+    weights = [base + strength * _affinity(moods_of(it), concept) for it in items]
+    return rng.choices(items, weights=weights, k=1)[0]
+
+
+def _add_moods(concept: Dict[str, float], moods, weight: float):
+    for m in (moods or []):
+        concept[m] = concept.get(m, 0.0) + weight
+
+
 def _role_available(role: str, gender: str) -> bool:
     role = D.ROLE_ALIASES.get(role, role)
     if role not in D.ROLES:
@@ -670,7 +698,10 @@ def generate(
     era: str = "auto",
     mascot: str = "none",
     face_mark: str = "none",
+    coherence: str = "normal",
 ) -> Character:
+    strength = D.COHERENCE_LEVELS.get(coherence, 1.2)
+    concept: Dict[str, float] = {}
     strict = consistency == "strict"
     rng = random.Random(seed)
     spec = parse_brief(brief)
@@ -701,16 +732,19 @@ def generate(
     else:
         weights = {k: w for k, w in D.MOTIF_WEIGHTS.items() if k not in excluded["motif"]} or dict(D.MOTIF_WEIGHTS)
         motif_key = _weighted_pick(rng, weights)
-    # --- テーマ（モチーフ）: 指定 > "none" > 確率で付与 -----------------------
+    _add_moods(concept, D.RACE_MOOD.get(motif_key), 2.0)
+    # --- テーマ（モチーフ）: 指定 > "none" > 確率で付与（種族との相性で重み付け） ------
     if spec.theme:
         theme_key = spec.theme
     elif theme == "none":
         theme_key = None
     elif theme == "random" or rng.random() < D.THEME_PROB:
         pool_t = [k for k in D.THEMES if k not in excluded["motif"]] or list(D.THEMES)
-        theme_key = _pick(rng, pool_t)
+        theme_key = _coherent_pick(rng, pool_t, lambda k: D.THEME_MOOD.get(k), concept, strength)
     else:
         theme_key = None
+    if theme_key:
+        _add_moods(concept, D.THEME_MOOD.get(theme_key), 2.5)  # モチーフはテーマ名を決める主役なので少し重く
     motif = merge_race_theme(D.MOTIFS[motif_key], D.MOTIFS[theme_key] if theme_key else None)
 
     # --- ギャップ（意外性）判定 ------------------------------------------
@@ -755,7 +789,7 @@ def generate(
                 classic = set(D.ROLE_ALIASES.get(r, r) for r in motif["classic_roles"])
                 pool = [r for r in pool if r not in classic] or pool
             pool = _without(pool, excluded["role"])
-        role_key = _pick(rng, pool)
+        role_key = _coherent_pick(rng, pool, lambda r: D.ROLE_MOOD.get(r), concept, strength)
     role = D.ROLES[role_key]
 
     # --- 融合する2つ目の服装系統 -----------------------------------------
@@ -784,8 +818,9 @@ def generate(
             if twist_arch:
                 pool = [a for a in pool if a not in motif["classic_arch"]] or pool
             pool = _without(pool, excluded["archetype"])
-        arch_key = _pick(rng, pool)
+        arch_key = _coherent_pick(rng, pool, lambda a: D.ARCH_MOOD.get(a), concept, strength)
     arch = D.ARCHETYPES[arch_key]
+    _add_moods(concept, D.ARCH_MOOD.get(arch_key), 1.0)
 
     if role_fixed and arch_fixed:
         twist_label = "fixed"
@@ -800,7 +835,10 @@ def generate(
     elif spec.exposure in EXPOSURES:
         exp = spec.exposure
     else:
-        cands = [(e, w) for e, w in zip(EXPOSURES, [2, 5, 3]) if e not in excluded["exposure"]] or list(zip(EXPOSURES, [2, 5, 3]))
+        exp_w = {"modest": 2 + strength * _affinity(["holy", "elegant", "military"], concept) * 0.5,
+                 "standard": 5,
+                 "high": 3 + strength * _affinity(["sexy"], concept)}
+        cands = [(e, exp_w[e]) for e in EXPOSURES if e not in excluded["exposure"]] or [(e, exp_w[e]) for e in EXPOSURES]
         exp = rng.choices([e for e, _ in cands], weights=[w for _, w in cands], k=1)[0]
 
     # --- テーマカラー（3色ルール） ---------------------------------------
@@ -810,7 +848,7 @@ def generate(
         palette_pool = list(motif["palettes"]) * 2 + list(arch["palettes"]) + list(role.get("palettes", []))
         if role_b:
             palette_pool += list(role_b.get("palettes", []))
-    main, sub, accent = _pick(rng, palette_pool)
+    main, sub, accent = _coherent_pick(rng, palette_pool, lambda p: D.COLOR_MOOD.get(p[0], []) + D.COLOR_MOOD.get(p[1], []) + D.COLOR_MOOD.get(p[2], []), concept, strength * 0.5)
     if spec.theme_color:
         main = spec.theme_color
     if sub == main:
@@ -1031,7 +1069,7 @@ def generate(
     # --- シグネチャ小物（1つだけ） -----------------------------------------
     # --- シルエット設計・シェイプ言語・情報量ゾーン ---------------------------
     sil_rng = random.Random(seed * 31337 + 5)
-    sil_key = silhouette if silhouette in D.SILHOUETTES else _pick(sil_rng, list(D.SILHOUETTES))
+    sil_key = silhouette if silhouette in D.SILHOUETTES else _coherent_pick(sil_rng, list(D.SILHOUETTES), lambda k: D.SIL_MOOD.get(k), concept, strength)
     sil = D.SILHOUETTES[sil_key]
     zones = list(sil["zones"])
     shape_key = shape_lang if shape_lang in D.SHAPES else D.ARCH_SHAPE.get(arch_key, "round")
@@ -1045,7 +1083,8 @@ def generate(
     embellish_tags, embellish_nl, iconic_tag = build_embellishments(
         detail_level, outfit, gender, exp, shape, tech_aff, " ".join(features).lower(), emb_rng, fill_slots,
         zones if detail_level >= 1 else None, shape_key,
-        (motif_key in D.DAMAGE_AFFINITY) or (theme_key in D.DAMAGE_AFFINITY) or (arch_key in D.DAMAGE_AFFINITY))
+        (motif_key in D.DAMAGE_AFFINITY) or (theme_key in D.DAMAGE_AFFINITY) or (arch_key in D.DAMAGE_AFFINITY),
+        {cat: 1.0 + strength * _affinity(m, concept) * 0.5 for cat, m in D.EMB_CAT_MOOD.items()} if strength > 0 else None)
     if strict:
         # 説明文版（シートのメモ）にも同じ内容を足しておく
         outfit_detail = outfit_detail + embellish_tags
@@ -1057,8 +1096,10 @@ def generate(
     extra_rng = random.Random(seed * 2003 + 11)
     mascot_tags: List[str] = []
     mascot_nl = ""
+    if mascot == "auto":
+        mascot = "random" if (strength > 0 and _affinity(["cute", "magic", "nature", "tech", "sweet"], concept) >= 3 and extra_rng.random() < 0.25) else "none"
     if mascot and mascot != "none":
-        m = next((x for x in D.MASCOTS if x["key"] == mascot), None) or _pick(extra_rng, D.MASCOTS)
+        m = next((x for x in D.MASCOTS if x["key"] == mascot), None) or _coherent_pick(extra_rng, D.MASCOTS, lambda x: D.MASCOT_MOOD.get(x["key"]), concept, strength)
         mfill = dict(fill_slots, shape=shape or "round")
         mascot_tags = [_fill(t, mfill) for t in m["tags"]]
         mascot_nl = _fill(m["nl"], mfill)
@@ -1068,14 +1109,30 @@ def generate(
         fm = next((x for x in D.FACE_MARKS if x["key"] == face_mark), None) or _pick(extra_rng, D.FACE_MARKS)
         face_mark_tags = [_fill(t, fill_slots) for t in fm["tags"]]
         face_mark_nl = _fill(fm["nl"], fill_slots)
+    if not era_key and strength > 0:
+        # 世界観が自動なら、コンセプトに最も合う世界観の雰囲気タグだけ足す（服装の制限はしない）
+        best = max(D.ERAS, key=lambda k: _affinity(D.ERA_MOOD[k], concept))
+        if _affinity(D.ERA_MOOD[best], concept) >= 4 and best != "modern":
+            era_key = best
     era_tags = list(D.ERAS[era_key]["tags"]) if era_key else []
+
+    # --- 導出されたコンセプトの名前 --------------------------------------------
+    theme_order = list(D.THEME_MOOD.get(theme_key, [])) if theme_key else []
+    top_moods = [m for m, _ in sorted(concept.items(), key=lambda kv: (-kv[1], theme_order.index(kv[0]) if kv[0] in theme_order else 99))][:3]
+    role_title = D.ROLE_TITLE.get(role_key, (role["jp"], role["jp"]))[0 if gender == "girl" else 1]
+    concept_jp = (D.MOOD_JP[top_moods[0]] + role_title) if top_moods else role_title
+    concept_en = f"the {D.ROLE_TITLE_EN.get(role_key, role_key)} of {D.MOOD_EN[top_moods[0]]}" if top_moods else D.ROLE_TITLE_EN.get(role_key, role_key)
 
     # --- 手持ち（武器・小道具）。既定では何も持たない --------------------------
     prop = ""
     handheld_tags: List[str] = []
     handheld_key = None
-    if handheld == "random":
-        handheld_key = _pick(rng, list(D.HANDHELDS))
+    if handheld == "auto":
+        # コンセプトが武器・小道具を語るなら 45% で相性の良いものを持たせる
+        if strength > 0 and _affinity(["military", "magic", "wafu", "dark", "music", "wild"], concept) >= 3 and rng.random() < 0.45:
+            handheld_key = _coherent_pick(rng, list(D.HANDHELDS), lambda k: D.HANDHELD_MOOD.get(k), concept, strength, base=0.2)
+    elif handheld == "random":
+        handheld_key = _coherent_pick(rng, list(D.HANDHELDS), lambda k: D.HANDHELD_MOOD.get(k), concept, strength)
     elif handheld in D.HANDHELDS:
         handheld_key = handheld
     elif handheld == "none" and spec.handheld:
@@ -1121,6 +1178,7 @@ def generate(
         detail_level=detail_level, hair_special_nl=hair_special_nl,
         silhouette=sil_key, shape_lang=shape_key, zones=zones, silhouette_tags=silhouette_tags,
         era=era_key or "", era_tags=era_tags, mascot_tags=mascot_tags, mascot_nl=mascot_nl, face_mark_tags=face_mark_tags, face_mark_nl=face_mark_nl,
+        concept_jp=concept_jp, concept_en=concept_en, moods=top_moods, coherence=coherence,
     )
 
 
@@ -1212,6 +1270,13 @@ def _article(phrase: str) -> str:
     return "an" if phrase[:1].lower() in "aeiou" else "a"
 
 
+def _concept_sentence(c: Character, pron: str, poss: str) -> str:
+    if not c.concept_en or c.coherence == "none" or not c.moods:
+        return ""
+    themes = " and ".join(D.MOOD_EN[m] for m in c.moods[:2])
+    return f"Concept: {c.concept_en}. Every element of the design, from the palette and silhouette to the ornaments, follows the theme of {themes}."
+
+
 def _mascot_sentence(c: Character, pron: str, poss: str) -> str:
     out = []
     if c.mascot_nl:
@@ -1292,6 +1357,7 @@ def build_positive(c: Character) -> str:
             parts.append(f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim{pat}.")
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
+        parts.append(_concept_sentence(c, pron, poss))
         parts.append(_color_sentence(c, pron, poss))
         parts.append(_embellish_sentence(c, pron, poss))
         parts.append(_silhouette_sentence(c, pron, poss))
@@ -1352,7 +1418,7 @@ def build_positive(c: Character) -> str:
         tags += c.era_tags
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [_concept_sentence(c, pron, poss), f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.features
@@ -1471,6 +1537,7 @@ def build_sheet(c: Character) -> str:
         f"# seed       : {c.seed}",
         f"# brief      : {c.brief.strip().replace(chr(10), ' / ') if c.brief.strip() else '(なし)'}",
         f"# concept    : {concept}  ——  一言: 「{era_jp}{D.MOTIFS[c.theme]['jp'] + '系' if c.theme else ''}{role['jp']} × {arch['jp']}{'（' + motif['jp'] + '）' if c.motif != 'human' else ''}」",
+        f"# theme(導出): 『{c.concept_jp}』 ({c.concept_en})   moods: {', '.join(D.MOOD_JP[m].rstrip('の') for m in c.moods) or '-'}   coherence: {c.coherence}",
         f"# race       : {motif['jp']} ({c.motif})   motif: " + (f"{D.MOTIFS[c.theme]['jp']} ({c.theme})" if c.theme else "(なし)") + f"   role: {role['jp']} ({c.role})" + (f" × {D.ROLES[c.role2]['jp']} ({c.role2}) [融合]" if c.role2 else "") + f"   gender: {c.gender}",
         f"# personality: {arch['jp']} ({c.archetype})",
         f"#   -> {arch['design_jp']}",
