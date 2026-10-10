@@ -62,7 +62,7 @@ ComfyUI用のカスタムノード詰め合わせリポジトリです。
   - **テーマカラー3色**: main / sub / accent に制限し、縁取り・裏地・小物・瞳の色まで accent で固定
   - **服装のバリエーション**: 服装系統ごとに主役の服の選択肢や、無くても成立する小物（アイマスク・聴診器・鞄など）の有無が seed で変わる
   - **モチーフは衣装に溶かす**: モチーフの記号は髪飾り・イヤリング・ブローチ・刺繍・プリントなど身に着ける物だけ（手持ちの別物体は出さない）。手持ち小物には `holding` を付けて手に固定し、「モチーフは衣装の装飾として表現」の一文と negative（floating objects）で背景への散らばりを抑える
-  - **露出アンカー**: 高露出のときは `(revealing clothes:1.44)`＋露出部位タグ（sideboob / underboob / backless / see-through / thighs 等から seed で2つ）＋自然文を追加し、negative に `covered navel` 等を入れてモデルが穏当に描くのを防ぐ
+  - **露出アンカー**: 高露出のときは露出部位タグ（sideboob / underboob / backless / see-through / bare shoulders / thighs / navel / bare back から seed で3つ、先頭だけ重み付き）＋自然文を追加し、negative に `covered navel` 等を入れてモデルが穏当に描くのを防ぐ。`revealing clothes` は特定の衣装構造に引っ張られるため使わない
   - **性格の署名**: 性格ごとに常に入るタグ（ドS: riding crop / evil smile / looking down at viewer、メスガキ: smug / fang など）と、性格を表す自然文1文を末尾に添える
   - **目の形の押し込み**: 目の形は画風に固定されがちなので、形タグに強弱3段階の重み、反対の形を negative、自然文での言い換え（upturned slanted eyes…）、大きさ軸（large round / almond-shaped / narrow / small）を組み合わせる
   - **目の構造化**: 色・形（ツリ目/タレ目/ジト目/三白眼）・開き具合・瞳孔（縦長/ハート/星/リング/収縮）・ハイライト（キラキラ/死んだ目/光る目）・まつ毛・眉・メイク・泣きぼくろ等を性格プロファイルから組み立てる。brief で「ツリ目」「死んだ目」「ハート瞳」「太眉」「赤シャドウ」などを直接指定可能

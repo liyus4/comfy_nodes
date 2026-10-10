@@ -3512,8 +3512,9 @@ FUSION_TAKE = {"head": 1, "face": 1, "hands": 1, "neck": 1, "outer": 1, "waist":
 # 土台側に既にあっても、この確率で 2つ目側が勝つスロット（どちらが主か seed で揺らぐ）
 FUSION_OVERRIDE = {"head": 0.4, "outer": 0.4, "feet": 0.3, "legs": 0.3}
 
-# 高露出のときに追加する露出アンカー（strict/full 共通）。booru の露出部位タグから seed で2つ選ぶ
-EXPOSURE_HIGH_ANCHOR = "revealing clothes"
+# 高露出のときに追加する露出部位タグ（strict/full 共通）。seed で3つ選び、先頭だけ重み付き。
+# "revealing clothes" は特定の衣装構造を強く学習しているため固定アンカーには使わない
+EXPOSURE_HIGH_COUNT = 3
 EXPOSURE_HIGH_EXTRAS = ["sideboob", "underboob", "backless outfit", "see-through", "bare shoulders", "thighs", "navel", "bare back"]
 EXPOSURE_HIGH_EXTRAS_MALE = ["bare pectorals", "abs", "bare shoulders", "bare back", "thighs", "see-through"]
 EXPOSURE_HIGH_NEGATIVE = ["covered navel", "covered collarbone", "turtleneck"]

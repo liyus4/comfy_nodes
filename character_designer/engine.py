@@ -821,7 +821,7 @@ def generate(
         pool_x = D.EXPOSURE_HIGH_EXTRAS_MALE if gender == "boy" else D.EXPOSURE_HIGH_EXTRAS
         outfit_text = " ".join(outfit + outfit_detail).lower()
         pool_x = [t for t in pool_x if t not in outfit_text]
-        exposure_tags = [D.EXPOSURE_HIGH_ANCHOR] + _sample(rng, pool_x, 2)
+        exposure_tags = _sample(rng, pool_x, D.EXPOSURE_HIGH_COUNT)
 
     # strict: 模様は booru に print タグがあるものだけ出す
     print_tag = (motif.get("signature_print") or D.BOORU_PRINT.get(base_pattern, "")) if strict else ""
@@ -889,8 +889,8 @@ def _eye_sentence(c: Character, pron: str, poss: str) -> str:
 def _exposure_sentence(c: Character, pron: str, poss: str) -> str:
     if c.exposure != "high" or not c.exposure_tags:
         return ""
-    parts = ", ".join(c.exposure_tags[1:]) if len(c.exposure_tags) > 1 else "a lot of skin"
-    return f"{poss.capitalize()} outfit is extremely revealing, showing {parts}."
+    parts = ", ".join(c.exposure_tags)
+    return f"{poss.capitalize()} outfit shows a lot of skin: {parts}."
 
 
 def _theme_sentence(c: Character, pron: str, poss: str) -> str:
