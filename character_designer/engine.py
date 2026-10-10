@@ -1130,7 +1130,7 @@ def generate(
     if handheld == "auto":
         # コンセプトが武器・小道具を語るなら 45% で相性の良いものを持たせる
         if strength > 0 and _affinity(["military", "magic", "wafu", "dark", "music", "wild"], concept) >= 3 and rng.random() < 0.45:
-            handheld_key = _coherent_pick(rng, list(D.HANDHELDS), lambda k: D.HANDHELD_MOOD.get(k), concept, strength, base=0.2)
+            handheld_key = _coherent_pick(rng, list(D.HANDHELDS), lambda k: D.HANDHELD_MOOD.get(k), concept, strength, base=0.05)
     elif handheld == "random":
         handheld_key = _coherent_pick(rng, list(D.HANDHELDS), lambda k: D.HANDHELD_MOOD.get(k), concept, strength)
     elif handheld in D.HANDHELDS:
