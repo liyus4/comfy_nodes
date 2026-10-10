@@ -39,6 +39,7 @@ class Spec:
     theme_color: Optional[str] = None
     hair_styles: List[str] = field(default_factory=list)
     traits: List[str] = field(default_factory=list)
+    eye_tags: Dict[str, str] = field(default_factory=dict)  # カテゴリ -> タグ（指示文で指定された目の特徴）
     extras: List[str] = field(default_factory=list)   # 認識できなかった語（そのまま通す）
     matched: List[str] = field(default_factory=list)  # ログ用
 
@@ -82,6 +83,7 @@ def _all_tables() -> List[Dict[str, List[str]]]:
         D.EYE_COLOR_WORDS,
         D.HAIR_STYLE_WORDS,
         {k: v["syn"] for k, v in D.TRAIT_WORDS.items()},
+        {str(k): v for k, v in D.EYE_WORDS.items()},
     ]
 
 
@@ -146,6 +148,9 @@ def parse_brief(brief: str) -> Spec:
         for t in _lookup(tok, {k: v["syn"] for k, v in D.TRAIT_WORDS.items()}):
             if t not in spec.traits:
                 spec.traits.append(t)
+            matched = True
+        for cat_tag in _lookup(tok, {k: v for k, v in D.EYE_WORDS.items()}):
+            spec.eye_tags[cat_tag[0]] = cat_tag[1]
             matched = True
 
         # 単色ワード（赤・青…）は、他に何も一致しなかった時だけテーマカラーとして扱う
@@ -239,6 +244,7 @@ class Character:
     pattern_base: str = ""      # スタイル修飾なしの模様名
     print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
     outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
+    eye_choice: Dict[str, str] = field(default_factory=dict)  # 目の各カテゴリの選択（negative 用）
     omitted: List[str] = field(default_factory=list)        # strict で省いた不安定要素
 
     @property
@@ -362,6 +368,7 @@ def generate(
     exclude: str = "",
     consistency: str = "strict",
     emphasis: bool = True,
+    eye_shape: str = "auto",
 ) -> Character:
     strict = consistency == "strict"
     rng = random.Random(seed)
@@ -539,10 +546,30 @@ def generate(
         eye_color = D.COLOR_TO_EYE.get(accent, _pick(rng, motif["eye_colors"]))
     else:
         eye_color = _pick(rng, motif["eye_colors"])
-    eye_shape = _pick(rng, arch["eyes"])
-    eyes = [eye_color, eye_shape]
+    eyes = [eye_color]
     if "heterochromia" in spec.traits and "heterochromia" not in eye_color:
         eyes.insert(0, "heterochromia")
+    # 目の構造: 形 / 開き具合 / 瞳孔 / ハイライト / まつ毛 / 眉 / メイク / その他
+    profile = D.EYE_PROFILES.get(arch_key, {"shape": ["tsurime", "tareme"]})
+    chosen: Dict[str, str] = {}
+    if eye_shape != "auto" and eye_shape in D.EYE_SHAPES:
+        chosen["shape"] = eye_shape
+    elif "shape" in spec.eye_tags:
+        chosen["shape"] = spec.eye_tags["shape"]
+    else:
+        chosen["shape"] = _pick(rng, profile.get("shape") or ["tsurime", "tareme"])
+    for cat in ("lid", "pupils", "highlights", "lashes", "brows", "makeup", "details"):
+        if cat in spec.eye_tags:
+            chosen[cat] = spec.eye_tags[cat]
+            continue
+        if cat == "pupils" and motif.get("pupils") and "heterochromia" not in eye_color:
+            chosen[cat] = _pick(rng, motif["pupils"])   # モチーフ由来の瞳孔は必ず出す
+            continue
+        cands = profile.get(cat)
+        if cands and rng.random() < D.EYE_PROBS[cat]:
+            chosen[cat] = _pick(rng, cands)
+    eye_order = ("shape", "lid", "pupils", "highlights", "lashes", "brows", "makeup", "details")
+    eyes += [_fill(chosen[cat], slots) for cat in eye_order if cat in chosen]
 
     # --- 肌・体型 ---------------------------------------------------------
     skin = _fill(motif.get("skin") or "fair skin", slots)
@@ -643,7 +670,7 @@ def generate(
         accessories=accessories, prop=prop, expression=expression, pose=pose,
         extras=[], unrecognized=spec.extras, excluded=excluded, prompt_style=prompt_style, expression_pose=expression_pose,
         consistency=consistency, emphasis=emphasis, pattern_base=base_pattern, print_tag=print_tag,
-        outfit_detail=outfit_detail, omitted=omitted,
+        outfit_detail=outfit_detail, omitted=omitted, eye_choice=chosen,
     )
 
 
@@ -787,6 +814,14 @@ def build_negative(c: Character) -> str:
     if "colored skin" in c.skin:
         neg += ["fair skin", "pale skin"]
     if c.consistency == "strict":
+        # 目: 選ばなかった特殊瞳孔・反対のハイライトを抑える
+        if "pupils" not in c.eye_choice:
+            neg += ["slit pupils", "heart-shaped pupils"]
+        hl = c.eye_choice.get("highlights")
+        if hl == "empty eyes":
+            neg.append("sparkling eyes")
+        elif hl:
+            neg.append("empty eyes")
         # 不安定要素は negative でも抑える
         neg += ["facial mark", "face paint", "body markings"]
         neg += _alt_color_negatives(c)

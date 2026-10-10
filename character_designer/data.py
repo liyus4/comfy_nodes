@@ -523,7 +523,8 @@ MOTIFS = {
         "classic_arch": ["mesugaki", "oneesan", "sadistic", "tsundere"],
         "gap_arch": ["seiso", "uchiki", "amaama", "dojikko"],
         "hair_colors": ["black hair", "dark purple hair", "red hair", "pink hair", "white hair"],
-        "eye_colors": ["red eyes with slit pupils", "golden eyes with slit pupils", "magenta eyes"],
+        "eye_colors": ["red eyes", "golden eyes", "magenta eyes"],
+        "pupils": ["slit pupils"],
         "skin": None,
         "classic_jp": "悪魔といえば妖艶な小悪魔——王道の記号（角・翼・尻尾）を外さない",
         "gap_jp": "悪魔なのに{role}——相反する記号で印象に残すギャップ設計",
@@ -559,7 +560,8 @@ MOTIFS = {
         "classic_arch": ["ojousama", "oneesan", "sadistic", "kuudere"],
         "gap_arch": ["dojikko", "genki", "uchiki", "amaama"],
         "hair_colors": ["silver hair", "black hair", "platinum blonde hair", "dark red hair"],
-        "eye_colors": ["red eyes", "red eyes with slit pupils", "golden eyes"],
+        "eye_colors": ["red eyes", "red eyes", "golden eyes"],
+        "pupils": ["slit pupils"],
         "skin": "pale skin",
         "classic_jp": "吸血鬼といえば黒×深紅の貴族——牙と青白い肌を記号にする",
         "gap_jp": "吸血鬼なのに{role}——夜の貴族を日常に放り込むギャップ設計",
@@ -595,7 +597,8 @@ MOTIFS = {
         "classic_arch": ["mesugaki", "amaama", "genki", "kuudere"],
         "gap_arch": ["seiso", "ojousama", "sadistic", "chuuni"],
         "hair_colors": ["black hair", "white hair", "brown hair", "gray hair", "orange hair"],
-        "eye_colors": ["golden eyes with slit pupils", "green eyes with slit pupils", "blue eyes with slit pupils", "heterochromia, golden and blue eyes"],
+        "eye_colors": ["golden eyes", "green eyes", "blue eyes", "heterochromia, golden and blue eyes"],
+        "pupils": ["slit pupils"],
         "skin": None,
         "classic_jp": "猫といえば気まぐれで可愛い——耳と尻尾を髪色と揃えて一体感を出す",
         "gap_jp": "猫なのに{role}——気まぐれな記号と規律的な服装のギャップ設計",
@@ -613,7 +616,8 @@ MOTIFS = {
         "classic_arch": ["oneesan", "kuudere", "ojousama", "sadistic"],
         "gap_arch": ["dojikko", "uchiki", "genki", "mesugaki"],
         "hair_colors": ["white hair", "blonde hair", "orange hair", "silver hair", "black hair"],
-        "eye_colors": ["golden eyes with slit pupils", "red eyes", "amber eyes"],
+        "eye_colors": ["golden eyes", "red eyes", "amber eyes"],
+        "pupils": ["slit pupils"],
         "skin": None,
         "classic_jp": "狐といえば和装の妖艶さ——白×紅×金と尻尾で神秘性を出す",
         "gap_jp": "狐なのに{role}——和の妖しさと現代的な服装のギャップ設計",
@@ -667,7 +671,8 @@ MOTIFS = {
         "classic_arch": ["ojousama", "kuudere", "sadistic", "tsundere"],
         "gap_arch": ["dojikko", "amaama", "uchiki", "genki"],
         "hair_colors": ["white hair", "black hair", "silver hair", "blonde hair", "green hair"],
-        "eye_colors": ["golden eyes with slit pupils", "red eyes with slit pupils", "green eyes with slit pupils"],
+        "eye_colors": ["golden eyes", "red eyes", "green eyes"],
+        "pupils": ["slit pupils"],
         "skin": None,
         "classic_jp": "竜といえば威厳——大きな角とうろこ模様、金の差し色で格の高さを出す",
         "gap_jp": "竜なのに{role}——最強の記号と日常的な服装のギャップ設計",
@@ -921,7 +926,8 @@ MOTIFS = {
         "classic_arch": ["genki", "nekketsu", "bokukko", "aneki", "tsundere"],
         "gap_arch": ["uchiki", "amaama", "seiso", "ottori", "fushigi"],
         "hair_colors": ["orange hair", "white hair", "blonde hair", "black hair"],
-        "eye_colors": ["golden eyes with slit pupils", "amber eyes", "ice blue eyes"],
+        "eye_colors": ["golden eyes", "amber eyes", "ice blue eyes"],
+        "pupils": ["slit pupils"],
         "skin": None,
         "classic_jp": "虎といえば力強さ——縞模様と牙、オレンジ×黒で迫力を記号化",
         "gap_jp": "虎なのに{role}——猛獣の記号とおとなしい服装のギャップ設計",
@@ -939,7 +945,8 @@ MOTIFS = {
         "classic_arch": ["sadistic", "oneesan", "yandere", "kuudere", "haraguro"],
         "gap_arch": ["dojikko", "genki", "uchiki", "amaama", "ottori"],
         "hair_colors": ["green hair", "black hair", "purple hair", "white hair"],
-        "eye_colors": ["golden eyes with slit pupils", "green eyes with slit pupils", "red eyes with slit pupils"],
+        "eye_colors": ["golden eyes", "green eyes", "red eyes"],
+        "pupils": ["slit pupils"],
         "skin": None,
         "classic_jp": "蛇といえば妖艶さ——縦長の瞳とうろこ、緑×黒×金で危うさを記号化",
         "gap_jp": "蛇なのに{role}——妖しい記号と健全な服装のギャップ設計",
@@ -2800,6 +2807,75 @@ PATTERN_STYLES = [
     "small repeating", "large", "fine", "bold", "scattered", "subtle tone-on-tone",
     "metallic-thread", "outlined", "tiny all-over", "single large",
 ]
+
+# 目の構造: 色 / 形 / 開き具合 / 瞳孔 / ハイライト / まつ毛 / 眉 / メイク / その他
+EYE_SHAPES = ["tsurime", "tareme", "jitome", "sanpaku"]
+EYE_LIDS = ["half-closed eyes", "narrowed eyes", "wide-eyed"]
+EYE_PUPILS = ["slit pupils", "heart-shaped pupils", "star-shaped pupils", "ringed eyes", "constricted pupils", "symbol-shaped pupils", "diamond-shaped pupils", "no pupils"]
+EYE_HIGHLIGHTS = ["sparkling eyes", "empty eyes", "glowing eyes"]
+EYE_LASHES = ["long eyelashes", "thick eyelashes"]
+EYE_BROWS = ["thick eyebrows", "thin eyebrows", "short eyebrows", "v-shaped eyebrows"]
+EYE_MAKEUP = ["eyeliner", "mascara", "eyeshadow", "red eyeshadow", "{accent} eyeshadow"]
+EYE_DETAILS = ["mole under eye", "bags under eyes", "eyes visible through hair", "gradient eyes"]
+
+# 性格ごとの目のプロファイル（候補が無いカテゴリは出さない）。確率は engine 側（EYE_PROBS）
+EYE_PROFILES = {
+    "tsundere":  {"shape": ["tsurime"], "lashes": ["long eyelashes"], "brows": ["thick eyebrows", "v-shaped eyebrows"], "highlights": ["sparkling eyes"]},
+    "amaama":    {"shape": ["tareme"], "pupils": ["heart-shaped pupils"], "highlights": ["sparkling eyes"], "lashes": ["long eyelashes"]},
+    "mesugaki":  {"shape": ["jitome", "tsurime"], "lid": ["half-closed eyes"], "highlights": ["sparkling eyes"], "brows": ["short eyebrows"]},
+    "seiso":     {"shape": ["tareme"], "lashes": ["long eyelashes"], "brows": ["thin eyebrows"]},
+    "jirai":     {"shape": ["tareme"], "highlights": ["empty eyes"], "makeup": ["red eyeshadow", "eyeliner", "mascara"], "details": ["bags under eyes"], "lashes": ["long eyelashes"]},
+    "uchiki":    {"shape": ["tareme"], "lid": ["half-closed eyes"], "details": ["eyes visible through hair"]},
+    "kuudere":   {"shape": ["tsurime"], "lid": ["half-closed eyes", "narrowed eyes"], "brows": ["thin eyebrows"]},
+    "yandere":   {"shape": ["tareme"], "pupils": ["constricted pupils"], "highlights": ["empty eyes"], "lid": ["wide-eyed"]},
+    "genki":     {"shape": ["tsurime"], "highlights": ["sparkling eyes"], "brows": ["thick eyebrows"], "lid": ["wide-eyed"]},
+    "ojousama":  {"shape": ["tsurime"], "lashes": ["long eyelashes", "thick eyelashes"], "makeup": ["eyeliner"]},
+    "oneesan":   {"shape": ["tareme"], "lid": ["half-closed eyes"], "lashes": ["long eyelashes"], "details": ["mole under eye"], "makeup": ["eyeliner", "mascara"]},
+    "gal":       {"shape": ["tsurime"], "lashes": ["thick eyelashes", "long eyelashes"], "makeup": ["eyeliner", "mascara", "eyeshadow"]},
+    "chuuni":    {"shape": ["tsurime"], "pupils": ["slit pupils", "symbol-shaped pupils"], "highlights": ["glowing eyes"], "details": ["eyes visible through hair"]},
+    "bokukko":   {"shape": ["tsurime"], "brows": ["thick eyebrows"]},
+    "dojikko":   {"shape": ["tareme"], "highlights": ["sparkling eyes"], "lid": ["wide-eyed"]},
+    "sadistic":  {"shape": ["tsurime"], "lid": ["narrowed eyes", "half-closed eyes"], "lashes": ["long eyelashes"], "makeup": ["eyeliner"]},
+    "haraguro":  {"shape": ["tareme"], "lid": ["narrowed eyes"], "highlights": ["empty eyes"]},
+    "fushigi":   {"shape": ["tareme"], "pupils": ["star-shaped pupils", "ringed eyes"], "highlights": ["sparkling eyes"], "lid": ["wide-eyed"]},
+    "iinchou":   {"shape": ["tsurime"], "brows": ["thin eyebrows"]},
+    "ottori":    {"shape": ["tareme"], "lid": ["half-closed eyes"]},
+    "nekketsu":  {"shape": ["tsurime"], "brows": ["thick eyebrows"], "highlights": ["sparkling eyes"]},
+    "dokuzetsu": {"shape": ["jitome"], "lid": ["half-closed eyes"]},
+    "aneki":     {"shape": ["tsurime"], "lashes": ["long eyelashes"], "makeup": ["eyeliner"]},
+}
+# 各カテゴリを出す確率（shape は常に出す）
+EYE_PROBS = {"lid": 0.5, "pupils": 0.5, "highlights": 0.6, "lashes": 0.5, "brows": 0.4, "makeup": 0.7, "details": 0.5}
+
+# 指示文の目ワード -> (カテゴリ, タグ)
+EYE_WORDS = {
+    ("shape", "tsurime"): ["ツリ目", "つり目", "釣り目", "tsurime"],
+    ("shape", "tareme"): ["タレ目", "たれ目", "垂れ目", "tareme"],
+    ("shape", "jitome"): ["ジト目", "じと目", "jitome"],
+    ("shape", "sanpaku"): ["三白眼", "sanpaku"],
+    ("lid", "half-closed eyes"): ["半目", "半眼", "half-closed eyes"],
+    ("lid", "narrowed eyes"): ["細目", "narrowed eyes"],
+    ("lid", "wide-eyed"): ["見開き", "wide-eyed"],
+    ("pupils", "slit pupils"): ["猫目", "縦長瞳孔", "縦瞳", "slit pupils"],
+    ("pupils", "heart-shaped pupils"): ["ハート瞳", "ハート目", "heart pupils", "heart-shaped pupils"],
+    ("pupils", "star-shaped pupils"): ["星瞳", "星目", "star pupils", "star-shaped pupils"],
+    ("pupils", "ringed eyes"): ["ぐるぐる目", "リング瞳", "ringed eyes"],
+    ("pupils", "constricted pupils"): ["収縮瞳孔", "小さい瞳孔", "constricted pupils"],
+    ("pupils", "no pupils"): ["瞳孔なし", "no pupils"],
+    ("highlights", "sparkling eyes"): ["キラキラ目", "キラキラ", "sparkling eyes"],
+    ("highlights", "empty eyes"): ["ハイライトなし", "死んだ目", "レイプ目", "empty eyes"],
+    ("highlights", "glowing eyes"): ["光る目", "発光目", "glowing eyes"],
+    ("lashes", "long eyelashes"): ["まつ毛長め", "長いまつ毛", "long eyelashes"],
+    ("lashes", "thick eyelashes"): ["濃いまつ毛", "thick eyelashes"],
+    ("brows", "thick eyebrows"): ["太眉", "thick eyebrows"],
+    ("brows", "thin eyebrows"): ["細眉", "thin eyebrows"],
+    ("brows", "short eyebrows"): ["短眉", "short eyebrows"],
+    ("brows", "v-shaped eyebrows"): ["キリッと眉", "v-shaped eyebrows"],
+    ("makeup", "red eyeshadow"): ["赤シャドウ", "赤アイシャドウ", "red eyeshadow"],
+    ("makeup", "eyeliner"): ["アイライン", "eyeliner"],
+    ("details", "bags under eyes"): ["目の隈", "クマ", "bags under eyes"],
+    ("details", "gradient eyes"): ["グラデ瞳", "gradient eyes"],
+}
 
 # 髪の構造: 色 / 長さ / 質感 / 型 / 前髪 / 横髪 / 差し色・アホ毛
 BANGS = ["blunt bangs", "swept bangs", "parted bangs", "hair between eyes", "asymmetrical bangs", "braided bangs", "crossed bangs", "curtained hair"]

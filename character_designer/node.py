@@ -90,6 +90,8 @@ class CharacterDesignerNode:
                 "emphasis": ("BOOLEAN", {"default": True}),
                 # 表情はキャラのデフォルト顔として含め、ポーズは状況側の責務なので既定では含めない
                 "expression_pose": (["expression_only", "both", "none"], {"default": "expression_only"}),
+                # 目の形を固定（auto なら brief の指定 > 性格プロファイル）
+                "eye_shape": (["auto", *data.EYE_SHAPES], {"default": "auto"}),
                 "lock": ("BOOLEAN", {"default": False, "label_on": "locked (use sheet)", "label_off": "generate"}),
                 "character_sheet": ("STRING", {
                     "multiline": True,
@@ -110,7 +112,7 @@ class CharacterDesignerNode:
         # data.py / engine.py を編集したら、同じ入力でもキャッシュを使わず再実行させる
         return str(sorted(_source_mtimes().items()))
 
-    def design(self, brief, exclude, motif, role, personality, seed, twist, exposure, prompt_style, consistency, emphasis, expression_pose, lock, character_sheet):
+    def design(self, brief, exclude, motif, role, personality, seed, twist, exposure, prompt_style, consistency, emphasis, expression_pose, eye_shape, lock, character_sheet):
         _reload_if_changed()
 
         if lock and character_sheet.strip():
@@ -131,6 +133,7 @@ class CharacterDesignerNode:
                 expression_pose=expression_pose,
                 consistency=consistency,
                 emphasis=emphasis,
+                eye_shape=eye_shape,
             )
             sheet = engine.build_sheet(character)
             positive = engine.build_positive(character)
