@@ -4354,6 +4354,41 @@ SLOT_ZONE = {
 }
 ZONE_JP = {"head": "head", "torso": "chest and shoulders", "waist": "waist and hips", "legs": "legs", "arms": "arms"}
 
+# ---------------------------------------------------------------------------
+# 世界観（時代設定）。服装候補をこの範囲に絞り、雰囲気タグを足す
+# ---------------------------------------------------------------------------
+ERAS = {
+    "fantasy": {"jp": "ファンタジー", "tags": ["fantasy"], "tech": False,
+                "roles": ["knight", "witch_robe", "hero", "archer", "thief", "merchant", "princess_dress", "dancer", "saint", "pontiff", "demon_lord",
+                          "goddess_dress", "pirate", "sister", "fortune_teller", "steampunk", "succubus", "gothic_lolita", "jester_outfit", "magical_girl"]},
+    "modern": {"jp": "現代", "tags": [], "tech": False,
+               "roles": ["school_uniform", "office_lady", "casual_street", "nurse", "idol", "police", "teacher", "chef", "cheerleader", "race_queen",
+                         "waitress", "flight_attendant", "sportswear", "swimsuit", "loungewear", "gothic_lolita", "maid", "delinquent", "bunny_girl", "military", "cow_suit"]},
+    "scifi": {"jp": "近未来", "tags": ["science fiction", "futuristic"], "tech": True,
+              "roles": ["bodysuit", "military", "police", "race_queen", "idol", "casual_street", "office_lady", "nurse", "sportswear", "school_uniform", "magical_girl"]},
+    "wafu": {"jp": "和風", "tags": ["japanese clothes"], "tech": False,
+             "roles": ["kimono", "shrine_miko", "samurai", "ninja", "school_uniform", "delinquent", "fortune_teller", "dancer"]},
+}
+# マスコット同伴（調査: ペット同伴・動物化はシルエットの個性化に効く）。既定はなし
+MASCOTS = [
+    {"key": "familiar", "jp": "肩に乗る小動物", "tags": ["small animal on the shoulder", "{shape}-eared {sub} familiar sitting on the shoulder"], "nl": "a tiny {sub} familiar with {shape}-shaped ears sits on {poss} shoulder"},
+    {"key": "spirit", "jp": "浮遊する精霊", "tags": ["floating spirit companion", "tiny glowing {accent} spirit floating beside"], "nl": "a tiny glowing {accent} spirit floats beside {poss} head"},
+    {"key": "drone", "jp": "小型ロボ", "tags": ["drone", "small {main} drone companion with {accent} lights"], "nl": "a small {main} drone with {accent} lights hovers beside {poss} shoulder"},
+    {"key": "plush", "jp": "ぬいぐるみ", "tags": ["stuffed toy clipped to the belt", "{shape}-shaped {sub} plush mascot hanging from the belt"], "nl": "a {shape}-shaped {sub} plush mascot hangs from {poss} belt"},
+    {"key": "bird", "jp": "小鳥", "tags": ["bird on the shoulder", "tiny {accent} bird perched on the shoulder"], "nl": "a tiny {accent} bird perches on {poss} shoulder"},
+]
+# 顔の印（調査: 顔周りの記号。不安定要素なので既定はなし、1つだけ）
+FACE_MARKS = [
+    {"key": "heart", "jp": "ハート", "tags": ["heart facial mark", "{accent} heart facial mark under the left eye"], "nl": "a small {accent} heart mark under {poss} left eye"},
+    {"key": "star", "jp": "星", "tags": ["star facial mark", "{accent} star facial mark on the cheek"], "nl": "a small {accent} star mark on {poss} cheek"},
+    {"key": "teardrop", "jp": "涙", "tags": ["teardrop facial mark", "{accent} teardrop facial mark under the eye"], "nl": "a {accent} teardrop mark under {poss} eye"},
+    {"key": "cross", "jp": "十字", "tags": ["cross-shaped facial mark", "{accent} cross-shaped facial mark on the cheek"], "nl": "a {accent} cross-shaped mark on {poss} cheek"},
+    {"key": "mole", "jp": "泣きぼくろ", "tags": ["mole under eye"], "nl": "a beauty mark under {poss} eye"},
+    {"key": "bandaid", "jp": "鼻の絆創膏", "tags": ["bandaid on nose"], "nl": "a bandaid across {poss} nose"},
+    {"key": "whisker", "jp": "ヒゲ模様", "tags": ["whisker markings", "{accent} whisker markings on the cheeks"], "nl": "{accent} whisker markings on {poss} cheeks"},
+    {"key": "stitch", "jp": "縫い目", "tags": ["stitched face", "stitches across the cheek"], "nl": "stitches across {poss} cheek"},
+]
+
 EMBELLISH_LEVELS = {0: (0, False), 1: (2, False), 2: (3, True), 3: (5, True)}
 # カテゴリの重み（テックは種族/モチーフが機械系なら engine が上げる）
 EMBELLISH_WEIGHTS = {"asymmetry": 3, "straps": 3, "hardware": 3, "layering": 2, "cutouts": 1, "tech": 1, "damage": 1}

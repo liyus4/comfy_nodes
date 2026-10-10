@@ -294,6 +294,12 @@ class Character:
     shape_lang: str = ""
     zones: List[str] = field(default_factory=list)
     silhouette_tags: List[str] = field(default_factory=list)
+    era: str = ""
+    era_tags: List[str] = field(default_factory=list)
+    mascot_tags: List[str] = field(default_factory=list)
+    mascot_nl: str = ""
+    face_mark_tags: List[str] = field(default_factory=list)
+    face_mark_nl: str = ""
     pattern_base: str = ""      # スタイル修飾なしの模様名
     print_tag: str = ""         # strict で出す booru の print タグ（無ければ空）
     outfit_detail: List[str] = field(default_factory=list)  # 説明文テンプレート版の服装（strict ではシートのメモ用）
@@ -659,6 +665,9 @@ def generate(
     detail_level: int = 2,
     silhouette: str = "auto",
     shape_lang: str = "auto",
+    era: str = "auto",
+    mascot: str = "none",
+    face_mark: str = "none",
 ) -> Character:
     strict = consistency == "strict"
     rng = random.Random(seed)
@@ -725,6 +734,8 @@ def generate(
                 twist_arch = True
 
     # --- 服装系統（役割） -------------------------------------------------
+    era_key = era if era in D.ERAS else None
+    era_roles = set(D.ERAS[era_key]["roles"]) if era_key else None
     if role_fixed:
         role_key = spec.role
     else:
@@ -733,6 +744,8 @@ def generate(
         else:
             pool = [D.ROLE_ALIASES.get(r, r) for r in motif["classic_roles"]]
         pool = [r for r in pool if _role_available(r, gender) and r not in excluded["role"]]
+        if era_roles:
+            pool = [r for r in pool if r in era_roles] or [r for r in era_roles if _role_available(r, gender) and r not in excluded["role"]]
         if not pool:
             # human モチーフなど候補が無い場合は全系統から（surprise なら王道を除く）
             pool = _all_roles(gender)
@@ -1025,7 +1038,7 @@ def generate(
 
     # --- 装飾レイヤー（独自性） -------------------------------------------------
     shape = D.SHAPE_WORDS.get(theme_key or "", "") or D.SHAPE_WORDS.get(motif_key, "")
-    tech_aff = (motif_key in D.TECH_AFFINITY) or (theme_key in D.TECH_AFFINITY)
+    tech_aff = (motif_key in D.TECH_AFFINITY) or (theme_key in D.TECH_AFFINITY) or bool(era_key and D.ERAS[era_key]["tech"])
     emb_rng = random.Random(seed * 7919 + 17)
     embellish_tags, embellish_nl, iconic_tag = build_embellishments(
         detail_level, outfit, gender, exp, shape, tech_aff, " ".join(features).lower(), emb_rng, fill_slots,
@@ -1037,6 +1050,23 @@ def generate(
     hair_special_tags, hair_special_nl = build_hair_special(detail_level, hair, hair_color, palette, shape, random.Random(seed * 104729 + 3),
                                                             prefer=sil.get("hair", []))
     hair = hair + hair_special_tags
+
+    # --- マスコット・顔の印（既定はなし） ---------------------------------------
+    extra_rng = random.Random(seed * 2003 + 11)
+    mascot_tags: List[str] = []
+    mascot_nl = ""
+    if mascot and mascot != "none":
+        m = next((x for x in D.MASCOTS if x["key"] == mascot), None) or _pick(extra_rng, D.MASCOTS)
+        mfill = dict(fill_slots, shape=shape or "round")
+        mascot_tags = [_fill(t, mfill) for t in m["tags"]]
+        mascot_nl = _fill(m["nl"], mfill)
+    face_mark_tags: List[str] = []
+    face_mark_nl = ""
+    if face_mark and face_mark != "none":
+        fm = next((x for x in D.FACE_MARKS if x["key"] == face_mark), None) or _pick(extra_rng, D.FACE_MARKS)
+        face_mark_tags = [_fill(t, fill_slots) for t in fm["tags"]]
+        face_mark_nl = _fill(fm["nl"], fill_slots)
+    era_tags = list(D.ERAS[era_key]["tags"]) if era_key else []
 
     # --- 手持ち（武器・小道具）。既定では何も持たない --------------------------
     prop = ""
@@ -1088,6 +1118,7 @@ def generate(
         body_sentences=body_sentences, embellish_tags=embellish_tags, embellish_nl=embellish_nl, iconic_tag=iconic_tag,
         detail_level=detail_level, hair_special_nl=hair_special_nl,
         silhouette=sil_key, shape_lang=shape_key, zones=zones, silhouette_tags=silhouette_tags,
+        era=era_key or "", era_tags=era_tags, mascot_tags=mascot_tags, mascot_nl=mascot_nl, face_mark_tags=face_mark_tags, face_mark_nl=face_mark_nl,
     )
 
 
@@ -1179,6 +1210,15 @@ def _article(phrase: str) -> str:
     return "an" if phrase[:1].lower() in "aeiou" else "a"
 
 
+def _mascot_sentence(c: Character, pron: str, poss: str) -> str:
+    out = []
+    if c.mascot_nl:
+        out.append(c.mascot_nl.replace("{poss}", poss).capitalize() + ".")
+    if c.face_mark_nl:
+        out.append(f"{poss.capitalize()} face has {c.face_mark_nl.replace('{poss}', poss)}.")
+    return " ".join(out)
+
+
 def _handheld_sentence(c: Character, pron: str, poss: str) -> str:
     if not c.prop:
         return ""
@@ -1256,6 +1296,7 @@ def build_positive(c: Character) -> str:
         parts.append(_hair_sentence(c, pron, poss))
         parts += c.body_sentences
         parts.append(_theme_sentence(c, pron, poss))
+        parts.append(_mascot_sentence(c, pron, poss))
         parts.append(_exposure_sentence(c, pron, poss))
         parts.append(_eye_sentence(c, pron, poss))
         parts.append(_persona_sentence(c, pron, poss))
@@ -1274,6 +1315,7 @@ def build_positive(c: Character) -> str:
     else:
         tags += c.eyes
     tags.append(c.skin)
+    tags += c.face_mark_tags
     if strict:
         # 記号 -> 主役の服（重み付き）-> 残りの服 -> 小物 -> 署名タグ -> 持ち物 -> 表情 -> 模様 -> 縁色 -> 自然文（服・目・性格）
         if c.features:
@@ -1295,6 +1337,7 @@ def build_positive(c: Character) -> str:
         if c.handheld_tags:
             tags.append(_w(c.handheld_tags[0], round(c.emphasis * 0.9, 2)))
             tags += c.handheld_tags[1:]
+        tags += c.mascot_tags
         # 表情に署名タグと同じ語が含まれていれば重複を除く（"sadistic smirk, looking down at viewer" など）
         expression = ", ".join(x for x in c.expression.split(", ") if x not in signature) or c.expression
         if c.expression_pose == "both":
@@ -1304,9 +1347,10 @@ def build_positive(c: Character) -> str:
         if c.print_tag:
             tags.append(c.print_tag)
         tags.append(f"{c.accent} trim")
+        tags += c.era_tags
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.features
@@ -1314,6 +1358,9 @@ def build_positive(c: Character) -> str:
     tags += c.embellish_tags
     tags += c.silhouette_tags
     tags += c.exposure_tags
+    tags += c.mascot_tags
+    tags += c.face_mark_tags
+    tags += c.era_tags
     tags += c.accessories
     tags += _signature_tags(c)
     if c.handheld_tags:
@@ -1365,10 +1412,11 @@ def build_negative(c: Character) -> str:
             neg.append("sparkling eyes")
         elif hl:
             neg.append("empty eyes")
-        # 不安定要素は negative でも抑える
-        neg += ["facial mark", "face paint", "body markings"]
-        # モチーフの小物が背景に単独で置かれるのを抑える
-        neg += ["floating objects", "scattered objects", "objects in background"]
+        # 不安定要素は negative でも抑える（顔の印を指定した場合は除く）
+        neg += (["face paint", "body markings"] if c.face_mark_tags else ["facial mark", "face paint", "body markings"])
+        # モチーフの小物が背景に単独で置かれるのを抑える（マスコット同伴時は除く）
+        if not c.mascot_tags:
+            neg += ["floating objects", "scattered objects", "objects in background"]
         # シェイプ言語の反対の形を抑える
         if c.detail_level >= 1 and c.shape_lang:
             neg += list(D.SHAPES[c.shape_lang]["neg"])
@@ -1398,14 +1446,15 @@ def build_sheet(c: Character) -> str:
     role = D.ROLES[c.role]
     arch = D.ARCHETYPES[c.archetype]
 
+    era_jp = (D.ERAS[c.era]["jp"] + "の") if c.era else ""
     if c.twist == "surprise":
-        concept = f"{motif['jp']} × {role['jp']}（ギャップ型）"
+        concept = f"{era_jp}{motif['jp']} × {role['jp']}（ギャップ型）"
         design_note = motif["gap_jp"].format(role=role["jp"])
     elif c.twist == "fixed":
-        concept = f"{motif['jp']} × {role['jp']}（指定どおり）"
+        concept = f"{era_jp}{motif['jp']} × {role['jp']}（指定どおり）"
         design_note = motif["classic_jp"]
     else:
-        concept = f"{motif['jp']} × {role['jp']}（王道型）"
+        concept = f"{era_jp}{motif['jp']} × {role['jp']}（王道型）"
         design_note = motif["classic_jp"]
 
     twist_detail = []
@@ -1419,12 +1468,12 @@ def build_sheet(c: Character) -> str:
         "# ━━━━━━━━━━━━━━━━ CHARACTER SHEET ━━━━━━━━━━━━━━━━",
         f"# seed       : {c.seed}",
         f"# brief      : {c.brief.strip().replace(chr(10), ' / ') if c.brief.strip() else '(なし)'}",
-        f"# concept    : {concept}",
+        f"# concept    : {concept}  ——  一言: 「{era_jp}{D.MOTIFS[c.theme]['jp'] + '系' if c.theme else ''}{role['jp']} × {arch['jp']}{'（' + motif['jp'] + '）' if c.motif != 'human' else ''}」",
         f"# race       : {motif['jp']} ({c.motif})   motif: " + (f"{D.MOTIFS[c.theme]['jp']} ({c.theme})" if c.theme else "(なし)") + f"   role: {role['jp']} ({c.role})" + (f" × {D.ROLES[c.role2]['jp']} ({c.role2}) [融合]" if c.role2 else "") + f"   gender: {c.gender}",
         f"# personality: {arch['jp']} ({c.archetype})",
         f"#   -> {arch['design_jp']}",
         f"# palette    : main={c.main} / sub={c.sub} / accent={c.accent}   pattern={c.pattern}   material={c.material}",
-        f"# handheld   : {c.prop or '(なし)'}",
+        f"# handheld   : {c.prop or '(なし)'}   mascot: {c.mascot_nl or '(なし)'}   face mark: {c.face_mark_nl or '(なし)'}",
         f"# embellish  : level={c.detail_level}  " + (" / ".join(c.embellish_tags) if c.embellish_tags else "(なし)"),
         f"# silhouette : {D.SILHOUETTES[c.silhouette]['jp'] if c.silhouette else '-'} ({c.silhouette})   shape: {D.SHAPES[c.shape_lang]['jp'] if c.shape_lang else '-'} ({c.shape_lang})   density zones: {', '.join(c.zones) or '-'}",
         f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
@@ -1474,6 +1523,25 @@ def parse_sheet(text: str) -> Tuple[str, str]:
 def _choices(table) -> List[str]:
     """ノードのコンボ用: 'auto' + 'key 日本語名' の一覧"""
     return ["auto"] + [f"{k} {v['jp']}" for k, v in table.items()]
+
+
+def build_turnaround(c: Character) -> str:
+    """固定したキャラの三面図（キャラシート）用プロンプト。表情・ポーズは外して全身・白背景にする"""
+    base = build_positive(_without_pose(c))
+    return base + ", character sheet, multiple views, turnaround, front view, side view, back view, full body, standing, arms at sides, white background, simple background"
+
+
+def build_expression_sheet(c: Character) -> str:
+    """同じ顔で表情違いを並べる表情シート用プロンプト"""
+    base = build_positive(_without_pose(c))
+    return base + ", expression chart, multiple views, portrait, same character, (smile, angry, sad, surprised, embarrassed blush, smug), white background, simple background"
+
+
+def _without_pose(c: Character) -> Character:
+    import copy
+    d = copy.copy(c)
+    d.expression_pose = "none"
+    return d
 
 
 def personality_choices() -> List[str]:
