@@ -121,8 +121,8 @@ class CharacterDesignerNode:
                              "tooltip": "同伴する小さな相棒（肩の小動物・精霊・小型ロボ・ぬいぐるみ・小鳥）。色と形は種族・モチーフに連動"}),
                 "顔の印": (["なし", "ランダム"] + [f"{m['jp']} ({m['key']})" for m in data.FACE_MARKS], {"default": "なし",
                            "tooltip": "頬や目元の記号（ハート・星・涙・十字・泣きぼくろ・鼻の絆創膏・ヒゲ模様・縫い目）。不安定要素なので既定はなし"}),
-                "手持ち": (["自動", "なし", "ランダム", "服装の小道具"] + [f"{v['jp']} ({k})" for k, v in data.HANDHELDS.items()], {"default": "自動",
-                           "tooltip": "武器・小道具。種類・刃や柄の色・飾り・持ち方まで seed で固定。なし=何も持たない（装飾が手持ち化しないよう negative も入る）"}),
+                "手持ち": (["自動", "なし", "ランダム", "巨大武器", "服装の小道具"] + [f"{v['jp']} ({k})" for k, v in data.HANDHELDS.items()], {"default": "自動",
+                           "tooltip": "武装・小道具は positive ではなく「装備」出力に入る。自動=職業の好みの武器を75%＋職業ギア / 巨大武器=本人より大きい武器 / 服装の小道具=職業ギアのみ"}),
                 "年齢感": (["自動", "若い (young)", "大人 (adult)", "年上 (older)"], {"default": "自動",
                            "tooltip": "顔立ち・体つきの年齢感。自動は性格（お姉さん・ドS・暴君など＝大人、メスガキ・ドジっ娘など＝若い）とコンセプトから"}),
                 "胸": (["自動"] + [lv[0] for lv in data.BUST_LEVELS], {"default": "自動", "tooltip": "0=flat chest … 5=gigantic、6以降は重みと文章でさらに大きく。自動は種族・性格の推奨"}),
@@ -156,8 +156,8 @@ class CharacterDesignerNode:
             },
         }
 
-    RETURN_TYPES = ("STRING", "STRING", "STRING", "INT", "STRING", "STRING")
-    RETURN_NAMES = ("positive", "negative", "キャラシート", "シード", "三面図", "表情シート")
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "INT", "STRING", "STRING", "STRING", "STRING")
+    RETURN_NAMES = ("positive", "negative", "キャラシート", "シード", "三面図", "表情シート", "装備", "装備なし負")
     FUNCTION = "design"
     CATEGORY = "Test/Example Nodes"
     OUTPUT_NODE = True
@@ -172,10 +172,12 @@ class CharacterDesignerNode:
 
         if 固定 and キャラシート.strip():
             # ロック中: シートを正として positive / negative を取り出す（再生成しない）
-            positive, negative = engine.parse_sheet(キャラシート)
+            parts = engine.parse_sheet_all(キャラシート)
+            positive, negative = parts["positive"], parts["negative"]
+            equipment, equipment_neg = parts["equipment"], parts["equipment-negative"]
             sheet = キャラシート
             # 三面図・表情シートは positive から組み立てる（表情のタグは残るが実用上は問題ない）
-            turnaround = positive + ", character sheet, multiple views, turnaround, front view, side view, back view, full body, standing, arms at sides, white background, simple background"
+            turnaround = positive + (". " + equipment if equipment else "") + ", character sheet, multiple views, turnaround, front view, side view, back view, full body, standing, arms at sides, white background, simple background"
             expressions = positive + ", expression chart, multiple views, portrait, same character, (smile, angry, sad, surprised, embarrassed blush, smug), white background, simple background"
         else:
             character = engine.generate(
@@ -189,7 +191,7 @@ class CharacterDesignerNode:
                 role=_jp_key(服装),
                 role2="random" if 服装2 == "ランダム" else ("none" if 服装2 == "なし" else _jp_key(服装2)),
                 exclude=除外,
-                handheld={"自動": "auto", "なし": "none", "ランダム": "random", "服装の小道具": "role"}.get(手持ち) or _jp_key(手持ち),
+                handheld={"自動": "auto", "なし": "none", "ランダム": "random", "巨大武器": "giant", "服装の小道具": "role"}.get(手持ち) or _jp_key(手持ち),
                 coherence={"なし": "none", "弱": "weak", "標準": "normal", "強": "strong"}.get(一貫性, "normal"),
                 detail_level=int(str(装飾量).split(" ")[0]),
                 silhouette=_jp_key(シルエット),
@@ -214,6 +216,8 @@ class CharacterDesignerNode:
             negative = engine.build_negative(character)
             turnaround = engine.build_turnaround(character)
             expressions = engine.build_expression_sheet(character)
+            equipment = engine.build_equipment(character)
+            equipment_neg = engine.build_equipment_negative(character)
 
         # "ui" の text は js/character_designer.js が受け取り、キャラシート欄に書き戻します
-        return {"ui": {"text": [sheet]}, "result": (positive, negative, sheet, シード, turnaround, expressions)}
+        return {"ui": {"text": [sheet]}, "result": (positive, negative, sheet, シード, turnaround, expressions, equipment, equipment_neg)}

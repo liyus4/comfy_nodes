@@ -330,6 +330,8 @@ class Character:
     face_mark_nl: str = ""
     concept_jp: str = ""
     age: str = ""
+    gear_tags: List[str] = field(default_factory=list)
+    gear_nl: str = ""
     age_tags: List[str] = field(default_factory=list)
     age_nl: str = ""
     age_neg: List[str] = field(default_factory=list)
@@ -515,18 +517,28 @@ def merge_race_theme(race: dict, theme: Optional[dict]) -> dict:
     return m
 
 
-def build_handheld(key: str, rng: random.Random, slots: Dict[str, str]) -> Tuple[List[str], str]:
-    """手持ち（武器・小道具）を seed で決めて、booru タグ列と形状を固定する文章を返す"""
+def build_handheld(key: str, rng: random.Random, slots: Dict[str, str], size: str = "auto") -> Tuple[List[str], str]:
+    """手持ち（武器・小道具）を seed で決めて、booru タグ列と形状を固定する文章を返す。
+    サイズ（通常/大型/巨大）と固有ギミックを足して、他作品と被りにくい形状にする"""
     spec = D.HANDHELDS[key]
     type_desc, type_tag = _pick(rng, spec["types"])
     parts = [_fill(_pick(rng, opts), slots) for opts in spec["slots"].values()]
     hold_desc, hold_tag = _pick(rng, spec["holds"])
     hold_desc = _fill(hold_desc, slots)
+    extra = _fill(_pick(rng, D.HANDHELD_EXTRA.get(key, [])) or "", slots)
+    sizes = [s for s in D.HANDHELD_SIZES if not (s[0] == "giant" and key in D.HANDHELD_NO_GIANT)]
+    if size in ("normal", "oversized", "giant") and not (size == "giant" and key in D.HANDHELD_NO_GIANT):
+        size_key, size_desc, size_tag, _ = next(s for s in sizes if s[0] == size)
+    else:
+        size_key, size_desc, size_tag, _ = rng.choices(sizes, weights=[s[3] for s in sizes], k=1)[0]
     tags = []
-    for t in list(spec["tags"]) + type_tag.split(", ") + hold_tag.split(", "):
-        if t not in tags:
+    for t in list(spec["tags"]) + type_tag.split(", ") + ([size_tag] if size_tag else []) + hold_tag.split(", "):
+        if t and t not in tags:
             tags.append(t)
-    desc = f"{type_desc} with {', '.join(parts)}, {hold_desc}"
+    desc = f"{size_desc + ' ' if size_desc else ''}{type_desc} with {', '.join(parts)}"
+    if extra:
+        desc += f", featuring {extra}"
+    desc += f", {hold_desc}"
     return tags, desc
 
 
@@ -1191,18 +1203,25 @@ def generate(
     prop = ""
     handheld_tags: List[str] = []
     handheld_key = None
+    size_pref = "auto"
     if handheld == "auto":
-        # コンセプトが武器・小道具を語るなら 45% で相性の良いものを持たせる
-        if strength > 0 and _affinity(["military", "magic", "wafu", "dark", "music", "wild"], concept) >= 3 and rng.random() < 0.45:
+        pref = D.ROLE_WEAPON.get(role_key) or (D.ROLE_WEAPON.get(role2_key) if role2_key else None)
+        if pref and rng.random() < 0.75:
+            handheld_key = _pick(rng, pref)
+        elif strength > 0 and _affinity(["military", "magic", "wafu", "dark", "music", "wild"], concept) >= 3 and rng.random() < 0.45:
             handheld_key = _coherent_pick(rng, list(D.HANDHELDS), lambda k: D.HANDHELD_MOOD.get(k), concept, strength, base=0.05)
     elif handheld == "random":
         handheld_key = _coherent_pick(rng, list(D.HANDHELDS), lambda k: D.HANDHELD_MOOD.get(k), concept, strength)
+    elif handheld == "giant":
+        size_pref = "giant"
+        pref = [k for k in (D.ROLE_WEAPON.get(role_key) or []) if k not in D.HANDHELD_NO_GIANT]
+        handheld_key = _pick(rng, pref) if pref else _coherent_pick(rng, [k for k in D.HANDHELDS if k not in D.HANDHELD_NO_GIANT], lambda k: D.HANDHELD_MOOD.get(k), concept, strength)
     elif handheld in D.HANDHELDS:
         handheld_key = handheld
     elif handheld == "none" and spec.handheld:
         handheld_key = spec.handheld
     if handheld_key:
-        handheld_tags, prop = build_handheld(handheld_key, rng, slots)
+        handheld_tags, prop = build_handheld(handheld_key, rng, slots, size_pref)
     elif handheld == "role":
         # 服装の小道具（巫女の御幣、ナースの注射器など）
         prop_pool = list(role.get("props", [])) + (list(role_b.get("props", [])) if role_b else [])
@@ -1210,6 +1229,17 @@ def generate(
         if prop and not any(w in prop.lower() for w in D.PROP_ANCHORED_WORDS):
             prop = "holding " + prop
         handheld_tags = [prop] if prop else []
+    # 職業ギア: 自動なら 50%、武器が無い職業なら 80%
+    gear_tags: List[str] = []
+    gear_nl = ""
+    gear_pool = list(D.ROLE_GEAR.get(role_key, [])) + (list(D.ROLE_GEAR.get(role2_key, [])) if role2_key else [])
+    if gear_pool and handheld != "none":
+        p_gear = 0.8 if not D.ROLE_WEAPON.get(role_key) else 0.5
+        if handheld == "role" or rng.random() < p_gear:
+            g = _pick(rng, gear_pool)
+            gfill = dict(fill_slots, pron_low="she" if gender == "girl" else "he")
+            gear_tags = [_fill(t, gfill) for t in g["tags"]]
+            gear_nl = _fill(g["nl"], gfill)
 
     # 高露出: 露出アンカー（モデルが穏当に描きがちなので明示する）
     exposure_tags: List[str] = []
@@ -1243,7 +1273,7 @@ def generate(
         silhouette=sil_key, shape_lang=shape_key, zones=zones, silhouette_tags=silhouette_tags,
         era=era_key or "", era_tags=era_tags, mascot_tags=mascot_tags, mascot_nl=mascot_nl, face_mark_tags=face_mark_tags, face_mark_nl=face_mark_nl,
         concept_jp=concept_jp, concept_en=concept_en, moods=top_moods, coherence=coherence,
-        age=age_key or "", age_tags=age_tags, age_nl=age_nl, age_neg=age_neg,
+        age=age_key or "", age_tags=age_tags, age_nl=age_nl, age_neg=age_neg, gear_tags=gear_tags, gear_nl=gear_nl,
     )
 
 
@@ -1417,8 +1447,6 @@ def build_positive(c: Character) -> str:
             parts.append(f"{pron} wears: {'; '.join(c.outfit)}.")
         if c.accessories:
             parts.append(f"{pron} also has {'; '.join(c.accessories)}.")
-        if c.prop:
-            parts.append(f"{pron} holds {_article(c.prop)} {c.prop}.")
         if c.expression_pose == "both":
             parts.append(f"Expression and pose: {c.expression}; {c.pose}.")
         elif c.expression_pose == "expression_only":
@@ -1475,9 +1503,6 @@ def build_positive(c: Character) -> str:
         signature = _signature_tags(c)
         present = {t.lower() for t in tags}
         tags += [_w(t, round(c.emphasis * 0.9, 2)) for t in signature if t.lower() not in present]
-        if c.handheld_tags:
-            tags.append(_w(c.handheld_tags[0], round(c.emphasis * 0.9, 2)))
-            tags += c.handheld_tags[1:]
         tags += c.mascot_tags
         # 表情に署名タグと同じ語が含まれていれば重複を除く（"sadistic smirk, looking down at viewer" など）
         expression = ", ".join(x for x in c.expression.split(", ") if x not in signature) or c.expression
@@ -1491,7 +1516,7 @@ def build_positive(c: Character) -> str:
         tags += c.era_tags
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [_concept_sentence(c, pron, poss), _age_sentence(c, pron, poss), f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [_concept_sentence(c, pron, poss), _age_sentence(c, pron, poss), f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.age_tags
@@ -1505,10 +1530,6 @@ def build_positive(c: Character) -> str:
     tags += c.era_tags
     tags += c.accessories
     tags += _signature_tags(c)
-    if c.handheld_tags:
-        tags += c.handheld_tags
-    if c.prop and c.prop not in c.handheld_tags:
-        tags.append(c.prop)
     if c.expression_pose == "both":
         tags += [c.expression, c.pose]
     elif c.expression_pose == "expression_only":
@@ -1563,10 +1584,6 @@ def build_negative(c: Character) -> str:
         # シェイプ言語の反対の形を抑える
         if c.detail_level >= 1 and c.shape_lang:
             neg += list(D.SHAPES[c.shape_lang]["neg"])
-        # 手持ちが無いときは、装飾が手持ち化しないよう抑える（署名に手持ちがある性格は除く）
-        sig = _signature_tags(c)
-        if not c.handheld_tags and not any(s in D.SIGNATURE_HANDHELDS for s in sig) and "holding own head" not in " ".join(c.features):
-            neg += list(D.HANDHELD_NEGATIVE)
         neg += _alt_color_negatives(c)
     if c.exposure == "modest":
         neg += ["cleavage", "navel", "bare shoulders", "midriff", "nude"]
@@ -1581,7 +1598,7 @@ def build_negative(c: Character) -> str:
 # キャラクターシート
 # ---------------------------------------------------------------------------
 
-_SECTION_RE = re.compile(r"^\s*#[\s\-─━=]*(positive|negative)\b", re.IGNORECASE)
+_SECTION_RE = re.compile(r"^\s*#[\s\-─━=]*(equipment-negative|equipment|positive|negative)\b", re.IGNORECASE)
 
 
 def build_sheet(c: Character) -> str:
@@ -1640,6 +1657,10 @@ def build_sheet(c: Character) -> str:
         build_positive(c),
         "# ──────── negative ────────",
         build_negative(c),
+        "# ──────── equipment ────────",
+        build_equipment(c) or "",
+        "# ──────── equipment-negative ────────",
+        build_equipment_negative(c),
         "# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
     ]
     return "\n".join(lines)
@@ -1652,8 +1673,14 @@ def parse_sheet(text: str) -> Tuple[str, str]:
       - それ以外の '#' 以降はコメントとして除去（ユーザーのメモ書きを許容）
       - セクション指定が無い行は positive 扱い
     """
+    buf = parse_sheet_all(text)
+    return buf["positive"], buf["negative"]
+
+
+def parse_sheet_all(text: str) -> Dict[str, str]:
+    """シートの全区画（positive / negative / equipment / equipment-negative）を取り出す"""
     section = "positive"
-    buf = {"positive": [], "negative": []}
+    buf = {"positive": [], "negative": [], "equipment": [], "equipment-negative": []}
     for raw in (text or "").splitlines():
         m = _SECTION_RE.match(raw)
         if m:
@@ -1662,7 +1689,7 @@ def parse_sheet(text: str) -> Tuple[str, str]:
         line = re.sub(r"#.*", "", raw).strip()
         if line:
             buf[section].append(line)
-    return "\n".join(buf["positive"]), "\n".join(buf["negative"])
+    return {k: "\n".join(v) for k, v in buf.items()}
 
 
 def _choices(table) -> List[str]:
@@ -1670,9 +1697,38 @@ def _choices(table) -> List[str]:
     return ["auto"] + [f"{k} {v['jp']}" for k, v in table.items()]
 
 
+def build_equipment(c: Character) -> str:
+    """装備（武装・職業ギア）の positive 断片。本体の positive と連結して使う"""
+    pron, poss = ("She", "her") if c.gender == "girl" else ("He", "his")
+    tags: List[str] = []
+    if c.handheld_tags:
+        tags.append(_w(c.handheld_tags[0], round(c.emphasis * 0.9, 2)) if c.consistency == "strict" else c.handheld_tags[0])
+        tags += c.handheld_tags[1:]
+    tags += c.gear_tags
+    sentences = []
+    if c.prop and not (c.handheld_tags and c.handheld_tags[0] == c.prop):
+        sentences.append(f"{poss.capitalize()} signature weapon is {_article(c.prop)} {c.prop}.")
+    if c.gear_nl:
+        sentences.append(f"{pron} also carries {c.gear_nl.replace('{poss}', poss)}.")
+    if not tags and not sentences:
+        return ""
+    return ", ".join(_dedupe(tags)) + (". " + " ".join(sentences) if sentences else "")
+
+
+def build_equipment_negative(c: Character) -> str:
+    """装備を付けないポーズ用の negative 断片（本体の negative に連結）"""
+    sig = _signature_tags(c)
+    if any(s in D.SIGNATURE_HANDHELDS for s in sig) or "holding own head" in " ".join(c.features):
+        return ""
+    return ", ".join(D.EQUIPMENT_NEGATIVE)
+
+
 def build_turnaround(c: Character) -> str:
     """固定したキャラの三面図（キャラシート）用プロンプト。表情・ポーズは外して全身・白背景にする"""
     base = build_positive(_without_pose(c))
+    eq = build_equipment(c)
+    if eq:
+        base = base + ". " + eq if not base.endswith(".") else base + " " + eq
     return base + ", character sheet, multiple views, turnaround, front view, side view, back view, full body, standing, arms at sides, white background, simple background"
 
 
