@@ -362,7 +362,7 @@ class _SafeDict(dict):
         return "{" + key + "}"
 
 
-_ARTICLE_RE = re.compile(r"(a|A) (?=[aeiouAEIOU](?!ni|se|ur|ne|u))")
+_ARTICLE_RE = re.compile(r"\b(a|A) (?=[aeiouAEIOU](?!ni|se|ur|ne|u))")
 
 
 def _fill(template: str, slots: Dict[str, str]) -> str:
