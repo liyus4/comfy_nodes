@@ -4876,6 +4876,216 @@ HANDHELDS = {
         },
         "holds": [("resting on the shoulder", "holding cannon, over shoulder"), ("mounted on the right arm", "arm cannon"), ("held in both hands", "holding cannon, two-handed")],
     },
+    "dual_blades": {
+        "jp": "双剣", "syn": ["双剣", "二刀", "二刀流", "dual blades", "twin swords", "dual wielding"],
+        "tags": ["dual wielding", "sword", "weapon"],
+        "types": [("twin short swords", "dual wielding, short sword"), ("twin curved blades", "dual wielding, scimitar"), ("a pair of mismatched blades, one long and one short", "dual wielding, sword, dagger")],
+        "slots": {
+            "blade": ["{accent} blades", "black blades with {accent} edges", "glowing {accent} blades", "silver blades with {pattern} engraving"],
+            "hilt": ["{main} wrapped hilts", "{sub} hilts with {accent} guards", "chain-linked hilts"],
+        },
+        "holds": [("one in each hand, blades down", "dual wielding, reverse grip"), ("crossed in front of the chest", "dual wielding"), ("sheathed crosswise on the lower back", "sheathed, dual wielding")],
+    },
+    "crossbow": {
+        "jp": "クロスボウ", "syn": ["クロスボウ", "弩", "ボウガン", "crossbow"],
+        "tags": ["crossbow", "weapon"],
+        "types": [("hand crossbow", "crossbow"), ("heavy repeating crossbow", "crossbow"), ("ornate elven crossbow", "crossbow")],
+        "slots": {
+            "stock": ["{main} wooden stock with {accent} fittings", "black metal stock with {accent} lines", "{sub} stock with {pattern} inlay"],
+            "limbs": ["{accent} steel limbs", "curved bone-white limbs", "glowing {accent} energy limbs"],
+        },
+        "holds": [("held in the right hand", "holding crossbow"), ("aimed with both hands", "holding crossbow, aiming"), ("mounted on the left forearm", "arm-mounted crossbow")],
+    },
+    "lance": {
+        "jp": "ランス", "syn": ["ランス", "騎兵槍", "lance", "jousting lance"],
+        "tags": ["lance", "polearm", "weapon"],
+        "types": [("conical jousting lance", "lance"), ("drill-tipped lance", "lance"), ("ornate ceremonial lance", "lance")],
+        "slots": {
+            "body": ["{main} body with {accent} spiral bands", "white body with {accent} fluting", "black body with {pattern} engraving"],
+            "guard": ["{accent} bell-shaped hand guard", "{sub} shield-like vamplate", "{shape}-shaped {accent} guard"],
+        },
+        "holds": [("couched under the right arm", "holding lance"), ("held upright in one hand", "holding lance"), ("resting on the shoulder", "holding polearm, over shoulder")],
+    },
+    "halberd": {
+        "jp": "ハルバード", "syn": ["ハルバード", "斧槍", "halberd", "poleaxe"],
+        "tags": ["halberd", "polearm", "weapon"],
+        "types": [("halberd", "halberd"), ("crescent-bladed poleaxe", "halberd"), ("ornate guard's halberd", "halberd")],
+        "slots": {
+            "head": ["{sub} steel axe blade with {accent} spike", "black head with glowing {accent} edge", "{accent} crescent blade with {pattern} engraving"],
+            "shaft": ["long {main} shaft with {accent} bands", "dark wood shaft", "white shaft with {accent} rings"],
+        },
+        "holds": [("held upright in both hands", "holding polearm"), ("planted beside the feet", "holding polearm"), ("resting on the shoulder", "holding polearm, over shoulder")],
+    },
+    "trident": {
+        "jp": "三叉槍", "syn": ["三叉槍", "トライデント", "trident"],
+        "tags": ["trident", "polearm", "weapon"],
+        "types": [("trident", "trident"), ("coral-wrapped trident", "trident"), ("ornate golden trident", "trident")],
+        "slots": {
+            "prongs": ["{accent} prongs", "silver prongs with {accent} glowing tips", "black prongs with {pattern} engraving"],
+            "shaft": ["{main} shaft with {accent} bands", "coral-wrapped shaft", "white shaft wrapped with {accent} cord"],
+        },
+        "holds": [("held upright in one hand", "holding trident"), ("held in both hands", "holding trident, two-handed"), ("slung on the back", "trident on back")],
+    },
+    "drill": {
+        "jp": "ドリル", "syn": ["ドリル", "drill", "drill arm"],
+        "tags": ["drill", "weapon"],
+        "types": [("arm-mounted drill", "drill"), ("huge hand drill", "drill"), ("twin drill gauntlets", "drill")],
+        "slots": {
+            "body": ["{main} body with {accent} glowing lines", "black steel body with {accent} rivets", "{sub} body with brass fittings"],
+            "bit": ["{accent} spiral drill bit", "silver drill bit with {accent} tip", "glowing {accent} energy drill bit"],
+        },
+        "holds": [("mounted on the right arm", "arm-mounted drill"), ("held in both hands", "holding drill, two-handed"), ("resting on the shoulder", "holding drill, over shoulder")],
+    },
+    "anchor": {
+        "jp": "錨", "syn": ["錨", "アンカー", "anchor"],
+        "tags": ["anchor", "weapon"],
+        "types": [("huge ship's anchor", "anchor"), ("anchor on a chain", "anchor, chain"), ("ornate golden anchor", "anchor")],
+        "slots": {
+            "body": ["black iron body with {accent} edges", "{main} body with {pattern} engraving", "rusted iron body with {accent} bands"],
+            "chain": ["long {accent} chain", "thick black chain", "silver chain wrapped around the shaft"],
+        },
+        "holds": [("resting on the shoulder", "holding anchor, over shoulder"), ("dragged along the ground by the chain", "holding anchor"), ("held in both hands", "holding anchor, two-handed")],
+    },
+    "scissors": {
+        "jp": "大鋏", "syn": ["鋏", "ハサミ", "大鋏", "scissors", "giant scissors"],
+        "tags": ["scissors", "weapon"],
+        "types": [("giant scissors", "scissors"), ("twin shears that split into two blades", "scissors"), ("ornate tailor's shears", "scissors")],
+        "slots": {
+            "blades": ["{accent} blades", "black blades with {accent} edges", "silver blades with {pattern} engraving"],
+            "handles": ["{main} ring handles", "{sub} handles with {accent} trim", "{shape}-shaped {accent} handles"],
+        },
+        "holds": [("held in the right hand, blades open", "holding scissors"), ("resting on the shoulder", "holding scissors, over shoulder"), ("hanging from the belt", "scissors at hip")],
+    },
+    "bits": {
+        "jp": "浮遊兵器", "syn": ["浮遊兵器", "ビット", "ファンネル", "floating weapon", "bits", "funnels", "drones"],
+        "tags": ["floating weapon", "weapon"],
+        "types": [("floating weapon units", "floating weapon, drone"), ("floating blade units", "floating weapon, floating sword"), ("floating cannon units", "floating weapon, cannon")],
+        "slots": {
+            "body": ["{main} units with {accent} glowing cores", "black units with {accent} lines", "{sub} units with {pattern} markings"],
+            "count": ["four units", "six units", "three units"],
+        },
+        "holds": [("hovering around the body", "floating weapon"), ("arranged in a ring behind the back", "floating weapon"), ("hovering over the shoulders", "floating weapon")],
+    },
+    "orb": {
+        "jp": "宝珠", "syn": ["宝珠", "オーブ", "水晶", "orb", "crystal orb", "floating crystal"],
+        "tags": ["orb", "weapon"],
+        "types": [("floating crystal orb", "orb, floating"), ("orb held in one hand", "orb"), ("chained orb", "orb, chain")],
+        "slots": {
+            "core": ["{accent} glowing core", "swirling {accent} light inside", "black core with {accent} cracks"],
+            "frame": ["{sub} metal frame", "{shape}-shaped {accent} frame", "no frame"],
+        },
+        "holds": [("floating above the right palm", "holding orb, floating"), ("cradled in both hands", "holding orb"), ("orbiting around the body", "floating orb")],
+    },
+    "tower_shield": {
+        "jp": "大盾", "syn": ["大盾", "タワーシールド", "tower shield", "greatshield"],
+        "tags": ["shield", "huge weapon", "weapon"],
+        "types": [("tower shield taller than its wielder", "shield"), ("door-like greatshield", "shield"), ("ornate kite greatshield", "shield")],
+        "slots": {
+            "face": ["{main} face with {accent} rim", "black face with glowing {accent} lines", "{sub} face with {pattern} emblem"],
+            "edge": ["{accent} spiked rim", "rounded steel rim", "{shape}-shaped {accent} crest on top"],
+        },
+        "holds": [("planted in front of the body", "holding shield"), ("strapped to the left arm", "holding shield"), ("slung on the back", "shield on back")],
+    },
+    "rifle": {
+        "jp": "ライフル", "syn": ["ライフル", "小銃", "狙撃銃", "スナイパー", "rifle", "sniper rifle", "assault rifle"],
+        "tags": ["rifle", "gun", "weapon"],
+        "types": [("long sniper rifle", "sniper rifle"), ("compact assault rifle", "assault rifle"), ("ornate bolt-action rifle", "rifle")],
+        "slots": {
+            "finish": ["{main} finish with {accent} lines", "black finish with {accent} glowing parts", "{sub} finish with {pattern} engraving"],
+            "scope": ["{accent} glowing scope", "long brass scope", "no scope"],
+        },
+        "holds": [("held in both hands", "holding gun, two-handed"), ("slung across the back", "gun on back"), ("resting on the shoulder", "holding gun, over shoulder")],
+    },
+    "twin_pistols": {
+        "jp": "二丁拳銃", "syn": ["二丁拳銃", "二挺拳銃", "ツインピストル", "twin pistols", "dual pistols", "akimbo"],
+        "tags": ["dual wielding", "handgun", "weapon"],
+        "types": [("twin revolvers", "dual wielding, revolver"), ("twin ornate pistols", "dual wielding, handgun"), ("twin energy pistols", "dual wielding, energy gun")],
+        "slots": {
+            "finish": ["{accent} finish", "black finish with {accent} lines", "silver finish with {pattern} engraving"],
+            "grip": ["{main} grips", "{sub} grips with {accent} inlay", "pearl grips"],
+        },
+        "holds": [("one in each hand", "dual wielding, holding gun"), ("crossed in front of the chest", "dual wielding, holding gun"), ("holstered on both thighs", "thigh holster, dual wielding")],
+    },
+    "gatling": {
+        "jp": "ガトリング", "syn": ["ガトリング", "機関銃", "ミニガン", "gatling", "minigun", "machine gun"],
+        "tags": ["gatling gun", "huge weapon", "weapon"],
+        "types": [("gatling gun", "gatling gun"), ("arm-mounted gatling", "gatling gun, arm cannon"), ("ornate brass gatling", "gatling gun")],
+        "slots": {
+            "body": ["{main} body with {accent} glowing lines", "black steel body with {accent} rivets", "brass body with {pattern} engraving"],
+            "barrels": ["{accent} rotating barrels", "six silver barrels", "glowing {accent} barrels"],
+        },
+        "holds": [("held in both hands at the hip", "holding gun, two-handed"), ("mounted on the right arm", "arm cannon"), ("resting on the shoulder", "holding gun, over shoulder")],
+    },
+    "puppet": {
+        "jp": "人形", "syn": ["人形", "操り人形", "マリオネット", "puppet", "marionette", "doll weapon"],
+        "tags": ["puppet", "doll"],
+        "types": [("marionette on glowing strings", "puppet, puppet strings"), ("floating doll familiar", "doll, floating"), ("life-sized armored puppet", "puppet")],
+        "slots": {
+            "look": ["{main} dress with {accent} eyes", "black body with {accent} joints", "{sub} body with {pattern} markings"],
+            "strings": ["glowing {accent} strings from the fingers", "silver strings", "no visible strings"],
+        },
+        "holds": [("controlled from the fingertips", "puppet strings"), ("floating beside the body", "floating"), ("perched on the shoulder", "on shoulder")],
+    },
+    "wrench": {
+        "jp": "巨大レンチ", "syn": ["レンチ", "スパナ", "巨大レンチ", "wrench", "spanner"],
+        "tags": ["wrench", "weapon"],
+        "types": [("huge wrench", "wrench"), ("oversized brass spanner", "wrench"), ("wrench-hammer hybrid", "wrench, hammer")],
+        "slots": {
+            "head": ["{accent} steel head", "brass head with {pattern} engraving", "black head with {accent} glowing lines"],
+            "handle": ["{main} wrapped handle", "{sub} handle with {accent} bands", "chain-wrapped handle"],
+        },
+        "holds": [("resting on the shoulder", "holding wrench, over shoulder"), ("held in both hands", "holding wrench, two-handed"), ("hanging from the belt", "wrench at hip")],
+    },
+    "pickaxe": {
+        "jp": "つるはし", "syn": ["つるはし", "ピッケル", "pickaxe", "pick"],
+        "tags": ["pickaxe", "weapon"],
+        "types": [("huge pickaxe", "pickaxe"), ("crystal-tipped pickaxe", "pickaxe"), ("ornate mining pick", "pickaxe")],
+        "slots": {
+            "head": ["{accent} steel head", "black iron head with {accent} glowing tip", "{sub} crystal head"],
+            "handle": ["{main} wrapped handle", "dark wood handle with {accent} bands"],
+        },
+        "holds": [("resting on the shoulder", "holding pickaxe, over shoulder"), ("held in both hands", "holding pickaxe, two-handed"), ("slung on the back", "pickaxe on back")],
+    },
+    "boomerang": {
+        "jp": "ブーメラン", "syn": ["ブーメラン", "boomerang"],
+        "tags": ["boomerang", "weapon"],
+        "types": [("large bladed boomerang", "boomerang"), ("twin boomerangs", "boomerang, dual wielding"), ("ornate crescent boomerang", "boomerang")],
+        "slots": {
+            "blade": ["{accent} edged blade", "black blade with {accent} glowing edge", "{sub} blade with {pattern} engraving"],
+            "ornament": ["{accent} ribbon tied to the tip", "{shape}-shaped {accent} ornament", "no ornament"],
+        },
+        "holds": [("held in the right hand", "holding boomerang"), ("strapped to the back", "boomerang on back"), ("spinning in the air beside the hand", "boomerang, floating")],
+    },
+    "kunai": {
+        "jp": "クナイ", "syn": ["クナイ", "手裏剣", "苦無", "kunai", "shuriken", "throwing knives"],
+        "tags": ["kunai", "weapon"],
+        "types": [("kunai", "kunai"), ("oversized shuriken", "shuriken"), ("throwing knives between the fingers", "throwing knife")],
+        "slots": {
+            "blade": ["black blades with {accent} edges", "{accent} blades", "silver blades with {pattern} engraving"],
+            "ornament": ["{accent} cord tied to the rings", "{shape}-shaped {accent} charms on the rings", "no ornament"],
+        },
+        "holds": [("held between the fingers", "holding kunai"), ("held in a reverse grip", "holding kunai, reverse grip"), ("tucked into a thigh holster", "kunai, thigh holster")],
+    },
+    "gunblade": {
+        "jp": "銃剣", "syn": ["銃剣", "ガンブレード", "gunblade", "gun blade"],
+        "tags": ["gunblade", "sword", "gun", "weapon"],
+        "types": [("gunblade", "gunblade"), ("revolver-hilted sword", "gunblade"), ("rifle with a sword blade", "gunblade")],
+        "slots": {
+            "blade": ["{accent} blade", "black blade with {accent} glowing groove", "silver blade with {pattern} engraving"],
+            "mechanism": ["{sub} revolver cylinder in the hilt", "brass firing mechanism", "{accent} glowing chamber"],
+        },
+        "holds": [("held in the right hand, blade down", "holding gunblade"), ("resting on the shoulder", "holding sword, over shoulder"), ("sheathed at the hip", "sheathed, gunblade")],
+    },
+    "brush": {
+        "jp": "巨大筆", "syn": ["筆", "巨大筆", "絵筆", "brush", "giant brush", "calligraphy brush"],
+        "tags": ["paintbrush", "weapon"],
+        "types": [("giant calligraphy brush", "paintbrush"), ("oversized paintbrush", "paintbrush"), ("brush that leaves glowing ink in the air", "paintbrush, ink")],
+        "slots": {
+            "handle": ["{main} handle with {accent} bands", "black lacquered handle with {pattern}", "{sub} bamboo handle"],
+            "tip": ["{accent} ink-stained tip", "white bristle tip", "glowing {accent} tip"],
+        },
+        "holds": [("held in the right hand", "holding paintbrush"), ("resting on the shoulder", "holding paintbrush, over shoulder"), ("tucked behind the back", "paintbrush on back")],
+    },
     "whip": {
         "jp": "鞭", "syn": ["鞭", "ムチ", "whip", "riding crop"],
         "tags": ["whip", "holding whip"],
@@ -4911,20 +5121,44 @@ HANDHELD_EXTRA = {
     "chakram": ["a ring that splits into two halves", "{accent} light trailing from the edge", "a ring shaped like a {shape}"],
     "flail": ["a head shaped like a {shape}", "a chain that glows {accent}", "multiple smaller balls on branching chains"],
     "cannon": ["a {shape}-shaped muzzle", "a barrel that folds for carrying", "{accent} coolant tubes along the body"],
+    "dual_blades": ["blades that connect at the hilts into a double-bladed staff", "{accent} light trailing from both blades", "blades that fold into the gauntlets"],
+    "crossbow": ["limbs that fold flat against the stock", "bolts tipped with {accent} crystal", "a {shape}-shaped frame"],
+    "lance": ["a spiral drill tip", "a tip that opens into three prongs", "{accent} light spiraling along the body"],
+    "halberd": ["a head that splits into axe and spear", "a {shape}-shaped axe blade", "{accent} glowing runes along the shaft"],
+    "trident": ["prongs that spread wider when thrust", "{accent} water swirling around the prongs", "a {shape}-shaped center prong"],
+    "drill": ["a bit that spins with {accent} light", "a bit shaped like a {shape}", "exhaust vents venting {accent} steam"],
+    "anchor": ["a chain that glows {accent}", "flukes shaped like {shape}s", "barnacles and coral growing on the iron"],
+    "scissors": ["blades that separate into two swords", "{accent} light along the cutting edges", "ring handles shaped like {shape}s"],
+    "bits": ["units that link into a ring", "units shaped like {shape}s", "units that fold into a backpack"],
+    "orb": ["a {shape} floating inside the orb", "rings orbiting the orb", "{accent} light leaking from cracks"],
+    "tower_shield": ["a face that opens like a door", "a {shape}-shaped emblem", "{accent} light along the rim"],
+    "rifle": ["a {shape}-shaped muzzle brake", "a stock that folds into a blade", "{accent} coolant lines along the barrel"],
+    "twin_pistols": ["pistols that link into a single rifle", "{shape}-shaped muzzles", "{accent} light along the barrels"],
+    "gatling": ["barrels that glow {accent} when spinning", "an ammo belt shaped like a {shape} chain", "a body that folds into a backpack"],
+    "puppet": ["a face that opens to reveal a {accent} core", "limbs shaped like {shape}s", "strings that glow {accent}"],
+    "wrench": ["a head that adjusts like a jaw", "{accent} glowing cracks across the head", "a head shaped like a {shape}"],
+    "pickaxe": ["a tip of glowing {accent} crystal", "a head shaped like a {shape}", "a handle that extends"],
+    "boomerang": ["a blade that splits in two mid-flight", "{accent} light trailing from the tips", "a {shape}-shaped silhouette"],
+    "kunai": ["rings shaped like {shape}s", "blades that glow {accent}", "blades connected by a thin wire"],
+    "gunblade": ["a cylinder that glows {accent} when fired", "a blade that splits open along the barrel", "a {shape}-shaped guard"],
+    "brush": ["ink that glows {accent}", "a handle shaped like a {shape}", "a tip that hardens into a blade"],
 }
 # 武器のサイズ軸: (キー, 説明, タグ, 重み)。giant_ok=False の武器は巨大にならない
 HANDHELD_SIZES = [("normal", "", "", 55), ("oversized", "oversized", "oversized weapon", 30), ("giant", "giant, taller than its wielder", "huge weapon", 15)]
-HANDHELD_NO_GIANT = {"wand", "fan", "umbrella", "lantern", "dagger", "claws", "chakram", "whip", "instrument", "grimoire"}
+HANDHELD_NO_GIANT = {"wand", "fan", "umbrella", "lantern", "dagger", "claws", "chakram", "whip", "instrument", "grimoire",
+                     "dual_blades", "crossbow", "bits", "orb", "twin_pistols", "puppet", "kunai", "boomerang", "tower_shield", "gatling"}
 # 職業ごとの武器の好み（手持ち「自動」のとき）
 ROLE_WEAPON = {
-    "knight": ["sword", "spear", "shield"], "paladin": ["sword", "shield", "hammer"], "dark_knight": ["sword", "scythe", "axe"], "warrior": ["axe", "hammer", "sword"],
-    "mage": ["staff", "grimoire", "wand"], "cleric": ["hammer", "staff", "grimoire"], "monk": ["claws", "staff"], "bard": ["instrument"], "summoner": ["staff", "grimoire"],
-    "necromancer": ["staff", "scythe", "grimoire"], "druid": ["staff"], "gunner": ["gun", "cannon"], "dragoon": ["spear"], "beast_tamer": ["whip"], "valkyrie": ["spear", "shield"],
-    "adventurer": ["sword", "dagger", "bow"], "thief": ["dagger", "chakram"], "archer": ["bow"], "samurai": ["katana"], "ninja": ["dagger", "chakram"], "hero": ["sword", "shield"],
-    "witch_robe": ["staff", "wand", "grimoire"], "military": ["gun"], "police": ["gun"], "pirate": ["gun", "sword"], "western": ["gun"], "demon_lord": ["scythe", "sword", "staff"],
-    "shrine_miko": ["bow", "fan"], "kimono": ["umbrella", "fan"], "princess_dress": ["fan", "umbrella"], "scholar": ["grimoire"], "cultist": ["dagger", "grimoire"],
-    "magical_girl": ["wand", "staff"], "succubus": ["whip", "spear"], "goddess_dress": ["staff"], "saint": ["staff"], "pontiff": ["staff"], "fortune_teller": ["grimoire"],
-    "steampunk": ["gun", "cannon"], "alchemist": ["gun"],
+    "knight": ["sword", "spear", "shield", "lance", "halberd"], "paladin": ["sword", "shield", "hammer", "tower_shield", "lance"], "dark_knight": ["sword", "scythe", "axe", "halberd", "gunblade"], "warrior": ["axe", "hammer", "sword", "halberd", "anchor"],
+    "mage": ["staff", "grimoire", "wand", "orb"], "cleric": ["hammer", "staff", "grimoire", "orb"], "monk": ["claws", "staff"], "bard": ["instrument"], "summoner": ["staff", "grimoire", "orb", "puppet"],
+    "necromancer": ["staff", "scythe", "grimoire", "puppet", "orb"], "druid": ["staff"], "gunner": ["gun", "cannon", "rifle", "twin_pistols", "gatling", "gunblade"], "dragoon": ["spear", "lance", "halberd"], "beast_tamer": ["whip"], "valkyrie": ["spear", "shield", "lance", "trident"],
+    "adventurer": ["sword", "dagger", "bow", "crossbow", "boomerang"], "thief": ["dagger", "chakram", "dual_blades", "kunai", "boomerang"], "archer": ["bow", "crossbow"], "samurai": ["katana"], "ninja": ["dagger", "chakram", "kunai", "dual_blades"], "hero": ["sword", "shield", "gunblade"],
+    "witch_robe": ["staff", "wand", "grimoire"], "military": ["gun", "rifle", "gatling"], "police": ["gun", "twin_pistols"], "pirate": ["gun", "sword", "anchor", "twin_pistols"], "western": ["gun", "twin_pistols", "rifle"], "demon_lord": ["scythe", "sword", "staff", "halberd", "bits"],
+    "shrine_miko": ["bow", "fan", "brush"], "kimono": ["umbrella", "fan"], "princess_dress": ["fan", "umbrella"], "scholar": ["grimoire"], "cultist": ["dagger", "grimoire"],
+    "magical_girl": ["wand", "staff"], "succubus": ["whip", "spear", "trident"], "goddess_dress": ["staff", "orb"], "saint": ["staff"], "pontiff": ["staff"], "fortune_teller": ["grimoire", "orb"],
+    "steampunk": ["gun", "cannon", "wrench", "gatling", "drill"], "alchemist": ["gun", "orb", "wrench"],
+    "jester_outfit": ["scissors", "puppet", "boomerang"], "gothic_lolita": ["scissors", "umbrella", "puppet"], "maid": ["twin_pistols", "dual_blades"],
+    "bodysuit": ["bits", "rifle", "drill"], "village_girl": ["pickaxe"], "chef": ["dual_blades"], "nurse": ["scissors"], "monk": ["claws", "staff", "orb"],
 }
 # 職業ギア（武器ではない、その職業らしい大きな持ち物。装備出力に入る）
 ROLE_GEAR = {
@@ -5063,9 +5297,9 @@ EMBELLISHMENTS = {
         {"tags": ["showgirl skirt"], "nl": "a showgirl skirt open at the front", "slot": "overskirt", "exposure": ["standard", "high"], "male": False},
     ],
     "iconic": [
-        {"tags": ["mechanical tail", "{main} segmented mechanical tail with {accent} lights"], "nl": "a segmented {main} mechanical tail with {accent} lights", "slot": "tail", "big": True},
+        {"tags": ["mechanical tail", "{main} segmented mechanical tail with {accent} lights"], "nl": "a segmented {main} mechanical tail with {accent} lights", "slot": "tail", "big": True, "tech": True},
         {"tags": ["ribbon tail", "tail made of trailing {sub} ribbons"], "nl": "a tail made of long trailing {sub} ribbons", "slot": "tail", "big": True},
-        {"tags": ["mechanical backpack", "oversized {main} mechanical backpack with {accent} lights"], "nl": "an oversized {main} mechanical backpack with {accent} lights", "slot": "back", "big": True},
+        {"tags": ["mechanical backpack", "oversized {main} mechanical backpack with {accent} lights"], "nl": "an oversized {main} mechanical backpack with {accent} lights", "slot": "back", "big": True, "tech": True},
         {"tags": ["giant key on the back", "giant {accent} key strapped to the back"], "nl": "a giant {accent} key strapped to {poss} back", "slot": "back", "big": True},
         {"tags": ["oversized fur-trimmed hood", "huge {sub} fur-trimmed hood"], "nl": "a huge {sub} fur-trimmed hood", "slot": "head", "big": True},
         {"tags": ["giant spiked collar", "oversized {main} collar with {accent} spikes"], "nl": "an oversized {main} collar with {accent} spikes", "slot": "neck", "big": True},
@@ -5074,12 +5308,11 @@ EMBELLISHMENTS = {
         {"tags": ["long trailing sash", "extra long {sub} sash trailing on the ground"], "nl": "an extra long {sub} sash trailing on the ground", "slot": "waist_cape", "big": True},
         {"tags": ["huge bell", "giant {accent} bell on the belt"], "nl": "a giant {accent} bell hanging from {poss} belt", "slot": "charms", "big": True},
         {"tags": ["oversized horn headdress", "giant {shape}-shaped {accent} horn headdress"], "nl": "a giant {shape}-shaped {accent} horn headdress", "slot": "head", "big": True, "shape": True},
-        {"tags": ["mechanical wings", "{main} mechanical wings with {accent} lights"], "nl": "{main} mechanical wings with {accent} lights", "slot": "back", "big": True},
+        {"tags": ["mechanical wings", "{main} mechanical wings with {accent} lights"], "nl": "{main} mechanical wings with {accent} lights", "slot": "back", "big": True, "tech": True},
         {"tags": ["huge bow", "oversized {sub} ribbon on the back"], "nl": "an oversized {sub} ribbon on {poss} back", "slot": "back", "big": True},
         {"tags": ["oversized headphones", "{sub} oversized headphones with {accent} lights"], "nl": "oversized {sub} headphones with {accent} lights", "slot": "head", "big": True},
         {"tags": ["floating ring behind the body", "{accent} floating halo ring behind the back"], "nl": "a large {accent} ring floating behind {poss} back", "slot": "back", "big": True},
         {"tags": ["oversized sleeves", "{sub} oversized sleeves past the hands"], "nl": "oversized {sub} sleeves hanging past {poss} hands", "slot": "sleeves", "big": True},
-        {"tags": ["mechanical tail", "{main} mechanical tail with {accent} lights"], "nl": "a {main} mechanical tail with {accent} lights", "slot": "tail", "big": True},
         {"tags": ["oversized hood", "{sub} oversized hood with {accent} lining"], "nl": "an oversized {sub} hood with {accent} lining", "slot": "head", "big": True},
         {"tags": ["oversized scarf", "huge {sub} scarf"], "nl": "a huge {sub} scarf trailing behind", "slot": "neck", "big": True},
         {"tags": ["oversized collar", "giant {sub} collar"], "nl": "a giant {sub} collar framing {poss} face", "slot": "neck", "big": True},
@@ -5319,7 +5552,11 @@ HANDHELD_MOOD = {"sword": ["military", "royal", "holy"], "katana": ["wafu", "mil
                  "gun": ["tech", "street", "military"], "shield": ["military", "holy"], "umbrella": ["elegant", "water", "wafu"], "fan": ["wafu", "elegant"],
                  "instrument": ["music"], "lantern": ["night", "ruin"], "whip": ["sexy", "dark"],
                  "axe": ["wild", "military"], "hammer": ["holy", "military", "tech"], "claws": ["wild", "dark"], "chakram": ["play", "wind", "elegant"],
-                 "flail": ["dark", "military"], "cannon": ["tech", "military"]}
+                 "flail": ["dark", "military"], "cannon": ["tech", "military"], "dual_blades": ["street", "military", "wind"], "crossbow": ["nature", "military"],
+                 "lance": ["royal", "military", "holy"], "halberd": ["military", "royal"], "trident": ["water", "royal"], "drill": ["tech", "play"], "anchor": ["water", "wild"],
+                 "scissors": ["play", "dark", "cute"], "bits": ["tech", "magic"], "orb": ["magic", "holy", "night"], "tower_shield": ["military", "holy"],
+                 "rifle": ["military", "tech"], "twin_pistols": ["street", "military"], "gatling": ["tech", "military"], "puppet": ["dark", "play", "elegant"],
+                 "wrench": ["tech", "play"], "pickaxe": ["nature", "wild"], "boomerang": ["wild", "play"], "kunai": ["wafu", "street"], "gunblade": ["military", "tech"], "brush": ["wafu", "elegant"]}
 MASCOT_MOOD = {"familiar": ["nature", "magic", "cute"], "spirit": ["magic", "holy", "night"], "drone": ["tech"], "plush": ["cute", "sweet", "sick"], "bird": ["nature", "sky"]}
 ERA_MOOD = {"fantasy": ["magic", "holy", "royal", "military", "nature"], "modern": ["street", "cute", "music", "play"], "scifi": ["tech"], "wafu": ["wafu"]}
 # コンセプト名の「役割」部分（女, 男）

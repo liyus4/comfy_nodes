@@ -590,6 +590,8 @@ def build_embellishments(level: int, outfit: List[str], gender: str, exposure: s
             return False
         if entry.get("shape_not") and shape_lang in entry["shape_not"]:
             return False
+        if entry.get("tech") and not tech_affinity:
+            return False
         slot = entry["slot"]
         if slot in used:
             return False
