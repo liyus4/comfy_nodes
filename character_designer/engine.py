@@ -362,8 +362,12 @@ class _SafeDict(dict):
         return "{" + key + "}"
 
 
+_ARTICLE_RE = re.compile(r"(a|A) (?=[aeiouAEIOU](?!ni|se|ur|ne|u))")
+
+
 def _fill(template: str, slots: Dict[str, str]) -> str:
-    return template.format_map(_SafeDict(slots))
+    """穴埋め後に冠詞を直す（a emerald → an emerald）"""
+    return _ARTICLE_RE.sub(lambda m: m.group(1) + "n ", template.format_map(_SafeDict(slots)))
 
 
 def _pick(rng: random.Random, seq, default=None):
@@ -525,7 +529,9 @@ def build_handheld(key: str, rng: random.Random, slots: Dict[str, str], size: st
     parts = [_fill(_pick(rng, opts), slots) for opts in spec["slots"].values()]
     hold_desc, hold_tag = _pick(rng, spec["holds"])
     hold_desc = _fill(hold_desc, slots)
-    extra = _fill(_pick(rng, D.HANDHELD_EXTRA.get(key, [])) or "", slots)
+    # モチーフの形状語が無いときは {shape} を使うギミックを除く
+    extras = [x for x in D.HANDHELD_EXTRA.get(key, []) if slots.get("shape") or "{shape}" not in x]
+    extra = _fill(_pick(rng, extras) or "", slots)
     sizes = [s for s in D.HANDHELD_SIZES if not (s[0] == "giant" and key in D.HANDHELD_NO_GIANT)]
     if size in ("normal", "oversized", "giant") and not (size == "giant" and key in D.HANDHELD_NO_GIANT):
         size_key, size_desc, size_tag, _ = next(s for s in sizes if s[0] == size)
@@ -535,6 +541,8 @@ def build_handheld(key: str, rng: random.Random, slots: Dict[str, str], size: st
     for t in list(spec["tags"]) + type_tag.split(", ") + ([size_tag] if size_tag else []) + hold_tag.split(", "):
         if t and t not in tags:
             tags.append(t)
+    if size_desc and type_desc.split()[0] in ("oversized", "giant", "huge", "large"):
+        type_desc = " ".join(type_desc.split()[1:])
     desc = f"{size_desc + ' ' if size_desc else ''}{type_desc} with {', '.join(parts)}"
     if extra:
         desc += f", featuring {extra}"
@@ -1221,7 +1229,7 @@ def generate(
     elif handheld == "none" and spec.handheld:
         handheld_key = spec.handheld
     if handheld_key:
-        handheld_tags, prop = build_handheld(handheld_key, rng, slots, size_pref)
+        handheld_tags, prop = build_handheld(handheld_key, rng, dict(slots, shape=shape), size_pref)
     elif handheld == "role":
         # 服装の小道具（巫女の御幣、ナースの注射器など）
         prop_pool = list(role.get("props", [])) + (list(role_b.get("props", [])) if role_b else [])
@@ -1234,7 +1242,7 @@ def generate(
     gear_nl = ""
     gear_pool = list(D.ROLE_GEAR.get(role_key, [])) + (list(D.ROLE_GEAR.get(role2_key, [])) if role2_key else [])
     if gear_pool and handheld != "none":
-        p_gear = 0.8 if not D.ROLE_WEAPON.get(role_key) else 0.5
+        p_gear = 0.6 if not D.ROLE_WEAPON.get(role_key) else 0.4
         if handheld == "role" or rng.random() < p_gear:
             g = _pick(rng, gear_pool)
             gfill = dict(fill_slots, pron_low="she" if gender == "girl" else "he")
