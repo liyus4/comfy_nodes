@@ -123,6 +123,8 @@ class CharacterDesignerNode:
                            "tooltip": "頬や目元の記号（ハート・星・涙・十字・泣きぼくろ・鼻の絆創膏・ヒゲ模様・縫い目）。不安定要素なので既定はなし"}),
                 "手持ち": (["自動", "なし", "ランダム", "服装の小道具"] + [f"{v['jp']} ({k})" for k, v in data.HANDHELDS.items()], {"default": "自動",
                            "tooltip": "武器・小道具。種類・刃や柄の色・飾り・持ち方まで seed で固定。なし=何も持たない（装飾が手持ち化しないよう negative も入る）"}),
+                "年齢感": (["自動", "若い (young)", "大人 (adult)", "年上 (older)"], {"default": "自動",
+                           "tooltip": "顔立ち・体つきの年齢感。自動は性格（お姉さん・ドS・暴君など＝大人、メスガキ・ドジっ娘など＝若い）とコンセプトから"}),
                 "胸": (["自動"] + [lv[0] for lv in data.BUST_LEVELS], {"default": "自動", "tooltip": "0=flat chest … 5=gigantic、6以降は重みと文章でさらに大きく。自動は種族・性格の推奨"}),
                 "身長": (["自動"] + list(data.HEIGHT_LEVELS), {"default": "自動"}),
                 "体型": (["自動"] + list(data.BUILD_LEVELS), {"default": "自動", "tooltip": "華奢/細身/普通/むっちり/ぽっちゃり/筋肉質。自動は種族・性格の推奨"}),
@@ -165,7 +167,7 @@ class CharacterDesignerNode:
         # data.py / engine.py を編集したら、同じ入力でもキャッシュを使わず再実行させる
         return str(sorted(_source_mtimes().items()))
 
-    def design(self, 指示文, 除外, 種族, モチーフ, 服装, 服装2, 性格, 一貫性, 装飾量, シルエット, シェイプ, 世界観, マスコット, 顔の印, 手持ち, 胸, 身長, 体型, 服の色, 髪の色, シード, 意外性, 露出, 出力形式, 再現性, 強調, 表情ポーズ, 目の形, 固定, キャラシート):
+    def design(self, 指示文, 除外, 種族, モチーフ, 服装, 服装2, 性格, 一貫性, 装飾量, シルエット, シェイプ, 世界観, マスコット, 顔の印, 手持ち, 年齢感, 胸, 身長, 体型, 服の色, 髪の色, シード, 意外性, 露出, 出力形式, 再現性, 強調, 表情ポーズ, 目の形, 固定, キャラシート):
         _reload_if_changed()
 
         if 固定 and キャラシート.strip():
@@ -195,6 +197,7 @@ class CharacterDesignerNode:
                 mascot={"自動": "auto", "なし": "none", "ランダム": "random"}.get(マスコット) or _jp_key(マスコット),
                 face_mark={"なし": "none", "ランダム": "random"}.get(顔の印) or _jp_key(顔の印),
                 shape_lang=_jp_key(シェイプ),
+                age=_jp_key(年齢感),
                 bust=胸 if 胸 != "自動" else "auto",
                 height=身長 if 身長 != "自動" else "auto",
                 build=体型 if 体型 != "自動" else "auto",

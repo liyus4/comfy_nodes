@@ -269,7 +269,7 @@ ARCHETYPES = {
     },
     "kuudere": {
         "jp": "クーデレ",
-        "syn": ["クーデレ", "クール", "無表情", "kuudere", "cool", "stoic"],
+        "syn": ["クーデレ", "クール", "kuudere", "cool", "stoic"],
         "design_jp": "寒色＋直線的な髪＋無表情で冷静さ。装飾は最小限で銀を差し色に",
         "eyes": ["calm half-closed eyes", "sharp calm eyes", "expressionless eyes"],
         "hair_styles": ["long straight hair", "short bob with straight bangs", "long straight hair with a single side braid"],
@@ -545,6 +545,20 @@ ARCHETYPES = {
         "pose": ["spinning a coin on the finger", "fanning playing cards", "bowing with a flourish"],
         "body": [],
         "accessories": ["{accent} coin pendant", "playing card tucked in the hair", "mismatched {main} and {sub} gloves"],
+        "footwear": None,
+    },
+    "mukanjou": {
+        "jp": "無感情",
+        "syn": ["無感情", "無表情", "感情がない", "感情欠落", "人形のよう", "mukanjou", "emotionless", "expressionless", "deadpan", "apathetic"],
+        "design_jp": "完全に平坦な表情＋光のない目＋まっすぐな姿勢。無彩色で装飾を最小限にし、人形のような無機質さを記号化",
+        "eyes": ["expressionless eyes", "blank half-lidded eyes"],
+        "hair_styles": ["long straight hair", "blunt bob with straight bangs", "long straight hair with a center part"],
+        "hair_colors": ["white hair", "silver hair", "black hair", "gray hair"],
+        "palettes": [("white", "gray", "black"), ("black", "white", "silver"), ("gray", "white", "sky blue")],
+        "expression": ["expressionless", "blank stare", "completely neutral face"],
+        "pose": ["standing perfectly straight, arms at sides", "staring blankly at viewer", "head tilted slightly, no expression"],
+        "body": [],
+        "accessories": ["thin {accent} choker", "plain {accent} hair pin"],
         "footwear": None,
     },
     "haraguro": {
@@ -4479,6 +4493,7 @@ EYE_PROFILES = {
     "kairaku":   {"shape": ["tareme"], "lid": ["half-closed eyes"], "lashes": ["long eyelashes"], "makeup": ["eyeliner", "eyeshadow"], "details": ["mole under eye"]},
     "higeki":    {"shape": ["tareme"], "lid": ["half-closed eyes"], "highlights": ["empty eyes"], "lashes": ["long eyelashes"]},
     "trickster": {"shape": ["tsurime"], "lid": ["half-closed eyes"], "highlights": ["sparkling eyes"], "pupils": ["star-shaped pupils", "heart-shaped pupils"]},
+    "mukanjou":  {"shape": ["tareme"], "lid": ["half-closed eyes"], "highlights": ["empty eyes"], "brows": ["thin eyebrows"]},
     "haraguro":  {"shape": ["tareme"], "lid": ["narrowed eyes"], "highlights": ["empty eyes"]},
     "fushigi":   {"shape": ["tareme"], "pupils": ["star-shaped pupils", "ringed eyes"], "highlights": ["sparkling eyes"], "lid": ["wide-eyed"]},
     "iinchou":   {"shape": ["tsurime"], "brows": ["thin eyebrows"]},
@@ -4530,6 +4545,7 @@ ARCH_SIGNATURE = {
     "kairaku":   {"tags": ["seductive smile"], "persona": "{pron} is a decadent hedonist who lives for pleasure, lounging with a languid, knowing smile."},
     "higeki":    {"tags": ["sad smile"], "persona": "{pron} is a tragic villain, gentle and sorrowful, carrying a broken keepsake of a kinder past."},
     "trickster": {"tags": ["mischievous smile", "playing card"], "persona": "{pron} is a trickster who treats everything as a game, grinning behind a fan of playing cards."},
+    "mukanjou":  {"tags": ["expressionless", "empty eyes"], "persona": "{pron} shows no emotion at all; {poss} face stays perfectly blank and {poss} eyes hold no light, like a living doll."},
     "haraguro":  {"tags": [], "persona": "{pron} wears a perfect polite smile that hides a scheming, two-faced nature."},
     "fushigi":   {"tags": [], "persona": "{pron} is an eccentric, spacey dreamer whose gaze drifts somewhere far away."},
     "iinchou":   {"tags": ["glasses"], "persona": "{pron} is a strict, diligent class representative who pushes up {poss} glasses disapprovingly."},
@@ -5001,7 +5017,7 @@ ARCH_SHAPE = {
     "iinchou": "square", "nekketsu": "square", "aneki": "square", "bokukko": "square", "jishinka": "square", "kuudere": "square",
     "tsundere": "sharp", "mesugaki": "sharp", "sadistic": "sharp", "yandere": "sharp", "chuuni": "sharp", "ojousama": "sharp",
     "oneesan": "sharp", "gal": "sharp", "haraguro": "sharp", "dokuzetsu": "sharp",
-    "kyouki": "sharp", "boukun": "sharp", "fukushu": "sharp", "kyoushin": "round", "kairaku": "round", "higeki": "round", "trickster": "sharp",
+    "mukanjou": "square", "kyouki": "sharp", "boukun": "sharp", "fukushu": "sharp", "kyoushin": "round", "kairaku": "round", "higeki": "round", "trickster": "sharp",
 }
 # 部位スロット -> 情報量ゾーン（装飾を集めるゾーンの判定）
 SLOT_ZONE = {
@@ -5123,7 +5139,7 @@ ARCH_MOOD = {
     "juujun": ["holy", "cute", "sweet"], "haraguro": ["dark", "elegant", "royal"], "fushigi": ["magic", "sky", "play"], "iinchou": ["military", "elegant", "street"],
     "ottori": ["nature", "sweet", "cute"], "nekketsu": ["fire", "wild", "military"], "dokuzetsu": ["ice", "street", "dark"], "aneki": ["wild", "street", "military"],
     "okubyou": ["cute", "sick", "nature"], "jishinka": ["royal", "fire", "light"],
-    "kyouki": ["dark", "sick", "play"], "boukun": ["royal", "dark", "military"], "fukushu": ["dark", "fire", "night"], "kyoushin": ["holy", "dark", "sick"],
+    "mukanjou": ["ice", "tech", "ruin"], "kyouki": ["dark", "sick", "play"], "boukun": ["royal", "dark", "military"], "fukushu": ["dark", "fire", "night"], "kyoushin": ["holy", "dark", "sick"],
     "kairaku": ["sexy", "royal", "elegant"], "higeki": ["night", "elegant", "sick"], "trickster": ["play", "dark", "magic"],
 }
 COLOR_MOOD = {
@@ -5200,6 +5216,26 @@ OPTIONAL_ITEM_KEYWORDS = {
     "fake tail": 0.7, "cotton tail": 0.7, "ribbon choker": 0.7, "choker": 0.7, "bow tie": 0.7, "bowtie": 0.7,
     "quiver": 0.7, "belt pouch": 0.7, "pouches": 0.7, "half-mask": 0.5, "mask around neck": 0.5, "scarf": 0.7,
 }
+
+# 年齢感。自動は性格・コンセプトから（妖艶・優雅・王家・鋼・大人系の性格は大人に寄る）
+AGE_LEVELS = {
+    "young": {"jp": "若い", "tags": ["youthful face"], "neg": ["mature female", "old"],
+              "nl": "{pron} looks youthful, with a soft, young face.", "body_remove": ["mature female"], "chest_bias": 0},
+    "adult": {"jp": "大人", "tags": ["mature female", "adult woman"], "neg": ["child", "loli", "youthful face"],
+              "nl": "{pron} is a grown adult woman in {poss} mid-to-late twenties, with a mature, composed face, defined cheekbones and a tall, adult figure.",
+              "body_remove": ["petite", "small build"], "chest_bias": 1},
+    "older": {"jp": "年上", "tags": ["mature female", "older woman"], "neg": ["child", "loli", "youthful face"],
+              "nl": "{pron} is an older, worldly woman in {poss} thirties, with a mature, elegant face and a composed, adult presence.",
+              "body_remove": ["petite", "small build"], "chest_bias": 2},
+}
+AGE_LEVELS_MALE = {
+    "young": {"tags": ["youthful face"], "neg": ["old man", "mature male"], "nl": "{pron} looks youthful, with a soft, young face."},
+    "adult": {"tags": ["mature male", "adult man"], "neg": ["child", "shota", "youthful face"], "nl": "{pron} is a grown adult man in {poss} late twenties, with a mature, defined face and a tall adult build."},
+    "older": {"tags": ["mature male", "older man"], "neg": ["child", "shota", "youthful face"], "nl": "{pron} is an older man in {poss} thirties or forties, with a weathered, dignified face."},
+}
+ADULT_ARCHS = {"oneesan", "sadistic", "boukun", "kairaku", "haraguro", "ojousama", "aneki", "kuudere", "jishinka", "dokuzetsu", "fukushu", "higeki"}
+YOUNG_ARCHS = {"mesugaki", "dojikko", "genki", "amaama", "okubyou", "uchiki", "jirai", "bokukko", "tsundere", "fushigi"}
+AGE_AUTO_ADULT_PROB = 0.35   # 自動のときの大人の基礎確率（性格・コンセプトで増減）
 
 # 体型の指定（ノードのドロップダウン）。指定が無ければ従来どおり種族・性格の推奨
 # 胸: 0=flat chest … 5=gigantic breasts、6 以降は booru の上限を超えるので重みと文章で押す

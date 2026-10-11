@@ -329,6 +329,10 @@ class Character:
     face_mark_tags: List[str] = field(default_factory=list)
     face_mark_nl: str = ""
     concept_jp: str = ""
+    age: str = ""
+    age_tags: List[str] = field(default_factory=list)
+    age_nl: str = ""
+    age_neg: List[str] = field(default_factory=list)
     concept_en: str = ""
     moods: List[str] = field(default_factory=list)
     coherence: str = "normal"
@@ -727,6 +731,7 @@ def generate(
     mascot: str = "none",
     face_mark: str = "none",
     coherence: str = "normal",
+    age: str = "auto",
 ) -> Character:
     strength = D.COHERENCE_LEVELS.get(coherence, 1.2)
     concept: Dict[str, float] = {}
@@ -1014,6 +1019,36 @@ def generate(
         body = [b for b in body if "breasts" not in b] + motif_body
     if arch_key == "mesugaki" and "petite" not in body:
         body.insert(0, "petite")
+    # --- 年齢感（自動は性格とコンセプトから） ---------------------------------
+    age_key = age if age in D.AGE_LEVELS else None
+    if age_key is None and age == "auto":
+        p_adult = D.AGE_AUTO_ADULT_PROB
+        if arch_key in D.ADULT_ARCHS:
+            p_adult += 0.4
+        elif arch_key in D.YOUNG_ARCHS:
+            p_adult -= 0.25
+        p_adult += 0.06 * strength * _affinity(["sexy", "elegant", "royal", "military"], concept) - 0.06 * strength * _affinity(["cute", "sweet", "play"], concept)
+        p_adult = max(0.05, min(0.9, p_adult))
+        r_age = random.Random(seed * 48611 + 9).random()
+        age_key = "adult" if r_age < p_adult else ("young" if r_age < p_adult + 0.35 else None)
+    age_tags: List[str] = []
+    age_nl = ""
+    age_neg: List[str] = []
+    if age_key:
+        spec_age = (D.AGE_LEVELS if gender == "girl" else D.AGE_LEVELS_MALE)[age_key]
+        age_tags = list(spec_age["tags"])
+        age_neg = list(spec_age["neg"])
+        age_nl = spec_age["nl"]
+        for b in spec_age.get("body_remove", []):
+            body = [x for x in body if x != b]
+        if gender == "girl" and spec_age.get("chest_bias") and not spec.traits and bust == "auto":
+            # 大人は胸をやや大きめに寄せ直す（指定が無いときだけ）
+            cur = next((b for b in body if b in D.CHEST_SIZES), None)
+            if cur and D.CHEST_SIZES.index(cur) < 2 and random.Random(seed * 7 + 1).random() < 0.5 * spec_age["chest_bias"]:
+                body = [b for b in body if b != cur] + [D.CHEST_SIZES[min(2, D.CHEST_SIZES.index(cur) + 1)]]
+        if age_key != "young" and "tall" not in body and random.Random(seed * 11 + 2).random() < 0.35:
+            body.append("tall")
+
     # --- 体型の指定（指定が無ければ従来どおり推奨のまま） ---------------------
     body_sentences: List[str] = []
     if height in D.HEIGHT_LEVELS:
@@ -1208,6 +1243,7 @@ def generate(
         silhouette=sil_key, shape_lang=shape_key, zones=zones, silhouette_tags=silhouette_tags,
         era=era_key or "", era_tags=era_tags, mascot_tags=mascot_tags, mascot_nl=mascot_nl, face_mark_tags=face_mark_tags, face_mark_nl=face_mark_nl,
         concept_jp=concept_jp, concept_en=concept_en, moods=top_moods, coherence=coherence,
+        age=age_key or "", age_tags=age_tags, age_nl=age_nl, age_neg=age_neg,
     )
 
 
@@ -1299,6 +1335,12 @@ def _article(phrase: str) -> str:
     return "an" if phrase[:1].lower() in "aeiou" else "a"
 
 
+def _age_sentence(c: Character, pron: str, poss: str) -> str:
+    if not c.age_nl:
+        return ""
+    return c.age_nl.replace("{pron}", pron).replace("{poss}", poss)
+
+
 def _concept_sentence(c: Character, pron: str, poss: str) -> str:
     if not c.concept_en or c.coherence == "none" or not c.moods:
         return ""
@@ -1387,6 +1429,7 @@ def build_positive(c: Character) -> str:
         else:
             parts.append(f"Color scheme: {c.main} and {c.sub} with {c.accent} accents; the pattern used is {c.pattern}.")
         parts.append(_concept_sentence(c, pron, poss))
+        parts.append(_age_sentence(c, pron, poss))
         parts.append(_color_sentence(c, pron, poss))
         parts.append(_embellish_sentence(c, pron, poss))
         parts.append(_silhouette_sentence(c, pron, poss))
@@ -1404,6 +1447,7 @@ def build_positive(c: Character) -> str:
 
     tags: List[str] = []
     tags += c.body
+    tags += c.age_tags
     tags += c.hair
     if strict:
         # 目の形には強弱に応じた重み（Anima は SDXL より強い重みが必要）
@@ -1447,9 +1491,10 @@ def build_positive(c: Character) -> str:
         tags += c.era_tags
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [_concept_sentence(c, pron, poss), f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [_concept_sentence(c, pron, poss), _age_sentence(c, pron, poss), f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _handheld_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
+    tags += c.age_tags
     tags += c.features
     tags += c.outfit
     tags += c.embellish_tags
@@ -1496,6 +1541,7 @@ def build_negative(c: Character) -> str:
         neg.append("heterochromia")
     if "colored skin" in c.skin:
         neg += ["fair skin", "pale skin"]
+    neg += c.age_neg
     if c.consistency == "strict":
         # 目: 反対の形を（重み付きで）抑える
         shape = c.eye_choice.get("shape")
@@ -1576,6 +1622,7 @@ def build_sheet(c: Character) -> str:
         f"# silhouette : {D.SILHOUETTES[c.silhouette]['jp'] if c.silhouette else '-'} ({c.silhouette})   shape: {D.SHAPES[c.shape_lang]['jp'] if c.shape_lang else '-'} ({c.shape_lang})   density zones: {', '.join(c.zones) or '-'}",
         f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
         f"# eyes       : {' / '.join(c.eyes)}   intensity={c.eye_intensity}   emphasis={c.emphasis}",
+        f"# age        : {D.AGE_LEVELS[c.age]['jp'] if c.age else '(指定なし)'} ({c.age or '-'})   body: {', '.join(c.body)}",
         f"# consistency: {c.consistency}" + ("（booru タグ骨格 / 色は main+accent の2色 / 不安定要素は省略）" if c.consistency == "strict" else "（詳細説明文）"),
         f"# design     : {design_note}",
     ]
