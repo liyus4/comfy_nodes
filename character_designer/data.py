@@ -166,6 +166,8 @@ EXPOSURE_WORDS = {
     "high": ["高露出", "露出高", "露出多", "露出度高", "セクシー", "エロ", "sexy", "revealing", "skimpy"],
     "modest": ["低露出", "露出少", "露出控えめ", "控えめ", "露出なし", "modest", "conservative"],
     "standard": ["標準露出", "標準", "普通の露出", "普通", "standard exposure", "normal exposure"],
+    "near_nude": ["準裸", "ほぼ裸", "半裸", "near nude", "nearly nude", "almost nude"],
+    "nude": ["全裸", "裸", "ヌード", "nude", "naked"],
 }
 
 # ---------------------------------------------------------------------------
@@ -559,6 +561,48 @@ ARCHETYPES = {
         "pose": ["standing perfectly straight, arms at sides", "staring blankly at viewer", "head tilted slightly, no expression"],
         "body": [],
         "accessories": ["thin {accent} choker", "plain {accent} hair pin"],
+        "footwear": None,
+    },
+    "mama": {
+        "jp": "甘やかしママ",
+        "syn": ["甘やかしママ", "ママ", "母性", "お母さん", "包容力", "mama", "doting", "motherly", "maternal"],
+        "design_jp": "包容力のある柔らかい目＋ゆるくまとめた髪＋暖色。大人の体型と抱きしめる仕草で「甘やかす側」を記号化",
+        "eyes": ["gentle half-lidded eyes", "warm motherly eyes"],
+        "hair_styles": ["long wavy hair loosely tied back", "low loose bun with loose strands", "long hair draped over one shoulder"],
+        "hair_colors": ["light brown hair", "blonde hair", "pink hair", "dark brown hair"],
+        "palettes": [("cream", "pastel pink", "gold"), ("beige", "brown", "white"), ("lavender", "white", "pink")],
+        "expression": ["warm gentle smile", "soft doting smile", "closed-eye smile with head tilt"],
+        "pose": ["arms open for a hug", "patting the viewer's head", "hands clasped at the chest, leaning forward"],
+        "body": ["large breasts", "curvy", "wide hips"],
+        "accessories": ["{accent} heart-shaped pendant", "soft {sub} shawl over the shoulders", "{accent} ribbon tied loosely in the hair"],
+        "footwear": None,
+    },
+    "hazukashigari": {
+        "jp": "恥ずかしがり屋",
+        "syn": ["恥ずかしがり屋", "恥ずかしがり", "照れ屋", "赤面", "テレ屋", "hazukashigari", "bashful", "easily embarrassed", "blushing"],
+        "design_jp": "常に赤面＋顔を隠す仕草＋目をそらす視線。隠れられる大きめの小物（マフラー・袖）で「照れ」を記号化",
+        "eyes": ["averted eyes", "wide blushing eyes"],
+        "hair_styles": ["long hair hiding part of the face", "low twin braids", "bob with long side bangs"],
+        "hair_colors": ["light brown hair", "pink hair", "black hair", "blonde hair"],
+        "palettes": [("pastel pink", "white", "red"), ("cream", "light blue", "pink"), ("white", "lavender", "pink")],
+        "expression": ["full-face blush", "covering face with hands, peeking through fingers", "embarrassed, steam rising from head"],
+        "pose": ["hiding behind own hair", "tugging the hem down", "hugging own arms, looking away"],
+        "body": [],
+        "accessories": ["oversized {sub} scarf to hide in", "{accent} hair clips", "sleeves pulled over the hands"],
+        "footwear": None,
+    },
+    "utagai": {
+        "jp": "疑り深い",
+        "syn": ["疑り深い", "疑い深い", "猜疑心", "警戒心", "疑心暗鬼", "utagai", "suspicious", "distrustful", "wary"],
+        "design_jp": "細めた目と横目の視線＋腕組み＋フードや前髪で顔を隠す。暗い寒色で「信用していない」を記号化",
+        "eyes": ["narrowed suspicious eyes", "sidelong glance"],
+        "hair_styles": ["long straight hair with heavy bangs", "hair covering one eye", "tight low ponytail"],
+        "hair_colors": ["dark purple hair", "black hair", "gray hair", "dark green hair"],
+        "palettes": [("dark purple", "black", "silver"), ("gray", "navy", "gold"), ("black", "dark green", "silver")],
+        "expression": ["narrowed eyes, suspicious look", "sidelong glance with a slight frown", "raised eyebrow, lips pressed together"],
+        "pose": ["arms crossed, leaning back", "peeking from behind a corner", "hand on chin, studying the viewer"],
+        "body": [],
+        "accessories": ["hooded {sub} cloak pulled low", "{accent} pendant clutched in one hand"],
         "footwear": None,
     },
     "haraguro": {
@@ -1850,6 +1894,101 @@ MOTIFS = {
         "skin": None,
         "classic_jp": "鎖——黒×銀と鎖の装飾で束縛と硬質さを添える",
         "gap_jp": "鎖——記号を{role}に添える",
+    },
+    "coin": {
+        "kind": "theme",
+        "jp": "硬貨",
+        "syn": ["コイン", "硬貨", "金貨", "貨幣", "coin", "coins", "gold coin"],
+        "features_primary": [],
+        "features_optional": ["{accent} coin pendant", "belt of hanging gold coins", "coin-shaped {accent} hair ornaments", "gold coin earrings", "coin-stitched {sub} sash"],
+        "palettes": [("black", "gold", "crimson"), ("brown", "gold", "cream"), ("emerald green", "gold", "black")],
+        "patterns": ["coin pattern", "gold coin print", "diamond pattern", "stripe pattern", "star pattern", "clover motif", "crown motif", "checkered pattern"],
+        "props": [],
+        "classic_roles": ["merchant", "thief", "pirate", "jester_outfit", "fortune_teller"],
+        "gap_roles": [],
+        "classic_arch": ["trickster", "jishinka", "gal", "haraguro"],
+        "gap_arch": [],
+        "hair_colors": ["blonde hair", "brown hair", "black hair"],
+        "eye_colors": ["golden eyes", "green eyes"],
+        "skin": None,
+        "classic_jp": "硬貨——黒×金と吊り下げたコインで商いと富を添える",
+        "gap_jp": "硬貨——記号を{role}に添える",
+    },
+    "milk_bottle": {
+        "kind": "theme",
+        "jp": "牛乳瓶",
+        "syn": ["牛乳瓶", "ミルク瓶", "牛乳", "ミルク", "milk bottle", "milk", "bottle of milk"],
+        "features_primary": [],
+        "features_optional": ["small milk bottle charm on the choker", "{accent} bottle-cap-shaped hair clips", "milk bottle holster on the belt", "cow-print bottle pouch on the hip"],
+        "palettes": [("white", "black", "pink"), ("cream", "brown", "white"), ("white", "sky blue", "pink")],
+        "patterns": ["cow print", "polka dot pattern", "milk splash pattern", "bottle motif", "heart print", "gingham pattern", "stripe pattern", "star print"],
+        "props": [],
+        "classic_roles": ["cow_suit", "village_girl", "maid", "waitress", "nurse"],
+        "gap_roles": [],
+        "classic_arch": ["ottori", "amaama", "mama", "dojikko"],
+        "gap_arch": [],
+        "hair_colors": ["white hair", "light brown hair", "blonde hair"],
+        "eye_colors": ["brown eyes", "blue eyes"],
+        "skin": None,
+        "classic_jp": "牛乳瓶——白×黒×ピンクと瓶の小物で乳のモチーフを添える",
+        "gap_jp": "牛乳瓶——記号を{role}に添える",
+    },
+    "milking_machine": {
+        "kind": "theme",
+        "jp": "搾乳機",
+        "syn": ["搾乳機", "搾乳", "ミルカー", "milking machine", "milker"],
+        "features_primary": [],
+        "features_optional": ["milking machine cups attached over the chest", "{accent} tube harness connected to small milk tanks on the hips", "cow-print milk tank backpack with clear tubes", "{accent} suction cup pasties with tubes"],
+        "palettes": [("white", "black", "pink"), ("white", "silver", "pink"), ("cream", "black", "red")],
+        "patterns": ["cow print", "tube pattern", "gauge motif", "polka dot pattern", "heart print", "stripe pattern", "cross pattern", "milk splash pattern"],
+        "props": [],
+        "classic_roles": ["cow_suit", "nurse", "bodysuit", "maid", "village_girl"],
+        "gap_roles": [],
+        "classic_arch": ["juujun", "amaama", "mama", "okubyou", "kairaku"],
+        "gap_arch": [],
+        "hair_colors": ["white hair", "pink hair", "light brown hair"],
+        "eye_colors": ["pink eyes", "brown eyes"],
+        "skin": None,
+        "classic_jp": "搾乳機——白×黒×ピンクとチューブ・カップの装具で搾乳を記号化",
+        "gap_jp": "搾乳機——記号を{role}に添える",
+    },
+    "restraints": {
+        "kind": "theme",
+        "jp": "拘束具",
+        "syn": ["拘束具", "拘束", "手枷", "足枷", "枷", "straitjacket", "restraints", "shackles", "bondage gear"],
+        "features_primary": [],
+        "features_optional": ["{accent} leather cuffs with dangling chains on both wrists", "{accent} collar with a hanging leash", "straitjacket-style {sub} straps across the torso", "ankle shackles with a short chain", "{accent} buckled straps on the thighs"],
+        "palettes": [("black", "crimson", "silver"), ("white", "black", "red"), ("dark purple", "black", "silver")],
+        "patterns": ["buckle motif", "chain pattern", "stripe pattern", "cross pattern", "padlock motif", "spiderweb pattern", "diamond pattern", "drip pattern"],
+        "props": [],
+        "classic_roles": ["gothic_lolita", "nurse", "cultist", "delinquent", "bodysuit", "succubus"],
+        "gap_roles": [],
+        "classic_arch": ["juujun", "yandere", "jirai", "sadistic", "kyouki"],
+        "gap_arch": [],
+        "hair_colors": ["black hair", "white hair", "silver hair"],
+        "eye_colors": ["red eyes", "purple eyes"],
+        "skin": None,
+        "classic_jp": "拘束具——黒×赤×銀と枷・ベルトで束縛を記号化",
+        "gap_jp": "拘束具——記号を{role}に添える",
+    },
+    "flask": {
+        "kind": "theme",
+        "jp": "フラスコ",
+        "syn": ["フラスコ", "試験管", "薬瓶", "ビーカー", "flask", "test tube", "vial", "potion bottle"],
+        "features_primary": [],
+        "features_optional": ["bandolier of glowing {accent} vials across the chest", "round flask pendant filled with {accent} liquid", "test tube hair ornaments", "belt of corked potion bottles", "{accent} vial earrings"],
+        "palettes": [("dark green", "gold", "purple"), ("white", "teal", "gold"), ("brown", "emerald green", "silver")],
+        "patterns": ["bubble pattern", "alchemical symbol print", "test tube motif", "hexagon pattern", "drip pattern", "star pattern", "spiral pattern", "skull motif"],
+        "props": [],
+        "classic_roles": ["alchemist", "scholar", "nurse", "steampunk", "witch_robe", "mage"],
+        "gap_roles": [],
+        "classic_arch": ["chuuni", "iinchou", "fushigi", "kuudere", "dojikko"],
+        "gap_arch": [],
+        "hair_colors": ["green hair", "white hair", "purple hair"],
+        "eye_colors": ["green eyes", "purple eyes"],
+        "skin": None,
+        "classic_jp": "フラスコ——緑×金×紫と薬瓶・試験管で錬金の雰囲気を添える",
+        "gap_jp": "フラスコ——記号を{role}に添える",
     },
     "thorn": {
         "kind": "theme",
@@ -4270,7 +4409,7 @@ ROLES = {
     },
     "alchemist": {
         "jp": "錬金術師",
-        "syn": ["錬金術師", "アルケミスト", "薬師", "alchemist", "apothecary"],
+        "syn": ["錬金術師", "錬金術士", "アルケミスト", "薬師", "alchemist", "apothecary"],
         "outfits": {
             "modest": ["{material} {main} long coat with {accent} buttons and {sub} {pattern} on the lapels, over a white shirt", "{sub} leather apron with vial pouches", "brass goggles on the head", "{main} gloves", "{main} trousers", "{main} boots"],
             "standard": ["{material} {main} coat with {accent} buttons and {sub} {pattern}, over a white blouse and {sub} corset", "{sub} leather apron with vial pouches", "brass goggles on the head", "{main} fingerless gloves", "{main} shorts", "{main} thigh-high socks with {accent} top band", "{main} boots"],
@@ -4494,6 +4633,9 @@ EYE_PROFILES = {
     "higeki":    {"shape": ["tareme"], "lid": ["half-closed eyes"], "highlights": ["empty eyes"], "lashes": ["long eyelashes"]},
     "trickster": {"shape": ["tsurime"], "lid": ["half-closed eyes"], "highlights": ["sparkling eyes"], "pupils": ["star-shaped pupils", "heart-shaped pupils"]},
     "mukanjou":  {"shape": ["tareme"], "lid": ["half-closed eyes"], "highlights": ["empty eyes"], "brows": ["thin eyebrows"]},
+    "mama":      {"shape": ["tareme"], "lid": ["half-closed eyes"], "lashes": ["long eyelashes"]},
+    "hazukashigari": {"shape": ["tareme"], "lid": ["wide-eyed"], "details": ["eyes visible through hair"]},
+    "utagai":    {"shape": ["tsurime"], "lid": ["narrowed eyes"], "highlights": ["empty eyes"]},
     "haraguro":  {"shape": ["tareme"], "lid": ["narrowed eyes"], "highlights": ["empty eyes"]},
     "fushigi":   {"shape": ["tareme"], "pupils": ["star-shaped pupils", "ringed eyes"], "highlights": ["sparkling eyes"], "lid": ["wide-eyed"]},
     "iinchou":   {"shape": ["tsurime"], "brows": ["thin eyebrows"]},
@@ -4546,6 +4688,9 @@ ARCH_SIGNATURE = {
     "higeki":    {"tags": ["sad smile"], "persona": "{pron} is a tragic villain, gentle and sorrowful, carrying a broken keepsake of a kinder past."},
     "trickster": {"tags": ["mischievous smile", "playing card"], "persona": "{pron} is a trickster who treats everything as a game, grinning behind a fan of playing cards."},
     "mukanjou":  {"tags": ["expressionless", "empty eyes"], "persona": "{pron} shows no emotion at all; {poss} face stays perfectly blank and {poss} eyes hold no light, like a living doll."},
+    "mama":  {"tags": ["mature female"], "persona": "{pron} is a doting, motherly presence who spoils everyone with a warm, patient smile, always ready to pull them into a hug."},
+    "hazukashigari":  {"tags": ["blush", "embarrassed"], "persona": "{pron} is painfully bashful, face always flushed, hiding behind {poss} hair or sleeves whenever someone looks."},
+    "utagai":  {"tags": ["narrowed eyes", "sidelong glance"], "persona": "{pron} trusts no one, watching the viewer with narrowed, sidelong eyes and keeping {poss} arms crossed."},
     "haraguro":  {"tags": [], "persona": "{pron} wears a perfect polite smile that hides a scheming, two-faced nature."},
     "fushigi":   {"tags": [], "persona": "{pron} is an eccentric, spacey dreamer whose gaze drifts somewhere far away."},
     "iinchou":   {"tags": ["glasses"], "persona": "{pron} is a strict, diligent class representative who pushes up {poss} glasses disapprovingly."},
@@ -5205,6 +5350,14 @@ ROLE_GEAR = {
 }
 # 装備を付けないポーズ用の negative 断片
 EQUIPMENT_NEGATIVE = ["holding object", "handheld object", "holding weapon", "weapon", "backpack"]
+# 準裸・全裸（ランダムでは選ばれない。明示指定か指示文の語のみ）。服は装身具の部位だけ残す
+NEAR_NUDE_BASES = [["pasties", "micro bikini bottom"], ["heart pasties", "maebari"], ["micro bikini"], ["naked ribbon"], ["cross pasties", "maebari"], ["pasties", "naked apron"]]
+NUDE_KEEP_SLOTS = {"head", "face", "hands", "legs", "feet", "neck", "outer"}
+NUDE_ACCESSORY_WORDS = ("earring", "necklace", "pendant", "choker", "brooch", "ring", "anklet", "charm", "hair", "ribbon", "bow", "bell", "bracelet", "piercing", "halo", "crown", "tiara")
+# 準裸・全裸で装飾やシルエットから外す語（服があることを前提にした要素）
+NUDE_FORBID_WORDS = ("hem", "sleeve", "belt", "cape", "skirt", "corset", "coat", "jacket", "bodice", "sash", "over the outfit", "buckle", "tabard", "outfit", "uniform", "dress", "shirt")
+NUDE_NEGATIVE = {"near_nude": ["bra", "panties", "shirt", "dress", "skirt", "pants", "covered navel"],
+                 "nude": ["clothes", "underwear", "bra", "panties", "shirt", "skirt", "dress", "pants", "bikini", "swimsuit"]}
 # 手持ちが無いときに negative に入れる（装飾が手持ち化するのを防ぐ）
 HANDHELD_NEGATIVE = ["holding object", "handheld object", "holding weapon"]
 # 性格の署名に含まれる手持ち（これがある性格では HANDHELD_NEGATIVE を入れない）
@@ -5230,7 +5383,7 @@ SHAPE_WORDS = {
     "rose": "rose", "feather": "feather", "chain": "chain-link", "thorn": "thorn", "key": "key", "rainbow": "prism", "holy_light": "cross",
     "shadow": "eye", "candle": "flame", "royal": "crown", "neon": "hexagon", "heart": "heart", "skull": "skull",
     "fallen_angel": "feather", "halfling": "leaf", "elemental": "wisp", "lizardfolk": "scale", "orc": "fang", "dryad": "leaf", "unicorn": "spiral-horn", "phoenix": "feather", "golem": "rune",
-    "wind": "swirl", "earth": "rune",
+    "wind": "swirl", "earth": "rune", "coin": "coin", "milk_bottle": "bottle", "milking_machine": "gauge", "restraints": "buckle", "flask": "flask",
 }
 
 EMBELLISHMENTS = {
@@ -5409,6 +5562,7 @@ ARCH_SHAPE = {
     "iinchou": "square", "nekketsu": "square", "aneki": "square", "bokukko": "square", "jishinka": "square", "kuudere": "square",
     "tsundere": "sharp", "mesugaki": "sharp", "sadistic": "sharp", "yandere": "sharp", "chuuni": "sharp", "ojousama": "sharp",
     "oneesan": "sharp", "gal": "sharp", "haraguro": "sharp", "dokuzetsu": "sharp",
+    "mama": "round", "hazukashigari": "round", "utagai": "sharp",
     "mukanjou": "square", "kyouki": "sharp", "boukun": "sharp", "fukushu": "sharp", "kyoushin": "round", "kairaku": "round", "higeki": "round", "trickster": "sharp",
 }
 # 部位スロット -> 情報量ゾーン（装飾を集めるゾーンの判定）
@@ -5503,6 +5657,8 @@ THEME_MOOD = {
     "skull": ["dark", "ruin", "street"], "face_mark": ["play", "sick", "street"], "medical": ["sick", "cute"], "gamer": ["tech", "play", "street"],
     "cosmetics": ["sexy", "elegant", "street"], "emblem": ["royal", "military", "holy", "magic"], "liquid": ["sweet", "sexy"], "stencil": ["street", "ruin", "play"],
     "wind": ["sky", "nature", "light"], "earth": ["nature", "military", "ruin"],
+    "coin": ["royal", "play", "street"], "milk_bottle": ["sweet", "cute", "nature"], "milking_machine": ["sexy", "sick", "tech"],
+    "restraints": ["dark", "sexy", "sick"], "flask": ["magic", "tech", "sick"],
 }
 ROLE_MOOD = {
     "succubus": ["sexy", "dark", "night"], "sister": ["holy", "elegant"], "maid": ["cute", "elegant"], "school_uniform": ["street", "cute"],
@@ -5531,6 +5687,7 @@ ARCH_MOOD = {
     "juujun": ["holy", "cute", "sweet"], "haraguro": ["dark", "elegant", "royal"], "fushigi": ["magic", "sky", "play"], "iinchou": ["military", "elegant", "street"],
     "ottori": ["nature", "sweet", "cute"], "nekketsu": ["fire", "wild", "military"], "dokuzetsu": ["ice", "street", "dark"], "aneki": ["wild", "street", "military"],
     "okubyou": ["cute", "sick", "nature"], "jishinka": ["royal", "fire", "light"],
+    "mama": ["sweet", "cute", "nature"], "hazukashigari": ["cute", "sweet", "light"], "utagai": ["dark", "night", "ruin"],
     "mukanjou": ["ice", "tech", "ruin"], "kyouki": ["dark", "sick", "play"], "boukun": ["royal", "dark", "military"], "fukushu": ["dark", "fire", "night"], "kyoushin": ["holy", "dark", "sick"],
     "kairaku": ["sexy", "royal", "elegant"], "higeki": ["night", "elegant", "sick"], "trickster": ["play", "dark", "magic"],
 }
@@ -5631,8 +5788,8 @@ AGE_LEVELS_MALE = {
     "adult": {"tags": ["mature male", "adult man"], "neg": ["child", "shota", "youthful face"], "nl": "{pron} is a grown adult man in {poss} late twenties, with a mature, defined face and a tall adult build."},
     "older": {"tags": ["mature male", "older man"], "neg": ["child", "shota", "youthful face"], "nl": "{pron} is an older man in {poss} thirties or forties, with a weathered, dignified face."},
 }
-ADULT_ARCHS = {"oneesan", "sadistic", "boukun", "kairaku", "haraguro", "ojousama", "aneki", "kuudere", "jishinka", "dokuzetsu", "fukushu", "higeki"}
-YOUNG_ARCHS = {"mesugaki", "dojikko", "genki", "amaama", "okubyou", "uchiki", "jirai", "bokukko", "tsundere", "fushigi"}
+ADULT_ARCHS = {"mama", "utagai", "oneesan", "sadistic", "boukun", "kairaku", "haraguro", "ojousama", "aneki", "kuudere", "jishinka", "dokuzetsu", "fukushu", "higeki"}
+YOUNG_ARCHS = {"hazukashigari", "mesugaki", "dojikko", "genki", "amaama", "okubyou", "uchiki", "jirai", "bokukko", "tsundere", "fushigi"}
 AGE_AUTO_ADULT_PROB = 0.35   # 自動のときの大人の基礎確率（性格・コンセプトで増減）
 
 # 体型の指定（ノードのドロップダウン）。指定が無ければ従来どおり種族・性格の推奨

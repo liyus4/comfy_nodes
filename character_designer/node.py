@@ -64,7 +64,7 @@ _reload_if_changed()
 
 # --- 日本語ラベル <-> 内部値 ---------------------------------------------------
 TWIST_JP = {"自動": "auto", "王道": "classic", "意外性": "surprise"}
-EXPOSURE_JP = {"自動": "auto", "控えめ": "modest", "標準": "standard", "高露出": "high"}
+EXPOSURE_JP = {"自動": "auto", "控えめ": "modest", "標準": "standard", "高露出": "high", "準裸": "near_nude", "全裸": "nude"}
 STYLE_JP = {"タグ": "tags", "文章": "natural"}
 CONSISTENCY_JP = {"厳密（タグ骨格・再現性重視）": "strict", "詳細（説明文）": "full"}
 EXPRESSION_JP = {"表情のみ": "expression_only", "表情とポーズ": "both", "なし": "none"}
@@ -138,7 +138,7 @@ class CharacterDesignerNode:
                     "tooltip": "同じ指示文とシードなら必ず同じキャラになります",
                 }),
                 "意外性": (list(TWIST_JP), {"default": "自動", "tooltip": "王道=悪魔→サキュバス / 意外性=悪魔→シスター / 自動=4割で意外性"}),
-                "露出": (list(EXPOSURE_JP), {"default": "自動", "tooltip": "自動は指示文の指定 > ランダム"}),
+                "露出": (list(EXPOSURE_JP), {"default": "自動", "tooltip": "自動は指示文の指定 > ランダム（準裸・全裸はランダムでは出ない）。準裸=下着未満の面積＋装身具のみ / 全裸=装身具のみ"}),
                 "出力形式": (list(STYLE_JP), {"default": "タグ", "tooltip": "タグ=カンマ区切り / 文章=自然文"}),
                 "再現性": (list(CONSISTENCY_JP), {"default": "厳密（タグ骨格・再現性重視）",
                                                   "tooltip": "厳密=booruタグ骨格・2色・不安定要素なし（Anima/Illustrious 向け） / 詳細=服1点ごとの説明文"}),

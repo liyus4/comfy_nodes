@@ -18,7 +18,8 @@ from . import data as D
 from . import outfit_tags as OT
 
 EXPOSURES = ("modest", "standard", "high")
-EXPOSURE_JP = {"modest": "控えめ", "standard": "標準", "high": "高露出"}
+NUDE_LEVELS = ("near_nude", "nude")  # ランダムでは選ばれない露出段階
+EXPOSURE_JP = {"modest": "控えめ", "standard": "標準", "high": "高露出", "near_nude": "準裸", "nude": "全裸"}
 CONSISTENCY = ("strict", "full")
 TWISTS = ("auto", "classic", "surprise")
 
@@ -564,7 +565,7 @@ def _dedupe(items: List[str]) -> List[str]:
 def build_embellishments(level: int, outfit: List[str], gender: str, exposure: str, shape: str, tech_affinity: bool,
                          features_text: str, rng: random.Random, slots: Dict[str, str],
                          zones: Optional[List[str]] = None, shape_lang: str = "", damage_affinity: bool = False,
-                         concept_weights: Optional[Dict[str, float]] = None) -> Tuple[List[str], List[str], str]:
+                         concept_weights: Optional[Dict[str, float]] = None, forbid: Tuple[str, ...] = ()) -> Tuple[List[str], List[str], str]:
     """
     装飾レイヤー。服装の部位スロットと衝突しないようにアドオンを選ぶ。
     返り値: (タグ列, 文章の断片, 象徴的な一点のタグ)
@@ -591,6 +592,8 @@ def build_embellishments(level: int, outfit: List[str], gender: str, exposure: s
         if entry.get("shape_not") and shape_lang in entry["shape_not"]:
             return False
         if entry.get("tech") and not tech_affinity:
+            return False
+        if forbid and any(w in " ".join(entry["tags"]).lower() for w in forbid):
             return False
         slot = entry["slot"]
         if slot in used:
@@ -886,9 +889,9 @@ def generate(
         twist_label = "classic"
 
     # --- 露出 -------------------------------------------------------------
-    if exposure in EXPOSURES:
+    if exposure in EXPOSURES or exposure in NUDE_LEVELS:
         exp = exposure
-    elif spec.exposure in EXPOSURES:
+    elif spec.exposure in EXPOSURES or spec.exposure in NUDE_LEVELS:
         exp = spec.exposure
     else:
         exp_w = {"modest": 2 + strength * _affinity(["holy", "elegant", "military"], concept) * 0.5,
@@ -896,6 +899,7 @@ def generate(
                  "high": 3 + strength * _affinity(["sexy"], concept)}
         cands = [(e, exp_w[e]) for e in EXPOSURES if e not in excluded["exposure"]] or [(e, exp_w[e]) for e in EXPOSURES]
         exp = rng.choices([e for e, _ in cands], weights=[w for _, w in cands], k=1)[0]
+    exp_src = "high" if exp in NUDE_LEVELS else exp  # 準裸・全裸は高露出の服を土台にして装身具だけ残す
 
     # --- テーマカラー（3色ルール） ---------------------------------------
     if motif.get("palette_only"):
@@ -1112,15 +1116,15 @@ def generate(
 
     # --- 服装 -------------------------------------------------------------
     if gender == "boy" and "male" in role:
-        outfit_src = role["male"][exp]
+        outfit_src = role["male"][exp_src]
     else:
-        outfit_src = role["outfits"][exp]
+        outfit_src = role["outfits"][exp_src]
     variant = rng.random()          # 選択肢の位置（説明文版・タグ版で共有）
     keep: Dict[str, bool] = {}      # 任意小物の採用判断（同上）
     outfit_detail = [_fill(o, slots).replace("print print", "print") for o in _expand_items(outfit_src, variant, keep, rng)]
     fuse_seed = rng.random()        # 融合の置き換え判断（説明文版・タグ版で共有）
     if role_b:
-        src_b = role_b["male"][exp] if (gender == "boy" and "male" in role_b) else role_b["outfits"][exp]
+        src_b = role_b["male"][exp_src] if (gender == "boy" and "male" in role_b) else role_b["outfits"][exp_src]
         detail_b = [_fill(o, slots).replace("print print", "print") for o in _expand_items(src_b, variant, dict(keep), random.Random(int(fuse_seed * 1e9)))]
         outfit_detail = fuse_outfits(outfit_detail, detail_b, random.Random(int(fuse_seed * 1e9) + 1))
     if arch.get("footwear"):
@@ -1128,10 +1132,10 @@ def generate(
         outfit_detail.append(_fill(arch["footwear"], slots))
     if strict:
         # booru の正規タグ列（先頭が主役の服）
-        tag_src = OT.OUTFIT_TAGS[role_key]["male" if gender == "boy" else "female"][exp]
+        tag_src = OT.OUTFIT_TAGS[role_key]["male" if gender == "boy" else "female"][exp_src]
         outfit = [_fill(t, slots_strict) for t in _expand_items(tag_src, variant, keep, rng)]
         if role_b:
-            tag_b = OT.OUTFIT_TAGS[role2_key]["male" if gender == "boy" else "female"][exp]
+            tag_b = OT.OUTFIT_TAGS[role2_key]["male" if gender == "boy" else "female"][exp_src]
             tags_b = [_fill(t, slots_strict) for t in _expand_items(tag_b, variant, dict(keep), random.Random(int(fuse_seed * 1e9)))]
             outfit = fuse_outfits(outfit, tags_b, random.Random(int(fuse_seed * 1e9) + 1))
         if arch.get("footwear_tags"):
@@ -1162,15 +1166,28 @@ def generate(
     shape_spec = D.SHAPES[shape_key]
     silhouette_tags = list(sil["tags"]) + (list(shape_spec["tags"]) if detail_level >= 1 else [])
 
+    # --- 準裸・全裸: 装身具の部位だけ残し、土台タグを先頭に ---------------------
+    if exp in NUDE_LEVELS:
+        def _keep(t: str) -> bool:
+            return classify_slot(t) in D.NUDE_KEEP_SLOTS or any(w in t.lower() for w in D.NUDE_ACCESSORY_WORDS)
+        outfit = [t for t in outfit if _keep(t)]
+        outfit_detail = [t for t in outfit_detail if _keep(t)]
+        silhouette_tags = [t for t in silhouette_tags if not any(w in t for w in D.NUDE_FORBID_WORDS)]
+        base = list(_pick(rng, D.NEAR_NUDE_BASES)) if exp == "near_nude" else ["nude"]
+        outfit = base + outfit
+        outfit_detail = base + outfit_detail
+
     # --- 装飾レイヤー（独自性） -------------------------------------------------
     shape = D.SHAPE_WORDS.get(theme_key or "", "") or D.SHAPE_WORDS.get(motif_key, "")
     tech_aff = (motif_key in D.TECH_AFFINITY) or (theme_key in D.TECH_AFFINITY) or bool(era_key and D.ERAS[era_key]["tech"])
     emb_rng = random.Random(seed * 7919 + 17)
     embellish_tags, embellish_nl, iconic_tag = build_embellishments(
-        detail_level, outfit, gender, exp, shape, tech_aff, " ".join(features).lower(), emb_rng, fill_slots,
+        detail_level, outfit, gender, exp_src, shape, tech_aff, " ".join(features).lower(), emb_rng, fill_slots,
         zones if detail_level >= 1 else None, shape_key,
         (motif_key in D.DAMAGE_AFFINITY) or (theme_key in D.DAMAGE_AFFINITY) or (arch_key in D.DAMAGE_AFFINITY),
-        {cat: 1.0 + strength * _affinity(m, concept) * 0.5 for cat, m in D.EMB_CAT_MOOD.items()} if strength > 0 else None)
+        dict({cat: 1.0 + strength * _affinity(m, concept) * 0.5 for cat, m in D.EMB_CAT_MOOD.items()} if strength > 0 else {},
+             **({"layering": 0.0, "cutouts": 0.0, "damage": 0.0} if exp in NUDE_LEVELS else {})) or None,
+        forbid=D.NUDE_FORBID_WORDS if exp in NUDE_LEVELS else ())
     if strict:
         # 説明文版（シートのメモ）にも同じ内容を足しておく
         outfit_detail = outfit_detail + embellish_tags
@@ -1318,6 +1335,10 @@ def _eye_sentence(c: Character, pron: str, poss: str) -> str:
 
 
 def _exposure_sentence(c: Character, pron: str, poss: str) -> str:
+    if c.exposure == "nude":
+        return f"{pron} is completely nude, wearing only accessories."
+    if c.exposure == "near_nude":
+        return f"{pron} wears almost nothing: only tiny coverings smaller than underwear, plus accessories."
     if c.exposure != "high" or not c.exposure_tags:
         return ""
     spots = [D.EXPOSURE_SPOT_NL.get(t, t) for t in c.exposure_tags]
@@ -1342,7 +1363,7 @@ def _color_sentence(c: Character, pron: str, poss: str) -> str:
 def _silhouette_sentence(c: Character, pron: str, poss: str) -> str:
     if not c.silhouette:
         return ""
-    parts = [D.SILHOUETTES[c.silhouette]["nl"].capitalize() + "."]
+    parts = [] if c.exposure in NUDE_LEVELS else [D.SILHOUETTES[c.silhouette]["nl"].capitalize() + "."]
     if c.detail_level >= 1 and c.shape_lang:
         parts.append(D.SHAPES[c.shape_lang]["nl"].capitalize() + ".")
     if c.detail_level >= 1 and c.zones:
@@ -1427,6 +1448,8 @@ def _alt_color_negatives(c: Character) -> List[str]:
     """主役の服について、別色の同じ服を negative に入れる（ポーズ違いでの色ブレ対策）"""
     if not c.outfit:
         return []
+    if c.exposure in NUDE_LEVELS:
+        return []  # 準裸・全裸は主役の服が無い
     noun = _primary_noun(c.outfit[0])
     if not noun or noun in ("clothes", "outfit", "male", "pectorals"):
         return []
@@ -1599,6 +1622,8 @@ def build_negative(c: Character) -> str:
         neg += ["cleavage", "navel", "bare shoulders", "midriff", "nude"]
     elif c.exposure == "high":
         neg += list(D.EXPOSURE_HIGH_NEGATIVE) + ["nude", "nipples"]
+    elif c.exposure in NUDE_LEVELS:
+        neg += list(D.NUDE_NEGATIVE[c.exposure])
     else:
         neg += ["nude", "nipples"]
     return ", ".join(_dedupe(neg))
