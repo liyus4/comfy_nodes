@@ -1717,7 +1717,11 @@ def build_equipment(c: Character) -> str:
     tags += c.gear_tags
     sentences = []
     if c.prop and not (c.handheld_tags and c.handheld_tags[0] == c.prop):
-        sentences.append(f"{poss.capitalize()} signature weapon is {_article(c.prop)} {c.prop}.")
+        head = c.prop.split(" with ")[0].split(",")[0]
+        if re.search(r"(twin|pair|units|blades|shears|pistols|revolvers|knives|boomerangs|chakrams|gauntlets|claws|scissors)\b", head):
+            sentences.append(f"{poss.capitalize()} signature weapons are {c.prop}.")
+        else:
+            sentences.append(f"{poss.capitalize()} signature weapon is {_article(c.prop)} {c.prop}.")
     if c.gear_nl:
         sentences.append(f"{pron} also carries {c.gear_nl.replace('{poss}', poss)}.")
     if not tags and not sentences:

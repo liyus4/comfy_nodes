@@ -4879,7 +4879,7 @@ HANDHELDS = {
     "dual_blades": {
         "jp": "双剣", "syn": ["双剣", "二刀", "二刀流", "dual blades", "twin swords", "dual wielding"],
         "tags": ["dual wielding", "sword", "weapon"],
-        "types": [("twin short swords", "dual wielding, short sword"), ("twin curved blades", "dual wielding, scimitar"), ("a pair of mismatched blades, one long and one short", "dual wielding, sword, dagger")],
+        "types": [("twin short swords", "dual wielding, short sword"), ("twin curved blades", "dual wielding, scimitar"), ("mismatched blades, one long and one short", "dual wielding, sword, dagger")],
         "slots": {
             "blade": ["{accent} blades", "black blades with {accent} edges", "glowing {accent} blades", "silver blades with {pattern} engraving"],
             "hilt": ["{main} wrapped hilts", "{sub} hilts with {accent} guards", "chain-linked hilts"],
