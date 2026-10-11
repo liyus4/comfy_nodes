@@ -91,8 +91,8 @@ class CharacterDesignerNode:
             "required": {
                 "指示文": ("STRING", {
                     "multiline": False,
-                    "default": "悪魔・女の子・高露出",
-                    "placeholder": "例: 悪魔・女の子・高露出 / 猫耳メイド・ツンデレ / 天使・清楚・黒髪・タレ目",
+                    "default": "",
+                    "placeholder": "例: 悪魔・女の子・高露出 / 猫耳メイド・ツンデレ / 天使・清楚・黒髪・タレ目（空ならすべてランダム）",
                     "tooltip": "雰囲気の指示。「・」「,」「空白」区切り。辞書に無い語はそのまま末尾に通します",
                 }),
                 "除外": ("STRING", {

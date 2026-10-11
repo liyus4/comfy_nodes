@@ -76,15 +76,42 @@ def _ascii_syn_re(s_low: str) -> "re.Pattern":
     return pat
 
 
-def _lookup(token: str, table: Dict[str, List[str]]) -> List[str]:
-    """同義語テーブルから token に一致するキーを（長い同義語優先で）列挙する。"""
+def _matched_syn(token: str, syns: List[str]) -> str:
+    """token に一致した同義語（最長）を返す。無ければ空文字"""
+    best = ""
+    for s in syns:
+        if _syn_hits(token, [s]) and len(s) > len(best):
+            best = s
+    return best
+
+
+def _lookup(token: str, table: Dict[str, List[str]], shadow: Optional[set] = None) -> List[str]:
+    """
+    同義語テーブルから token に一致するキーを（長い同義語優先で）列挙する。
+    shadow に「他の辞書でこの token に一致した同義語」を渡すと、それに含まれる短い一致は捨てる
+    （"トリックスター" が性格に一致したとき、中の "スター" で星モチーフに一致させない）
+    """
     hits = []
-    # 長い同義語を持つ項目を先に（"黒髪" を "黒" より優先する等）
     order = sorted(table.items(), key=lambda kv: -max(len(s) for s in kv[1]))
     for key, syns in order:
-        if _syn_hits(token, syns):
-            hits.append(key)
+        m = _matched_syn(token, syns)
+        if not m:
+            continue
+        if shadow and any(m != other and m.lower() in other.lower() for other in shadow):
+            continue
+        hits.append(key)
     return hits
+
+
+def _all_syns_hit(token: str) -> set:
+    """全辞書で token に一致した同義語の集合（長い一致で短い一致を隠すために使う）"""
+    out = set()
+    for table in _all_tables():
+        for syns in table.values():
+            m = _matched_syn(token, syns)
+            if m:
+                out.add(m)
+    return out
 
 
 def _all_tables() -> List[Dict[str, List[str]]]:
@@ -145,48 +172,49 @@ def parse_brief(brief: str) -> Spec:
     for tok in tokens:
         tok = tok.replace("_", " ")
         matched = False
+        shadow = _all_syns_hit(tok)
 
-        for g in _lookup(tok, D.GENDER_WORDS):
+        for g in _lookup(tok, D.GENDER_WORDS, shadow):
             spec.gender = g
             matched = True
-        for m in _lookup(tok, {k: v["syn"] for k, v in D.MOTIFS.items()}):
+        for m in _lookup(tok, {k: v["syn"] for k, v in D.MOTIFS.items()}, shadow):
             if D.MOTIFS[m].get("kind") == "theme":
                 if spec.theme is None:
                     spec.theme = m
             elif spec.motif is None:
                 spec.motif = m
             matched = True
-        for r in _lookup(tok, {k: v["syn"] for k, v in D.ROLES.items()}):
+        for r in _lookup(tok, {k: v["syn"] for k, v in D.ROLES.items()}, shadow):
             if spec.role is None:
                 spec.role = r
             elif spec.role2 is None and r != spec.role:
                 spec.role2 = r
             matched = True
-        for a in _lookup(tok, {k: v["syn"] for k, v in D.ARCHETYPES.items()}):
+        for a in _lookup(tok, {k: v["syn"] for k, v in D.ARCHETYPES.items()}, shadow):
             if spec.archetype is None:
                 spec.archetype = a
             matched = True
-        for e in _lookup(tok, D.EXPOSURE_WORDS):
+        for e in _lookup(tok, D.EXPOSURE_WORDS, shadow):
             spec.exposure = e
             matched = True
-        for h in _lookup(tok, D.HAIR_COLOR_WORDS):
+        for h in _lookup(tok, D.HAIR_COLOR_WORDS, shadow):
             spec.hair_color = h
             matched = True
-        for e in _lookup(tok, D.EYE_COLOR_WORDS):
+        for e in _lookup(tok, D.EYE_COLOR_WORDS, shadow):
             spec.eye_color = e
             matched = True
-        for s in _lookup(tok, D.HAIR_STYLE_WORDS):
+        for s in _lookup(tok, D.HAIR_STYLE_WORDS, shadow):
             if s not in spec.hair_styles:
                 spec.hair_styles.append(s)
             matched = True
-        for t in _lookup(tok, {k: v["syn"] for k, v in D.TRAIT_WORDS.items()}):
+        for t in _lookup(tok, {k: v["syn"] for k, v in D.TRAIT_WORDS.items()}, shadow):
             if t not in spec.traits:
                 spec.traits.append(t)
             matched = True
-        for cat_tag in _lookup(tok, {k: v for k, v in D.EYE_WORDS.items()}):
+        for cat_tag in _lookup(tok, {k: v for k, v in D.EYE_WORDS.items()}, shadow):
             spec.eye_tags[cat_tag[0]] = cat_tag[1]
             matched = True
-        for h in _lookup(tok, {k: v["syn"] for k, v in D.HANDHELDS.items()}):
+        for h in _lookup(tok, {k: v["syn"] for k, v in D.HANDHELDS.items()}, shadow):
             if spec.handheld is None:
                 spec.handheld = h
             matched = True
@@ -791,6 +819,7 @@ def generate(
             pool = _without(pool, excluded["role"])
         role_key = _coherent_pick(rng, pool, lambda r: D.ROLE_MOOD.get(r), concept, strength)
     role = D.ROLES[role_key]
+    _add_moods(concept, D.ROLE_MOOD.get(role_key), 2.0)
 
     # --- 融合する2つ目の服装系統 -----------------------------------------
     if role2 in D.ROLES:

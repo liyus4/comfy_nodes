@@ -585,6 +585,234 @@ OUTFIT_TAGS = {
             "high": ["{main} open vest", "fortune teller", "bare pectorals", "head scarf", "rings", "{main} pants", "{main} sandals"],
         },
     },
+    "warrior": {
+        "female": {
+            "modest": ["{main} leather armor", "warrior", "fur-trimmed cape", "{main} gauntlets", "{main} pants", "{main} boots", "belt"],
+            "standard": ["{main} breastplate", "warrior", "{sub} tunic", "fur-trimmed cape", "{main} gauntlets", "{main} shorts", "{main} thigh boots", "tooth necklace"],
+            "high": ["{main} bikini armor", "warrior", "midriff", "fur-trimmed cape", "{main} gauntlets", "loincloth", "{main} thigh boots", "tooth necklace", "war paint"],
+        },
+        "male": {
+            "modest": ["{main} leather armor", "warrior", "fur-trimmed cape", "{main} gauntlets", "{main} pants", "{main} boots"],
+            "standard": ["{main} breastplate", "warrior", "{sub} tunic", "fur-trimmed cape", "{main} gauntlets", "{main} pants", "{main} boots"],
+            "high": ["single pauldron", "warrior", "bare pectorals", "war paint", "fur-trimmed cape", "{main} gauntlets", "{main} pants", "{main} boots"],
+        },
+    },
+    "paladin": {
+        "female": {
+            "modest": ["white armor", "paladin", "plate armor", "{sub} tabard", "white gauntlets", "armored boots", "{sub} cape"],
+            "standard": ["white breastplate", "paladin", "{sub} tunic", "{sub} cape", "white gauntlets", "armored skirt", "{sub} shorts", "white thigh boots"],
+            "high": ["white bikini armor", "paladin", "midriff", "{sub} cape", "white gauntlets", "white thigh boots", "{sub} garter belt"],
+        },
+        "male": {
+            "modest": ["white armor", "paladin", "plate armor", "{sub} tabard", "white gauntlets", "armored boots", "{sub} cape"],
+            "standard": ["white breastplate", "paladin", "{sub} tunic", "{sub} cape", "white gauntlets", "armored boots"],
+            "high": ["white pauldrons", "paladin", "white gauntlets", "bare pectorals", "{sub} cape", "greaves"],
+        },
+    },
+    "dark_knight": {
+        "female": {
+            "modest": ["black armor", "dark knight", "plate armor", "spiked pauldrons", "{sub} torn cape", "black gauntlets", "armored boots", "glowing"],
+            "standard": ["black breastplate", "dark knight", "{sub} bodysuit", "spiked pauldrons", "{sub} torn cape", "black gauntlets", "armored skirt", "black thigh boots", "glowing"],
+            "high": ["black bikini armor", "dark knight", "midriff", "spiked pauldrons", "{sub} torn cape", "black gauntlets", "black thigh boots", "garter straps", "glowing"],
+        },
+        "male": {
+            "modest": ["black armor", "dark knight", "plate armor", "spiked pauldrons", "{sub} torn cape", "black gauntlets", "armored boots", "glowing"],
+            "standard": ["black breastplate", "dark knight", "{sub} shirt", "spiked pauldrons", "{sub} torn cape", "black gauntlets", "black pants", "armored boots"],
+            "high": ["spiked pauldrons", "dark knight", "black gauntlets", "bare pectorals", "glowing cracks", "{sub} torn cape", "greaves"],
+        },
+    },
+    "mage": {
+        "female": {
+            "modest": ["{main} robe", "mage", "wide sleeves", "high collar", "rune embroidery", "{sub} mantle", "{main} gloves", "{main} boots", "circlet"],
+            "standard": ["{main} coat", "mage", "rune embroidery", "{sub} short mantle", "{main} fingerless gloves", "{main} thighhighs", "{main} boots", "circlet"],
+            "high": ["{main} dress", "mage", "plunging neckline", "cleavage", "side slit", "rune embroidery", "{sub} short mantle", "{main} elbow gloves", "{main} thighhighs", "lace-trimmed thighhighs", "garter straps", "{main} boots", "high heels", "circlet"],
+        },
+        "male": {
+            "modest": ["{main} robe", "mage", "high collar", "rune embroidery", "{sub} mantle", "{main} gloves", "{main} boots"],
+            "standard": ["{main} coat", "mage", "{sub} shirt", "rune embroidery", "{sub} short mantle", "{main} fingerless gloves", "{main} pants", "{main} boots"],
+            "high": ["{main} coat", "mage", "open clothes", "bare pectorals", "rune embroidery", "{sub} short mantle", "{main} pants", "{main} boots"],
+        },
+    },
+    "cleric": {
+        "female": {
+            "modest": ["white robe", "cleric", "long sleeves", "{sub} tabard", "white gloves", "white boots", "holy symbol pendant"],
+            "standard": ["white dress", "cleric", "short cape", "{sub} tabard", "white gloves", "white thighhighs", "white boots", "holy symbol pendant"],
+            "high": ["white dress", "cleric", "plunging neckline", "cleavage", "side slit", "{sub} tabard", "white elbow gloves", "white thighhighs", "lace-trimmed thighhighs", "garter straps", "white boots", "high heels", "holy symbol pendant"],
+        },
+        "male": {
+            "modest": ["white robe", "cleric", "{sub} tabard", "white gloves", "white boots", "holy symbol pendant"],
+            "standard": ["white coat", "cleric", "{sub} shirt", "{sub} tabard", "white gloves", "{main} pants", "white boots"],
+            "high": ["white robe", "cleric", "open clothes", "bare pectorals", "{sub} tabard", "{main} pants", "white boots"],
+        },
+    },
+    "monk": {
+        "female": {
+            "modest": ["{main} dougi", "martial artist", "long sleeves", "{sub} sash", "hand wraps", "{main} baggy pants", "{main} shoes"],
+            "standard": ["{main} sleeveless dougi", "martial artist", "{sub} sash", "hand wraps", "shin guards", "{main} baggy shorts", "barefoot", "anklet"],
+            "high": ["{main} sarashi", "martial artist", "midriff", "{sub} sash", "hand wraps", "shin guards", "{main} micro shorts", "barefoot", "anklet"],
+        },
+        "male": {
+            "modest": ["{main} dougi", "martial artist", "{sub} sash", "hand wraps", "{main} baggy pants", "{main} shoes"],
+            "standard": ["{main} sleeveless dougi", "martial artist", "{sub} sash", "hand wraps", "{main} baggy pants", "barefoot"],
+            "high": ["bare pectorals", "martial artist", "hand wraps", "{sub} sash", "{main} baggy pants", "barefoot", "prayer beads"],
+        },
+    },
+    "bard": {
+        "female": {
+            "modest": ["{main} doublet", "bard", "puffy sleeves", "{sub} feathered hat", "{main} pants", "{main} boots", "{sub} half cape"],
+            "standard": ["{main} doublet", "bard", "puffy short sleeves", "white blouse", "{sub} feathered hat", "{main} shorts", "{main} thighhighs", "{main} ankle boots", "{sub} half cape"],
+            "high": ["{main} corset", "bard", "cleavage", "off-shoulder shirt", "white blouse", "{sub} feathered hat", "{main} micro shorts", "{main} thighhighs", "lace-trimmed thighhighs", "{main} boots", "high heels", "{sub} half cape"],
+        },
+        "male": {
+            "modest": ["{main} doublet", "bard", "{sub} feathered hat", "{main} pants", "{main} boots", "{sub} half cape"],
+            "standard": ["{main} doublet", "bard", "white blouse", "{sub} feathered hat", "{main} pants", "{main} boots", "{sub} half cape"],
+            "high": ["{main} doublet", "bard", "open clothes", "bare pectorals", "{sub} feathered hat", "{main} pants", "{main} boots"],
+        },
+    },
+    "summoner": {
+        "female": {
+            "modest": ["{main} robe", "summoner", "wide sleeves", "beads", "{sub} horned headdress", "bead necklace", "{main} boots"],
+            "standard": ["{main} dress", "summoner", "detached sleeves", "beads", "{sub} horned headdress", "bead necklace", "{main} thighhighs", "{main} boots"],
+            "high": ["{main} halterneck", "summoner", "beads", "cleavage", "midriff", "see-through skirt", "side slit", "{sub} horned headdress", "bead necklace", "{main} thighhighs", "{main} sandals"],
+        },
+        "male": {
+            "modest": ["{main} robe", "summoner", "beads", "{sub} horned headdress", "bead necklace", "{main} boots"],
+            "standard": ["{main} coat", "summoner", "{sub} shirt", "beads", "{sub} horned headdress", "bead necklace", "{main} pants", "{main} boots"],
+            "high": ["{main} coat", "summoner", "open clothes", "bare pectorals", "beads", "{sub} horned headdress", "bead necklace", "{main} pants", "{main} sandals"],
+        },
+    },
+    "necromancer": {
+        "female": {
+            "modest": ["{main} hooded robe", "necromancer", "torn clothes", "bone trim", "skull ornament", "{main} gloves", "{main} boots", "skull pendant"],
+            "standard": ["{main} dress", "necromancer", "torn clothes", "hooded cape", "bone trim", "skull ornament", "{main} fingerless gloves", "{main} thighhighs", "{main} boots", "skull pendant"],
+            "high": ["{main} dress", "necromancer", "plunging neckline", "cleavage", "torn clothes", "side slit", "bone trim", "skull ornament", "{main} elbow gloves", "{main} thighhighs", "lace-trimmed thighhighs", "garter straps", "{main} boots", "high heels", "skull pendant"],
+        },
+        "male": {
+            "modest": ["{main} hooded robe", "necromancer", "torn clothes", "bone trim", "skull ornament", "{main} gloves", "{main} boots"],
+            "standard": ["{main} coat", "necromancer", "torn clothes", "{sub} shirt", "bone trim", "skull ornament", "{main} gloves", "{main} pants", "{main} boots"],
+            "high": ["{main} coat", "necromancer", "open clothes", "bare pectorals", "torn clothes", "bone trim", "skull ornament", "{main} pants", "{main} boots"],
+        },
+    },
+    "alchemist": {
+        "female": {
+            "modest": ["{main} long coat", "alchemist", "white shirt", "{sub} apron", "vial", "goggles on head", "{main} gloves", "{main} pants", "{main} boots"],
+            "standard": ["{main} coat", "alchemist", "white blouse", "{sub} corset", "{sub} apron", "vial", "goggles on head", "{main} fingerless gloves", "{main} shorts", "{main} thighhighs", "{main} boots"],
+            "high": ["{main} coat", "alchemist", "open clothes", "{sub} corset", "cleavage", "{sub} apron", "vial", "goggles on head", "{main} fingerless gloves", "microskirt", "{main} thighhighs", "garter straps", "{main} boots"],
+        },
+        "male": {
+            "modest": ["{main} long coat", "alchemist", "white shirt", "{sub} apron", "vial", "goggles on head", "{main} gloves", "{main} pants", "{main} boots"],
+            "standard": ["{main} coat", "alchemist", "{sub} vest", "{sub} apron", "vial", "goggles on head", "{main} pants", "{main} boots"],
+            "high": ["{main} coat", "alchemist", "open clothes", "bare pectorals", "{sub} apron", "vial", "goggles on head", "{main} pants", "{main} boots"],
+        },
+    },
+    "druid": {
+        "female": {
+            "modest": ["{main} robe", "druid", "leaf trim", "long sleeves", "antlers", "antler headdress", "{sub} fur mantle", "{main} sandals", "wooden pendant"],
+            "standard": ["{main} dress", "druid", "leaf trim", "antler headdress", "{sub} fur mantle", "{main} leg wraps", "barefoot", "anklet", "wooden pendant"],
+            "high": ["{main} leaf bikini", "druid", "cleavage", "midriff", "leaf skirt", "side slit", "antler headdress", "{sub} fur mantle", "{main} leg wraps", "barefoot", "anklet", "wooden pendant"],
+        },
+        "male": {
+            "modest": ["{main} robe", "druid", "leaf trim", "antler headdress", "{sub} fur mantle", "{main} sandals"],
+            "standard": ["{main} tunic", "druid", "leaf trim", "{sub} shirt", "antler headdress", "{sub} fur mantle", "{main} pants", "{main} sandals"],
+            "high": ["bare pectorals", "druid", "body paint", "vine trim", "antler headdress", "{sub} fur mantle", "{main} pants", "barefoot"],
+        },
+    },
+    "gunner": {
+        "female": {
+            "modest": ["{main} long coat", "gunner", "white shirt", "{sub} vest", "{main} tricorne", "{main} gloves", "{main} pants", "{main} boots", "bandolier"],
+            "standard": ["{main} coat", "gunner", "white blouse", "{sub} corset", "{main} tricorne", "{main} fingerless gloves", "{main} shorts", "{main} thigh boots", "bandolier"],
+            "high": ["{main} open coat", "gunner", "{sub} bikini top", "cleavage", "midriff", "{main} tricorne", "{main} fingerless gloves", "{main} micro shorts", "{main} thigh boots", "garter straps", "bandolier"],
+        },
+        "male": {
+            "modest": ["{main} long coat", "gunner", "white shirt", "{sub} vest", "{main} tricorne", "{main} gloves", "{main} pants", "{main} boots", "bandolier"],
+            "standard": ["{main} coat", "gunner", "{sub} vest", "{main} tricorne", "{main} pants", "{main} boots", "bandolier"],
+            "high": ["{main} open coat", "gunner", "bare pectorals", "{main} tricorne", "{main} pants", "{main} boots", "bandolier"],
+        },
+    },
+    "dragoon": {
+        "female": {
+            "modest": ["{main} armor", "dragoon", "dragon armor", "spiked pauldrons", "{main} horned helmet", "{main} clawed gauntlets", "armored boots", "{sub} cape"],
+            "standard": ["{main} breastplate", "dragoon", "dragon armor", "{sub} bodysuit", "{main} horned headpiece", "{main} clawed gauntlets", "armored skirt", "{sub} shorts", "{main} thigh boots"],
+            "high": ["{main} bikini armor", "dragoon", "dragon armor", "midriff", "{main} horned headpiece", "{main} clawed gauntlets", "{main} thigh boots", "garter straps"],
+        },
+        "male": {
+            "modest": ["{main} armor", "dragoon", "dragon armor", "spiked pauldrons", "{main} horned helmet", "{main} clawed gauntlets", "armored boots", "{sub} cape"],
+            "standard": ["{main} breastplate", "dragoon", "dragon armor", "{sub} shirt", "{main} horned headpiece", "{main} clawed gauntlets", "{main} pants", "armored boots"],
+            "high": ["{main} pauldrons", "dragoon", "{main} clawed gauntlets", "bare pectorals", "{main} horned headpiece", "greaves"],
+        },
+    },
+    "beast_tamer": {
+        "female": {
+            "modest": ["{main} leather vest", "beast tamer", "{sub} shirt", "pelt", "fur mantle", "{main} gloves", "{main} pants", "{main} boots", "fang necklace"],
+            "standard": ["{main} leather vest", "beast tamer", "{sub} crop top", "midriff", "pelt", "fur mantle", "{main} bracer", "{main} shorts", "{main} thigh boots", "fang necklace"],
+            "high": ["{main} open vest", "beast tamer", "{sub} bikini top", "cleavage", "midriff", "pelt", "fur mantle", "{main} bracer", "{main} micro shorts", "{main} thigh boots", "fang necklace"],
+        },
+        "male": {
+            "modest": ["{main} leather vest", "beast tamer", "{sub} shirt", "fur mantle", "{main} gloves", "{main} pants", "{main} boots", "fang necklace"],
+            "standard": ["{main} leather vest", "beast tamer", "{sub} shirt", "fur mantle", "{main} bracer", "{main} pants", "{main} boots"],
+            "high": ["{main} open vest", "beast tamer", "bare pectorals", "fur mantle", "{main} bracer", "{main} pants", "{main} boots", "fang necklace"],
+        },
+    },
+    "valkyrie": {
+        "female": {
+            "modest": ["{main} armor", "valkyrie", "winged helmet", "plate armor", "{sub} cape", "{main} gauntlets", "armored boots"],
+            "standard": ["{main} breastplate", "valkyrie", "winged headpiece", "{sub} pleated skirt", "{sub} cape", "{main} gauntlets", "{main} thigh boots"],
+            "high": ["{main} bikini armor", "valkyrie", "winged headpiece", "midriff", "{sub} cape", "{main} gauntlets", "{main} thigh boots", "garter straps"],
+        },
+        "male": {
+            "modest": ["{main} armor", "valkyrie", "winged helmet", "plate armor", "{sub} cape", "{main} gauntlets", "armored boots"],
+            "standard": ["{main} breastplate", "valkyrie", "winged headpiece", "{sub} tunic", "{sub} cape", "{main} gauntlets", "armored boots"],
+            "high": ["{main} pauldrons", "valkyrie", "winged headpiece", "bare pectorals", "{main} gauntlets", "{sub} cape", "greaves"],
+        },
+    },
+    "adventurer": {
+        "female": {
+            "modest": ["{main} tunic", "adventurer", "long sleeves", "{sub} hooded cloak", "{main} bracer", "{main} pants", "{main} boots", "satchel", "belt pouch"],
+            "standard": ["{main} tunic", "adventurer", "white shirt", "{sub} hooded cloak", "{main} bracer", "{main} shorts", "belt", "{main} boots", "satchel", "belt pouch"],
+            "high": ["{main} crop top", "adventurer", "midriff", "{sub} hooded cloak", "{main} bracer", "{main} micro shorts", "belt", "{main} thigh boots", "satchel", "belt pouch"],
+        },
+        "male": {
+            "modest": ["{main} tunic", "adventurer", "{sub} hooded cloak", "{main} bracer", "{main} pants", "{main} boots", "satchel"],
+            "standard": ["{main} tunic", "adventurer", "white shirt", "{sub} hooded cloak", "{main} bracer", "{main} pants", "{main} boots", "satchel"],
+            "high": ["{main} open vest", "adventurer", "bare pectorals", "{sub} hooded cloak", "{main} bracer", "{main} pants", "{main} boots"],
+        },
+    },
+    "village_girl": {
+        "female": {
+            "modest": ["{main} dress", "village girl", "peasant dress", "long sleeves", "long skirt", "{sub} apron", "{sub} head scarf", "white socks", "{main} shoes"],
+            "standard": ["{main} dress", "village girl", "peasant dress", "puffy short sleeves", "{sub} apron", "{sub} head scarf", "white kneehighs", "{main} shoes", "basket"],
+            "high": ["{main} off-shoulder shirt", "village girl", "cleavage", "{sub} corset", "miniskirt", "{sub} apron", "{sub} head scarf", "white thighhighs", "{main} shoes"],
+        },
+        "male": {
+            "modest": ["{main} shirt", "villager", "{sub} vest", "{main} pants", "{sub} sash", "{main} shoes", "straw hat"],
+            "standard": ["{main} shirt", "villager", "{sub} vest", "{main} pants", "{sub} sash", "{main} shoes", "straw hat"],
+            "high": ["{main} open shirt", "villager", "bare pectorals", "{sub} vest", "{main} pants", "{sub} sash", "straw hat"],
+        },
+    },
+    "scholar": {
+        "female": {
+            "modest": ["{main} robe", "scholar", "long sleeves", "{sub} sash", "round eyewear", "glasses", "{main} gloves", "{main} shoes", "quill"],
+            "standard": ["{main} coat", "scholar", "white blouse", "{sub} vest", "{sub} sash", "round eyewear", "glasses", "{main} pencil skirt", "black pantyhose", "{main} shoes", "quill"],
+            "high": ["{main} coat", "scholar", "open clothes", "{sub} corset", "cleavage", "{sub} sash", "round eyewear", "glasses", "microskirt", "black pantyhose", "garter straps", "{main} high heels"],
+        },
+        "male": {
+            "modest": ["{main} robe", "scholar", "{sub} sash", "round eyewear", "glasses", "{main} shoes"],
+            "standard": ["{main} coat", "scholar", "white shirt", "{sub} vest", "{sub} sash", "round eyewear", "glasses", "{main} pants", "{main} shoes"],
+            "high": ["{main} coat", "scholar", "open clothes", "bare pectorals", "{sub} sash", "round eyewear", "glasses", "{main} pants", "{main} shoes"],
+        },
+    },
+    "cultist": {
+        "female": {
+            "modest": ["{main} hooded robe", "cultist", "hood up", "wide sleeves", "occult symbols", "{sub} sash", "{main} gloves", "{main} boots", "sigil pendant"],
+            "standard": ["{main} hooded dress", "cultist", "hood down", "detached sleeves", "occult symbols", "{sub} sash", "{main} thighhighs", "{main} boots", "sigil pendant", "mask on head"],
+            "high": ["{main} hooded robe", "cultist", "open robe", "{sub} bikini top", "cleavage", "side slit", "occult symbols", "{sub} sash", "{main} thighhighs", "garter straps", "{main} boots", "high heels", "sigil pendant", "mask on head"],
+        },
+        "male": {
+            "modest": ["{main} hooded robe", "cultist", "hood up", "occult symbols", "{sub} sash", "{main} gloves", "{main} boots", "sigil pendant"],
+            "standard": ["{main} hooded robe", "cultist", "hood down", "occult symbols", "{sub} sash", "{main} boots", "sigil pendant", "mask on head"],
+            "high": ["{main} hooded robe", "cultist", "open robe", "bare pectorals", "body paint", "occult symbols", "{sub} sash", "{main} pants", "{main} boots"],
+        },
+    },
     "flight_attendant": {
         "female": {
             "modest": ["{main} jacket", "flight attendant", "white blouse", "{sub} scarf", "{main} long skirt", "pencil skirt", "pillbox hat", "black pantyhose", "{main} pumps"],
