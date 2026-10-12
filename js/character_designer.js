@@ -6,7 +6,7 @@ import { app } from "../../scripts/app.js";
 app.registerExtension({
     name: "ComfyNodes.CharacterDesigner",
     async beforeRegisterNodeDef(nodeType, nodeData, app) {
-        if (nodeData.name !== "CharacterDesignerNode") return;
+        if (!["CharacterDesignerNode", "MaleCharacterDesignerNode", "MonsterDesignerNode"].includes(nodeData.name)) return;
 
         const onExecuted = nodeType.prototype.onExecuted;
         nodeType.prototype.onExecuted = function (message) {

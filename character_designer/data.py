@@ -633,6 +633,76 @@ ARCHETYPES = {
         "accessories": ["one sock slipping down", "unbuttoned {sub} collar", "{accent} hair tie around the wrist"],
         "footwear": None,
     },
+    "ouji": {
+        "jp": "王子様",
+        "syn": ["王子様", "王子", "プリンス", "貴公子", "ouji", "prince", "princely"],
+        "design_jp": "整った目元と柔らかな微笑み、白×金×青の気品。片手を胸に当てる礼の仕草で「王子」を記号化",
+        "eyes": ["gentle confident eyes", "clear bright eyes"],
+        "hair_styles": ["neat medium hair swept back", "short wavy hair with a side part", "shoulder-length hair tied low with a ribbon"],
+        "hair_colors": ["blonde hair", "silver hair", "light brown hair", "white hair"],
+        "palettes": [("white", "gold", "royal blue"), ("navy", "white", "gold"), ("cream", "gold", "crimson")],
+        "expression": ["gentle smile", "confident smile", "soft gaze"],
+        "pose": ["hand on chest in a bow", "offering a hand", "standing straight with one hand behind the back"],
+        "body": [],
+        "accessories": ["{accent} epaulettes", "small {accent} circlet", "{accent} rose brooch"],
+        "footwear": None,
+    },
+    "oresama": {
+        "jp": "俺様",
+        "syn": ["俺様", "オレ様", "傲慢", "尊大", "oresama", "arrogant", "cocky", "domineering"],
+        "design_jp": "見下ろす鋭い目＋不敵な笑み＋開いた襟。黒×赤×金で支配的な雰囲気",
+        "eyes": ["sharp narrowed eyes", "looking down at the viewer"],
+        "hair_styles": ["slicked-back short hair", "wild medium hair with an undercut", "long hair tied back roughly"],
+        "hair_colors": ["black hair", "red hair", "dark blue hair", "white hair"],
+        "palettes": [("black", "crimson", "gold"), ("wine red", "black", "gold"), ("navy", "black", "silver")],
+        "expression": ["smug grin", "arrogant smirk", "looking down with a sneer"],
+        "pose": ["arms crossed, chin raised", "sitting with legs crossed like a throne", "pointing at the viewer"],
+        "body": [],
+        "accessories": ["open {sub} collar", "{accent} chain necklace", "{accent} signet ring"],
+        "footwear": None,
+    },
+    "mukuchi": {
+        "jp": "無口",
+        "syn": ["無口", "寡黙", "物静か", "口数が少ない", "mukuchi", "taciturn", "quiet", "stoic"],
+        "design_jp": "口元を隠す高襟やマフラー＋伏せ気味の静かな目＋無駄のない装い。寒色でストイックに",
+        "eyes": ["calm quiet eyes", "half-lidded steady eyes"],
+        "hair_styles": ["short neat hair", "medium hair covering one eye", "low ponytail"],
+        "hair_colors": ["black hair", "dark blue hair", "gray hair", "silver hair"],
+        "palettes": [("navy", "gray", "white"), ("black", "gray", "sky blue"), ("teal", "black", "silver")],
+        "expression": ["expressionless", "calm neutral face", "slight nod"],
+        "pose": ["standing still with hands at sides", "reading quietly", "leaning against a wall with arms crossed"],
+        "body": [],
+        "accessories": ["high {sub} collar covering the mouth", "{sub} scarf over the mouth", "plain {accent} earring"],
+        "footwear": None,
+    },
+    "sawayaka": {
+        "jp": "爽やか",
+        "syn": ["爽やか", "さわやか", "好青年", "陽キャ", "sawayaka", "refreshing", "wholesome", "sunny"],
+        "design_jp": "明るい笑顔＋短めの髪＋白×青の清潔感。スポーティな小物で健全さを記号化",
+        "eyes": ["bright friendly eyes", "sparkling eyes"],
+        "hair_styles": ["short messy hair", "short hair with a slight wave", "cropped hair with longer bangs"],
+        "hair_colors": ["brown hair", "black hair", "blonde hair", "light blue hair"],
+        "palettes": [("white", "sky blue", "navy"), ("sky blue", "white", "orange"), ("white", "mint", "gold")],
+        "expression": ["bright grin", "friendly smile", "laughing"],
+        "pose": ["waving", "thumbs up", "hands behind head"],
+        "body": ["athletic"],
+        "accessories": ["{accent} wristband", "sporty {sub} towel around the neck", "{accent} sneakers laces"],
+        "footwear": None,
+    },
+    "oniisan": {
+        "jp": "頼れる兄貴",
+        "syn": ["頼れる兄貴", "兄貴", "お兄さん", "兄貴分", "面倒見", "oniisan", "big brother", "reliable older guy"],
+        "design_jp": "落ち着いた笑顔＋袖をまくった腕＋少し崩した服。暖色で包容力と頼もしさを記号化",
+        "eyes": ["warm calm eyes", "gentle tired eyes"],
+        "hair_styles": ["short hair with stubble", "medium messy hair tied back", "short hair with a headband"],
+        "hair_colors": ["dark brown hair", "black hair", "red hair", "gray hair"],
+        "palettes": [("brown", "cream", "orange"), ("navy", "brown", "gold"), ("olive", "black", "orange")],
+        "expression": ["relaxed smile", "wry grin", "patting someone's head"],
+        "pose": ["sleeves rolled up, hands on hips", "crouching to eye level", "carrying something on the shoulder"],
+        "body": ["muscular"],
+        "accessories": ["rolled-up {sub} sleeves", "{accent} bandage on the cheek", "{accent} dog tag necklace"],
+        "footwear": None,
+    },
     "haraguro": {
         "jp": "腹黒",
         "syn": ["腹黒", "はらぐろ", "黒幕", "haraguro", "two-faced", "scheming"],
@@ -4666,6 +4736,11 @@ EYE_PROFILES = {
     "utagai":    {"shape": ["tsurime"], "lid": ["narrowed eyes"], "highlights": ["empty eyes"]},
     "nemuri":    {"shape": ["tareme"], "lid": ["half-closed eyes"]},
     "mendou":    {"shape": ["jitome"], "lid": ["half-closed eyes"]},
+    "ouji":      {"shape": ["tareme"], "lid": ["half-closed eyes"]},
+    "oresama":   {"shape": ["tsurime"], "lid": ["narrowed eyes"]},
+    "mukuchi":   {"shape": ["tareme"], "lid": ["half-closed eyes"]},
+    "sawayaka":  {"shape": ["tareme"], "highlights": ["sparkling eyes"]},
+    "oniisan":   {"shape": ["tareme"], "lid": ["half-closed eyes"]},
     "haraguro":  {"shape": ["tareme"], "lid": ["narrowed eyes"], "highlights": ["empty eyes"]},
     "fushigi":   {"shape": ["tareme"], "pupils": ["star-shaped pupils", "ringed eyes"], "highlights": ["sparkling eyes"], "lid": ["wide-eyed"]},
     "iinchou":   {"shape": ["tsurime"], "brows": ["thin eyebrows"]},
@@ -4723,6 +4798,11 @@ ARCH_SIGNATURE = {
     "utagai":  {"tags": ["narrowed eyes", "sidelong glance"], "persona": "{pron} trusts no one, watching the viewer with narrowed, sidelong eyes and keeping {poss} arms crossed."},
     "nemuri":  {"tags": ["sleepy", "half-closed eyes"], "persona": "{pron} is perpetually sleepy, yawning and rubbing {poss} eyes, always a moment away from dozing off."},
     "mendou":  {"tags": ["bored", "jitome"], "persona": "{pron} cannot be bothered with anything, slouching with a bored, half-lidded stare and clothes worn carelessly."},
+    "ouji":  {"tags": ["gentle smile"], "persona": "{pron} carries {poss}self like a prince, with a gentle confident smile and a courteous hand on the chest."},
+    "oresama":  {"tags": ["smug", "looking down at viewer"], "persona": "{pron} is arrogant and domineering, looking down at the viewer with a smug grin and arms crossed."},
+    "mukuchi":  {"tags": ["expressionless"], "persona": "{pron} is quiet and stoic, saying little, with calm steady eyes and a collar that hides {poss} mouth."},
+    "sawayaka":  {"tags": ["grin"], "persona": "{pron} is bright and wholesome, grinning openly like a sunny sports club captain."},
+    "oniisan":  {"tags": ["relaxed"], "persona": "{pron} is a reliable big-brother type, relaxed and warm, with sleeves rolled up and a wry grin."},
     "haraguro":  {"tags": [], "persona": "{pron} wears a perfect polite smile that hides a scheming, two-faced nature."},
     "fushigi":   {"tags": [], "persona": "{pron} is an eccentric, spacey dreamer whose gaze drifts somewhere far away."},
     "iinchou":   {"tags": ["glasses"], "persona": "{pron} is a strict, diligent class representative who pushes up {poss} glasses disapprovingly."},
@@ -5629,7 +5709,7 @@ ARCH_SHAPE = {
     "iinchou": "square", "nekketsu": "square", "aneki": "square", "bokukko": "square", "jishinka": "square", "kuudere": "square",
     "tsundere": "sharp", "mesugaki": "sharp", "sadistic": "sharp", "yandere": "sharp", "chuuni": "sharp", "ojousama": "sharp",
     "oneesan": "sharp", "gal": "sharp", "haraguro": "sharp", "dokuzetsu": "sharp",
-    "mama": "round", "hazukashigari": "round", "utagai": "sharp", "nemuri": "round", "mendou": "square",
+    "mama": "round", "hazukashigari": "round", "utagai": "sharp", "ouji": "round", "oresama": "sharp", "mukuchi": "square", "sawayaka": "round", "oniisan": "square", "nemuri": "round", "mendou": "square",
     "mukanjou": "square", "kyouki": "sharp", "boukun": "sharp", "fukushu": "sharp", "kyoushin": "round", "kairaku": "round", "higeki": "round", "trickster": "sharp",
 }
 # 部位スロット -> 情報量ゾーン（装飾を集めるゾーンの判定）
@@ -5754,7 +5834,7 @@ ARCH_MOOD = {
     "juujun": ["holy", "cute", "sweet"], "haraguro": ["dark", "elegant", "royal"], "fushigi": ["magic", "sky", "play"], "iinchou": ["military", "elegant", "street"],
     "ottori": ["nature", "sweet", "cute"], "nekketsu": ["fire", "wild", "military"], "dokuzetsu": ["ice", "street", "dark"], "aneki": ["wild", "street", "military"],
     "okubyou": ["cute", "sick", "nature"], "jishinka": ["royal", "fire", "light"],
-    "nemuri": ["night", "sweet", "cute"], "mendou": ["street", "ruin", "play"], "mama": ["sweet", "cute", "nature"], "hazukashigari": ["cute", "sweet", "light"], "utagai": ["dark", "night", "ruin"],
+    "nemuri": ["night", "sweet", "cute"], "mendou": ["street", "ruin", "play"], "ouji": ["royal", "holy", "elegant"], "oresama": ["royal", "dark", "fire"], "mukuchi": ["ice", "military", "night"], "sawayaka": ["sky", "light", "street"], "oniisan": ["fire", "street", "wild"], "mama": ["sweet", "cute", "nature"], "hazukashigari": ["cute", "sweet", "light"], "utagai": ["dark", "night", "ruin"],
     "mukanjou": ["ice", "tech", "ruin"], "kyouki": ["dark", "sick", "play"], "boukun": ["royal", "dark", "military"], "fukushu": ["dark", "fire", "night"], "kyoushin": ["holy", "dark", "sick"],
     "kairaku": ["sexy", "royal", "elegant"], "higeki": ["night", "elegant", "sick"], "trickster": ["play", "dark", "magic"],
 }
@@ -5855,8 +5935,11 @@ AGE_LEVELS_MALE = {
     "adult": {"tags": ["mature male", "adult man"], "neg": ["child", "shota", "youthful face"], "nl": "{pron} is a grown adult man in {poss} late twenties, with a mature, defined face and a tall adult build."},
     "older": {"tags": ["mature male", "older man"], "neg": ["child", "shota", "youthful face"], "nl": "{pron} is an older man in {poss} thirties or forties, with a weathered, dignified face."},
 }
-ADULT_ARCHS = {"mama", "utagai", "oneesan", "sadistic", "boukun", "kairaku", "haraguro", "ojousama", "aneki", "kuudere", "jishinka", "dokuzetsu", "fukushu", "higeki"}
-YOUNG_ARCHS = {"hazukashigari", "mesugaki", "dojikko", "genki", "amaama", "okubyou", "uchiki", "jirai", "bokukko", "tsundere", "fushigi"}
+# 性別で除く性格（男性ノードのドロップダウンと、男性キャラのランダム選択から外す）
+FEMALE_ONLY_ARCHS = {"mesugaki", "ojousama", "oneesan", "gal", "bokukko", "aneki", "mama"}
+MALE_ONLY_ARCHS = {"oniisan", "oresama"}
+ADULT_ARCHS = {"oniisan", "oresama", "mama", "utagai", "oneesan", "sadistic", "boukun", "kairaku", "haraguro", "ojousama", "aneki", "kuudere", "jishinka", "dokuzetsu", "fukushu", "higeki"}
+YOUNG_ARCHS = {"sawayaka", "hazukashigari", "mesugaki", "dojikko", "genki", "amaama", "okubyou", "uchiki", "jirai", "bokukko", "tsundere", "fushigi"}
 AGE_AUTO_ADULT_PROB = 0.35   # 自動のときの大人の基礎確率（性格・コンセプトで増減）
 
 # 体型の指定（ノードのドロップダウン）。指定が無ければ従来どおり種族・性格の推奨

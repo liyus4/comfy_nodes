@@ -334,6 +334,8 @@ class Character:
     gear_tags: List[str] = field(default_factory=list)
     gear_nl: str = ""
     free_words: List[str] = field(default_factory=list)  # 自由モチーフ（英単語）
+    brief_hits: Dict[str, str] = field(default_factory=dict)  # 指示文で指定された要素（強調用）
+    theme_feature_tags: List[str] = field(default_factory=list)
     free_nl: List[str] = field(default_factory=list)
     age_tags: List[str] = field(default_factory=list)
     age_nl: str = ""
@@ -758,13 +760,13 @@ def generate(
     mascot: str = "none",
     face_mark: str = "none",
     coherence: str = "normal",
-    age: str = "auto",
-) -> Character:
+    age: str = "auto", gender: str = "auto") -> Character:
     strength = D.COHERENCE_LEVELS.get(coherence, 1.2)
     concept: Dict[str, float] = {}
     strict = consistency == "strict"
     rng = random.Random(seed)
     spec = parse_brief(brief)
+    _p_motif, _p_role, _p_personality = motif, role, personality  # 指示文由来の判定用（motif/role は後で辞書に差し替わる）
     excluded = parse_exclude(exclude)
 
     # ドロップダウン指定（auto 以外）は brief より優先
@@ -784,7 +786,7 @@ def generate(
         spec.role = role
 
     # --- 性別 -------------------------------------------------------------
-    gender = spec.gender or "girl"
+    gender = gender if gender in ("girl", "boy") else (spec.gender or "girl")
 
     # --- モチーフ ---------------------------------------------------------
     if spec.motif:
@@ -879,6 +881,8 @@ def generate(
             if twist_arch:
                 pool = [a for a in pool if a not in motif["classic_arch"]] or pool
             pool = _without(pool, excluded["archetype"])
+        banned = D.FEMALE_ONLY_ARCHS if gender == "boy" else D.MALE_ONLY_ARCHS
+        pool = [a for a in pool if a not in banned] or [a for a in D.ARCHETYPES if a not in banned]
         arch_key = _coherent_pick(rng, pool, lambda a: D.ARCH_MOOD.get(a), concept, strength)
     arch = D.ARCHETYPES[arch_key]
     _add_moods(concept, D.ARCH_MOOD.get(arch_key), 1.0)
@@ -1113,8 +1117,22 @@ def generate(
     if strict:
         omitted += [_fill(f, slots) for f in theme_pool if _unstable(f)]
         theme_pool = [f for f in theme_pool if not _unstable(f)]
-    features += _sample(rng, theme_pool, 1 if strict else rng.randint(1, 2))
+    theme_from_brief = bool(theme_key) and spec.theme == theme_key and theme == "auto"
+    theme_feats = _sample(rng, theme_pool, (2 if theme_from_brief else 1) if strict else rng.randint(1, 2))
+    features += theme_feats
     features = [_fill(f, fill_slots) for f in features]
+    theme_feature_tags = [_fill(f, fill_slots) for f in theme_feats]
+    brief_hits: Dict[str, str] = {}
+    if spec.motif and motif_key == spec.motif and _p_motif == "auto":
+        brief_hits["race"] = D.MOTIFS[motif_key]["jp"]
+    if theme_from_brief:
+        brief_hits["theme"] = theme_key.replace("_", " ") + " motif"
+    if spec.role and role_key == spec.role and _p_role == "auto":
+        brief_hits["role"] = D.ROLE_TITLE_EN.get(role_key, role_key.replace("_", " "))
+    if spec.archetype and arch_key == spec.archetype and _p_personality == "auto":
+        brief_hits["archetype"] = next((s for s in D.ARCHETYPES[arch_key]["syn"] if s.isascii()), arch_key) + " personality"
+    if spec.handheld and handheld_key == spec.handheld:
+        brief_hits["handheld"] = handheld_key.replace("_", " ")
 
     # --- 服装 -------------------------------------------------------------
     if gender == "boy" and "male" in role:
@@ -1319,6 +1337,7 @@ def generate(
         era=era_key or "", era_tags=era_tags, mascot_tags=mascot_tags, mascot_nl=mascot_nl, face_mark_tags=face_mark_tags, face_mark_nl=face_mark_nl,
         concept_jp=concept_jp, concept_en=concept_en, moods=top_moods, coherence=coherence,
         age=age_key or "", age_tags=age_tags, age_nl=age_nl, age_neg=age_neg, gear_tags=gear_tags, gear_nl=gear_nl, free_words=free_words, free_nl=free_nl,
+        brief_hits=brief_hits, theme_feature_tags=theme_feature_tags,
     )
 
 
@@ -1427,6 +1446,35 @@ def _concept_sentence(c: Character, pron: str, poss: str) -> str:
     return f"Concept: {c.concept_en}. Every element of the design, from the palette and silhouette to the ornaments, follows the theme of {themes}."
 
 
+def _brief_sentence(c: Character, pron: str, poss: str) -> str:
+    """指示文で指定された要素を文で念押しする（モデルへの効きを強くする）"""
+    items = [v for k, v in c.brief_hits.items() if k != "race"] + list(c.free_words)
+    race_feat = c.features[0] if "race" in c.brief_hits and c.features else ""
+    if race_feat:
+        items.insert(0, race_feat)
+    if not items:
+        return ""
+    return f"Specified traits that must be clearly visible: {'; '.join(items)}."
+
+
+def _emphasize_brief(c: Character, tags: List[str]) -> List[str]:
+    """strict: 指示文由来のモチーフ小物・自由モチーフの先頭タグに重みを付ける"""
+    if c.consistency != "strict":
+        return tags
+    boost = set()
+    if "theme" in c.brief_hits and c.theme_feature_tags:
+        boost.add(c.theme_feature_tags[0])
+    if c.free_words:
+        boost.update(t for t in c.features if any(w in t for w in c.free_words))
+    out = []
+    for t in tags:
+        if t in boost:
+            out.append(_w(t, round(c.emphasis * 0.9, 2)))
+        else:
+            out.append(t)
+    return out
+
+
 def _free_sentence(c: Character, pron: str, poss: str) -> str:
     if not c.free_words:
         return ""
@@ -1524,6 +1572,7 @@ def build_positive(c: Character) -> str:
         parts += c.body_sentences
         parts.append(_theme_sentence(c, pron, poss))
         parts.append(_mascot_sentence(c, pron, poss))
+        parts.append(_brief_sentence(c, pron, poss))
         parts.append(_free_sentence(c, pron, poss))
         parts.append(_exposure_sentence(c, pron, poss))
         parts.append(_eye_sentence(c, pron, poss))
@@ -1576,7 +1625,7 @@ def build_positive(c: Character) -> str:
         tags += c.era_tags
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [_concept_sentence(c, pron, poss), _age_sentence(c, pron, poss), f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _free_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [_concept_sentence(c, pron, poss), _brief_sentence(c, pron, poss), _age_sentence(c, pron, poss), f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _free_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.age_tags

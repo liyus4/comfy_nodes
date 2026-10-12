@@ -23,12 +23,12 @@ import importlib
 import os
 import re
 
-from . import data, engine, outfit_tags
+from . import data, engine, outfit_tags, monster
 
 # --- 開発用ホットリロード -----------------------------------------------------
 # data.py / outfit_tags.py / engine.py が更新されていたら、実行時に再読み込みする（ComfyUI の再起動不要）。
 # node.py 自体（入力欄の定義）と js/ の変更は従来どおり再起動 + ブラウザリロードが必要。
-_WATCHED = (data, outfit_tags, engine)
+_WATCHED = (data, outfit_tags, engine, monster)
 _MTIMES = {}
 
 
@@ -167,8 +167,16 @@ class CharacterDesignerNode:
         # data.py / engine.py を編集したら、同じ入力でもキャッシュを使わず再実行させる
         return str(sorted(_source_mtimes().items()))
 
-    def design(self, 指示文, 除外, 種族, モチーフ, 服装, 服装2, 性格, 一貫性, 装飾量, シルエット, シェイプ, 世界観, マスコット, 顔の印, 手持ち, 年齢感, 胸, 身長, 体型, 服の色, 髪の色, シード, 意外性, 露出, 出力形式, 再現性, 強調, 表情ポーズ, 目の形, 固定, キャラシート):
+    GENDER = "auto"  # 男性ノードは "boy"
+
+    def design(self, **kw):
         _reload_if_changed()
+        指示文 = kw.get("指示文", ""); 除外 = kw.get("除外", ""); 種族 = kw.get("種族", "自動"); モチーフ = kw.get("モチーフ", "自動"); 服装 = kw.get("服装", "自動")
+        服装2 = kw.get("服装2", "なし"); 性格 = kw.get("性格", "自動"); 一貫性 = kw.get("一貫性", "標準"); 装飾量 = kw.get("装飾量", "2 標準"); シルエット = kw.get("シルエット", "自動")
+        シェイプ = kw.get("シェイプ", "自動"); 世界観 = kw.get("世界観", "自動"); マスコット = kw.get("マスコット", "自動"); 顔の印 = kw.get("顔の印", "なし"); 手持ち = kw.get("手持ち", "自動")
+        年齢感 = kw.get("年齢感", "自動"); 胸 = kw.get("胸", "自動"); 身長 = kw.get("身長", "自動"); 体型 = kw.get("体型", "自動"); 服の色 = kw.get("服の色", "自動"); 髪の色 = kw.get("髪の色", "自動")
+        シード = kw.get("シード", 0); 意外性 = kw.get("意外性", "自動"); 露出 = kw.get("露出", "自動"); 出力形式 = kw.get("出力形式", "タグ"); 再現性 = kw.get("再現性", "厳密（タグ骨格・再現性重視）")
+        強調 = kw.get("強調", 1.6); 表情ポーズ = kw.get("表情ポーズ", "表情のみ"); 目の形 = kw.get("目の形", "自動"); 固定 = kw.get("固定", False); キャラシート = kw.get("キャラシート", "")
 
         if 固定 and キャラシート.strip():
             # ロック中: シートを正として positive / negative を取り出す（再生成しない）
@@ -210,6 +218,7 @@ class CharacterDesignerNode:
                 emphasis=強調,
                 expression_pose=EXPRESSION_JP.get(表情ポーズ, "expression_only"),
                 eye_shape=EYE_SHAPE_JP.get(目の形, "auto"),
+                gender=self.GENDER,
             )
             sheet = engine.build_sheet(character)
             positive = engine.build_positive(character)
@@ -221,3 +230,83 @@ class CharacterDesignerNode:
 
         # "ui" の text は js/character_designer.js が受け取り、キャラシート欄に書き戻します
         return {"ui": {"text": [sheet]}, "result": (positive, negative, sheet, シード, turnaround, expressions, equipment, equipment_neg)}
+
+
+class MaleCharacterDesignerNode(CharacterDesignerNode):
+    """男性キャラクター版。性別を男性に固定し、女性限定の性格と胸の指定を外す"""
+    GENDER = "boy"
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        t = CharacterDesignerNode.INPUT_TYPES()
+        req = dict(t["required"])
+        req["指示文"] = ("STRING", {"multiline": False, "default": "",
+                                   "placeholder": "例: 騎士・俺様 / 狼・執事・無口 / 王子様・金髪（空ならすべてランダム。性別は男性固定）",
+                                   "tooltip": "雰囲気の指示。「・」「,」「空白」区切り。辞書に無い英単語は自由モチーフとして小物・模様に混ざります"})
+        req["性格"] = (["自動"] + [f"{v['jp']} ({k})" for k, v in data.ARCHETYPES.items() if k not in data.FEMALE_ONLY_ARCHS], {"default": "自動", "tooltip": "自動以外は指示文より優先"})
+        req["服装"] = (["自動"] + [f"{v['jp']} ({k})" for k, v in data.ROLES.items() if "male" in v], {"default": "自動", "tooltip": "男性用の服装がある系統のみ"})
+        req["服装2"] = (["なし", "ランダム"] + [f"{v['jp']} ({k})" for k, v in data.ROLES.items() if "male" in v], {"default": "なし", "tooltip": "2つ目の服装系統と融合"})
+        del req["胸"]
+        return {"required": req}
+
+
+MONSTER_COHERENCE_JP = {"なし": "none", "弱": "weak", "標準": "normal", "強": "strong"}
+
+
+class MonsterDesignerNode:
+    """人型ではない完全なモンスター（竜・獣・スライム・ゴーレム・植物・虫・機械・霊体…）を設計する"""
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "指示文": ("STRING", {"multiline": False, "default": "",
+                                     "placeholder": "例: ドラゴン・炎・巨大 / スライム・毒・愛嬌 / 大狼・氷・威厳・白（空ならすべてランダム）",
+                                     "tooltip": "種別・属性・大きさ・気質・色を「・」「,」「空白」区切りで。辞書に無い英単語は模様・角・体の形に混ざります"}),
+                "除外": ("STRING", {"multiline": False, "default": "", "placeholder": "出したくない語（例: スライム, 毒, 不気味）",
+                                   "tooltip": "ランダム選択のプールから種別/属性/気質を外します"}),
+                "種別": (["自動"] + [f"{v['jp']} ({k})" for k, v in monster.TYPES.items()], {"default": "自動", "tooltip": "体の設計図。自動以外は指示文より優先"}),
+                "属性": (["自動", "なし"] + [f"{v['jp']} ({k})" for k, v in monster.ELEMENTS.items()], {"default": "自動", "tooltip": "体表のエフェクト・配色・模様。自動は種別に合う属性を80%で"}),
+                "大きさ": (["自動"] + [f"{v['jp']} ({k})" for k, v in monster.SIZES.items()], {"default": "自動", "tooltip": "自動は種別の既定±1段"}),
+                "気質": (["自動"] + [f"{v['jp']} ({k})" for k, v in monster.TEMPERS.items()], {"default": "自動", "tooltip": "目・姿勢・表情（人型の性格に相当）。シェイプ言語の既定もここから"}),
+                "一貫性": (["なし", "弱", "標準", "強"], {"default": "標準", "tooltip": "種別・属性・気質からコンセプト（例: 炎の古竜）を導出し、装飾や配色をそれに寄せる強さ"}),
+                "装飾量": (["0 なし", "1 控えめ", "2 標準", "3 盛る"], {"default": "2 標準", "tooltip": "体の装飾（骨甲冑・結晶・棘・ルーン・鎖・苔・追加の目・機械部品…）の数"}),
+                "シェイプ": (["自動"] + [f"{v['jp']} ({k})" for k, v in data.SHAPES.items()], {"default": "自動", "tooltip": "丸=親しみ/四角=安定/鋭角=攻撃性。自動は気質から"}),
+                "世界観": (["自動"] + [f"{v['jp']} ({k})" for k, v in data.ERAS.items()], {"default": "自動", "tooltip": "SF 以外では機械部品の装飾が出ません"}),
+                "体の色": (["自動"] + [f"{jp} ({k})" for k, jp in data.COLOR_JP.items()], {"default": "自動", "tooltip": "体のメインカラー。副色・差し色は属性のパレットから"}),
+                "シード": ("INT", {"default": 0, "min": 0, "max": 0xffffffffffffffff, "control_after_generate": True}),
+                "出力形式": (list(STYLE_JP), {"default": "タグ"}),
+                "再現性": (list(CONSISTENCY_JP), {"default": "厳密（タグ骨格・再現性重視）", "tooltip": "厳密=主要タグに重み / 詳細=重みなし"}),
+                "強調": ("FLOAT", {"default": 1.6, "min": 0.0, "max": 3.0, "step": 0.1}),
+                "固定": ("BOOLEAN", {"default": False, "label_on": "固定中（シートを使用）", "label_off": "生成する"}),
+                "キャラシート": ("STRING", {"multiline": True, "default": "", "placeholder": "生成するとここにモンスターシートが残ります。「固定」を ON にするとこの内容がそのまま出力されます。"}),
+            },
+        }
+
+    RETURN_TYPES = ("STRING", "STRING", "STRING", "INT", "STRING")
+    RETURN_NAMES = ("positive", "negative", "キャラシート", "シード", "三面図")
+    FUNCTION = "design"
+    CATEGORY = "Test/Example Nodes"
+    OUTPUT_NODE = True
+
+    @classmethod
+    def IS_CHANGED(cls, **kwargs):
+        return str(sorted(_source_mtimes().items()))
+
+    def design(self, **kw):
+        _reload_if_changed()
+        固定 = kw.get("固定", False); キャラシート = kw.get("キャラシート", ""); シード = kw.get("シード", 0)
+        if 固定 and キャラシート.strip():
+            positive, negative = engine.parse_sheet(キャラシート)
+            sheet = キャラシート
+            turnaround = positive + ", creature sheet, multiple views, turnaround, front view, side view, back view, full body, white background, simple background"
+        else:
+            m = monster.generate(
+                brief=kw.get("指示文", ""), seed=シード, exclude=kw.get("除外", ""),
+                mtype=_jp_key(kw.get("種別", "自動")), element={"なし": "none"}.get(kw.get("属性", "自動")) or _jp_key(kw.get("属性", "自動")),
+                size=_jp_key(kw.get("大きさ", "自動")), temper=_jp_key(kw.get("気質", "自動")),
+                coherence=MONSTER_COHERENCE_JP.get(kw.get("一貫性", "標準"), "normal"), detail_level=int(str(kw.get("装飾量", "2 標準")).split(" ")[0]),
+                shape_lang=_jp_key(kw.get("シェイプ", "自動")), era=_jp_key(kw.get("世界観", "自動")), main_color=_jp_key(kw.get("体の色", "自動")),
+                emphasis=kw.get("強調", 1.6), consistency=CONSISTENCY_JP.get(kw.get("再現性", ""), "strict"), prompt_style=STYLE_JP.get(kw.get("出力形式", "タグ"), "tags"),
+            )
+            sheet = monster.build_sheet(m); positive = monster.build_positive(m); negative = monster.build_negative(m); turnaround = monster.build_turnaround(m)
+        return {"ui": {"text": [sheet]}, "result": (positive, negative, sheet, シード, turnaround)}

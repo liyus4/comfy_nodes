@@ -2,7 +2,7 @@ import os
 
 from .example_node import MyCustomStringNode
 from .string_selector_node import StringSelectorNode, BatchIndexGeneratorNode
-from .character_designer import CharacterDesignerNode
+from .character_designer import CharacterDesignerNode, MaleCharacterDesignerNode, MonsterDesignerNode
 from .browser_download_node import BrowserDownloadImageNode
 
 # ノードのクラスと、内部で管理される識別子のマッピング
@@ -12,6 +12,8 @@ NODE_CLASS_MAPPINGS = {
     "StringSelectorNode": StringSelectorNode,
     "BatchIndexGeneratorNode": BatchIndexGeneratorNode,
     "CharacterDesignerNode": CharacterDesignerNode,
+    "MaleCharacterDesignerNode": MaleCharacterDesignerNode,
+    "MonsterDesignerNode": MonsterDesignerNode,
     "BrowserDownloadImageNode": BrowserDownloadImageNode,
 }
 
@@ -21,6 +23,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     "StringSelectorNode": "Dynamic String Selector",
     "BatchIndexGeneratorNode": "Batch Index Generator",
     "CharacterDesignerNode": "Random Character Designer",
+    "MaleCharacterDesignerNode": "Random Character Designer (男性)",
+    "MonsterDesignerNode": "Random Monster Designer",
     "BrowserDownloadImageNode": "Browser Download Image",
 }
 

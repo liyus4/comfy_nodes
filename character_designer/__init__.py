@@ -1,3 +1,3 @@
-from .node import CharacterDesignerNode
+from .node import CharacterDesignerNode, MaleCharacterDesignerNode, MonsterDesignerNode
 
-__all__ = ["CharacterDesignerNode"]
+__all__ = ["CharacterDesignerNode", "MaleCharacterDesignerNode", "MonsterDesignerNode"]
