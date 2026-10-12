@@ -5403,6 +5403,28 @@ NUDE_ACCESSORY_WORDS = ("earring", "necklace", "pendant", "choker", "brooch", "r
 NUDE_FORBID_WORDS = ("hem", "sleeve", "belt", "cape", "skirt", "corset", "coat", "jacket", "bodice", "sash", "over the outfit", "buckle", "tabard", "outfit", "uniform", "dress", "shirt")
 NUDE_NEGATIVE = {"near_nude": ["bra", "panties", "shirt", "dress", "skirt", "pants", "covered navel"],
                  "nude": ["clothes", "underwear", "bra", "panties", "shirt", "skirt", "dress", "pants", "bikini", "swimsuit"]}
+# 自由モチーフ（辞書に無い英単語）を身に着ける小物・模様に変換するテンプレート。(タグ, 説明文) で seed で2つ選ぶ
+FREE_MOTIF_TEMPLATES = [
+    ("{word}-shaped {accent} hair ornament", "a {word}-shaped {accent} hair ornament"),
+    ("{word}-shaped {accent} earrings", "{word}-shaped {accent} earrings"),
+    ("small {word} charm hanging from the choker", "a small {word} charm hanging from {poss} choker"),
+    ("{word} embroidery on the hem", "{word} embroidery along the hem"),
+    ("{word} print", "a {word} print on the outfit"),
+    ("{word}-shaped {accent} brooch on the chest", "a {word}-shaped {accent} brooch on the chest"),
+    ("{word}-shaped {sub} pouch on the belt", "a {word}-shaped {sub} pouch on {poss} belt"),
+    ("{word} emblem on the back", "a large {word} emblem on {poss} back"),
+    ("{word}-shaped {accent} hair clips", "{word}-shaped {accent} hair clips"),
+    ("{word} motif on the gloves", "a {word} motif on {poss} gloves"),
+    ("{word}-shaped {accent} buttons", "{word}-shaped {accent} buttons"),
+    ("{word}-shaped {accent} pendant", "a {word}-shaped {accent} pendant"),
+    ("{word} motif embroidery on the collar", "{word} motif embroidery on the collar"),
+    ("{word}-themed {accent} hair ornament", "a {word}-themed {accent} hair ornament"),
+    ("{word} pattern on the skirt", "a {word} pattern on the skirt"),
+    ("{word} motif choker", "a {word} motif choker"),
+    ("{word} design on the sleeves", "a {word} design on the sleeves"),
+    ("{word}-themed accessories", "{word}-themed accessories"),
+]
+FREE_MOTIF_COUNT = 2
 # 手持ちが無いときに negative に入れる（装飾が手持ち化するのを防ぐ）
 HANDHELD_NEGATIVE = ["holding object", "handheld object", "holding weapon"]
 # 性格の署名に含まれる手持ち（これがある性格では HANDHELD_NEGATIVE を入れない）

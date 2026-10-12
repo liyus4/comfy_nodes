@@ -333,6 +333,8 @@ class Character:
     age: str = ""
     gear_tags: List[str] = field(default_factory=list)
     gear_nl: str = ""
+    free_words: List[str] = field(default_factory=list)  # 自由モチーフ（英単語）
+    free_nl: List[str] = field(default_factory=list)
     age_tags: List[str] = field(default_factory=list)
     age_nl: str = ""
     age_neg: List[str] = field(default_factory=list)
@@ -1179,6 +1181,19 @@ def generate(
 
     # --- 装飾レイヤー（独自性） -------------------------------------------------
     shape = D.SHAPE_WORDS.get(theme_key or "", "") or D.SHAPE_WORDS.get(motif_key, "")
+    # --- 自由モチーフ: 辞書に無い英単語を小物・模様・形状語として全体に混ぜる --------
+    free_words = [w.lower() for w in spec.extras if w.isascii() and re.fullmatch(r"[A-Za-z][A-Za-z\- ]{1,30}", w)][:2]
+    free_nl: List[str] = []
+    if free_words:
+        frng = random.Random(seed * 104729 + 7)
+        for w in free_words:
+            for tag_t, nl_t in _sample(frng, D.FREE_MOTIF_TEMPLATES, D.FREE_MOTIF_COUNT):
+                fw = dict(fill_slots, word=w)
+                features.append(_fill(tag_t, fw))
+                free_nl.append(_fill(nl_t, fw))
+        if not shape:
+            shape = free_words[0]  # 装備・装飾の「{shape}-shaped」にも使う
+    unrecognized = [w for w in spec.extras if w.lower() not in free_words]
     tech_aff = (motif_key in D.TECH_AFFINITY) or (theme_key in D.TECH_AFFINITY) or bool(era_key and D.ERAS[era_key]["tech"])
     emb_rng = random.Random(seed * 7919 + 17)
     embellish_tags, embellish_nl, iconic_tag = build_embellishments(
@@ -1294,7 +1309,7 @@ def generate(
         palette=palette, pattern=pattern, material=material,
         hair=hair, eyes=eyes, skin=skin, body=body, features=features, outfit=outfit,
         accessories=accessories, prop=prop, expression=expression, pose=pose,
-        extras=[], unrecognized=spec.extras, excluded=excluded, prompt_style=prompt_style, expression_pose=expression_pose,
+        extras=[], unrecognized=unrecognized, excluded=excluded, prompt_style=prompt_style, expression_pose=expression_pose,
         consistency=consistency, emphasis=emphasis, pattern_base=base_pattern, print_tag=print_tag,
         outfit_detail=outfit_detail, omitted=omitted, eye_choice=chosen, eye_intensity=eye_intensity,
         role2=role2_key or "", exposure_tags=exposure_tags, theme=theme_key or "", handheld_tags=handheld_tags,
@@ -1303,7 +1318,7 @@ def generate(
         silhouette=sil_key, shape_lang=shape_key, zones=zones, silhouette_tags=silhouette_tags,
         era=era_key or "", era_tags=era_tags, mascot_tags=mascot_tags, mascot_nl=mascot_nl, face_mark_tags=face_mark_tags, face_mark_nl=face_mark_nl,
         concept_jp=concept_jp, concept_en=concept_en, moods=top_moods, coherence=coherence,
-        age=age_key or "", age_tags=age_tags, age_nl=age_nl, age_neg=age_neg, gear_tags=gear_tags, gear_nl=gear_nl,
+        age=age_key or "", age_tags=age_tags, age_nl=age_nl, age_neg=age_neg, gear_tags=gear_tags, gear_nl=gear_nl, free_words=free_words, free_nl=free_nl,
     )
 
 
@@ -1412,6 +1427,14 @@ def _concept_sentence(c: Character, pron: str, poss: str) -> str:
     return f"Concept: {c.concept_en}. Every element of the design, from the palette and silhouette to the ornaments, follows the theme of {themes}."
 
 
+def _free_sentence(c: Character, pron: str, poss: str) -> str:
+    if not c.free_words:
+        return ""
+    words = " and ".join(c.free_words)
+    items = "; ".join(x.replace("{poss}", poss) for x in c.free_nl)
+    return f"The whole design is themed around {words}: {items}. Ornaments, patterns and small details all reference {words}."
+
+
 def _mascot_sentence(c: Character, pron: str, poss: str) -> str:
     out = []
     if c.mascot_nl:
@@ -1501,6 +1524,7 @@ def build_positive(c: Character) -> str:
         parts += c.body_sentences
         parts.append(_theme_sentence(c, pron, poss))
         parts.append(_mascot_sentence(c, pron, poss))
+        parts.append(_free_sentence(c, pron, poss))
         parts.append(_exposure_sentence(c, pron, poss))
         parts.append(_eye_sentence(c, pron, poss))
         parts.append(_persona_sentence(c, pron, poss))
@@ -1552,7 +1576,7 @@ def build_positive(c: Character) -> str:
         tags += c.era_tags
         tags += c.unrecognized
         # タグ列のあとに自然文（服・目・性格）を続ける: "tags, tags. Sentence. Sentence."
-        sentences = [_concept_sentence(c, pron, poss), _age_sentence(c, pron, poss), f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
+        sentences = [_concept_sentence(c, pron, poss), _age_sentence(c, pron, poss), f"{poss.capitalize()} outfit is {c.main} with {c.accent} trim.", _color_sentence(c, pron, poss), _embellish_sentence(c, pron, poss), _silhouette_sentence(c, pron, poss), _hair_sentence(c, pron, poss), *c.body_sentences, _theme_sentence(c, pron, poss), _free_sentence(c, pron, poss), _mascot_sentence(c, pron, poss), _exposure_sentence(c, pron, poss), _eye_sentence(c, pron, poss), _persona_sentence(c, pron, poss)]
         return ", ".join(_dedupe(tags)) + ". " + " ".join(s for s in sentences if s)
 
     tags += c.age_tags
@@ -1678,6 +1702,7 @@ def build_sheet(c: Character) -> str:
         f"# handheld   : {c.prop or '(なし)'}   mascot: {(c.mascot_nl or '(なし)').replace('{poss}', 'her' if c.gender == 'girl' else 'his')}   face mark: {(c.face_mark_nl or '(なし)').replace('{poss}', 'her' if c.gender == 'girl' else 'his')}",
         f"# embellish  : level={c.detail_level}  " + (" / ".join(c.embellish_tags) if c.embellish_tags else "(なし)"),
         f"# silhouette : {D.SILHOUETTES[c.silhouette]['jp'] if c.silhouette else '-'} ({c.silhouette})   shape: {D.SHAPES[c.shape_lang]['jp'] if c.shape_lang else '-'} ({c.shape_lang})   density zones: {', '.join(c.zones) or '-'}",
+        f"# free motif : {', '.join(c.free_words)}" if c.free_words else "# free motif : (なし)  ※指示文の辞書に無い英単語は自由モチーフとして小物・模様・形状に混ざる",
         f"# exposure   : {EXPOSURE_JP[c.exposure]} ({c.exposure})   twist: {twist_text}   style: {c.prompt_style}   expression_pose: {c.expression_pose}",
         f"# eyes       : {' / '.join(c.eyes)}   intensity={c.eye_intensity}   emphasis={c.emphasis}",
         f"# age        : {D.AGE_LEVELS[c.age]['jp'] if c.age else '(指定なし)'} ({c.age or '-'})   body: {', '.join(c.body)}",
