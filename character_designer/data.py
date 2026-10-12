@@ -605,6 +605,34 @@ ARCHETYPES = {
         "accessories": ["hooded {sub} cloak pulled low", "{accent} pendant clutched in one hand"],
         "footwear": None,
     },
+    "nemuri": {
+        "jp": "眠り",
+        "syn": ["眠り", "眠そう", "眠たげ", "寝起き", "ねむねむ", "居眠り", "nemuri", "sleepy", "drowsy", "half-asleep"],
+        "design_jp": "半分閉じた目＋寝癖＋ゆるい服。ナイトキャップやブランケット、目の下のたるみで「寝足りない」を記号化",
+        "eyes": ["half-closed sleepy eyes", "drooping eyelids"],
+        "hair_styles": ["messy bed hair", "long hair with a sleep-flattened side", "loose low braid coming undone"],
+        "hair_colors": ["lavender hair", "light blue hair", "gray hair", "light brown hair"],
+        "palettes": [("lavender", "white", "yellow"), ("navy", "cream", "gold"), ("sky blue", "white", "pink")],
+        "expression": ["yawning", "sleepy half-lidded eyes", "rubbing one eye, mouth slightly open"],
+        "pose": ["hugging a pillow", "leaning against something, dozing off", "stretching with a yawn"],
+        "body": [],
+        "accessories": ["{accent} nightcap", "blanket draped over the shoulders", "small {sub} sleep mask pushed up on the forehead"],
+        "footwear": None,
+    },
+    "mendou": {
+        "jp": "面倒くさがり",
+        "syn": ["面倒くさがり", "めんどくさがり", "怠け者", "ダラダラ", "やる気なし", "無気力", "mendou", "lazy", "slacker", "unmotivated"],
+        "design_jp": "だらしなく着崩した服＋ジト目＋猫背。片方だけずり下がった靴下や外れたボタンで「手を抜いている」を記号化",
+        "eyes": ["bored half-lidded eyes", "jitome"],
+        "hair_styles": ["messy low ponytail", "unkempt medium hair", "hair tied up carelessly with a pen through it"],
+        "hair_colors": ["dark brown hair", "black hair", "gray hair", "dark green hair"],
+        "palettes": [("gray", "black", "yellow"), ("olive", "cream", "orange"), ("navy", "gray", "white")],
+        "expression": ["bored expression", "sigh, half-lidded eyes", "lazy unimpressed look"],
+        "pose": ["slouching with hands in pockets", "lying sprawled on the floor", "leaning on one elbow, chin in hand"],
+        "body": [],
+        "accessories": ["one sock slipping down", "unbuttoned {sub} collar", "{accent} hair tie around the wrist"],
+        "footwear": None,
+    },
     "haraguro": {
         "jp": "腹黒",
         "syn": ["腹黒", "はらぐろ", "黒幕", "haraguro", "two-faced", "scheming"],
@@ -4636,6 +4664,8 @@ EYE_PROFILES = {
     "mama":      {"shape": ["tareme"], "lid": ["half-closed eyes"], "lashes": ["long eyelashes"]},
     "hazukashigari": {"shape": ["tareme"], "lid": ["wide-eyed"], "details": ["eyes visible through hair"]},
     "utagai":    {"shape": ["tsurime"], "lid": ["narrowed eyes"], "highlights": ["empty eyes"]},
+    "nemuri":    {"shape": ["tareme"], "lid": ["half-closed eyes"]},
+    "mendou":    {"shape": ["jitome"], "lid": ["half-closed eyes"]},
     "haraguro":  {"shape": ["tareme"], "lid": ["narrowed eyes"], "highlights": ["empty eyes"]},
     "fushigi":   {"shape": ["tareme"], "pupils": ["star-shaped pupils", "ringed eyes"], "highlights": ["sparkling eyes"], "lid": ["wide-eyed"]},
     "iinchou":   {"shape": ["tsurime"], "brows": ["thin eyebrows"]},
@@ -4691,6 +4721,8 @@ ARCH_SIGNATURE = {
     "mama":  {"tags": ["mature female"], "persona": "{pron} is a doting, motherly presence who spoils everyone with a warm, patient smile, always ready to pull them into a hug."},
     "hazukashigari":  {"tags": ["blush", "embarrassed"], "persona": "{pron} is painfully bashful, face always flushed, hiding behind {poss} hair or sleeves whenever someone looks."},
     "utagai":  {"tags": ["narrowed eyes", "sidelong glance"], "persona": "{pron} trusts no one, watching the viewer with narrowed, sidelong eyes and keeping {poss} arms crossed."},
+    "nemuri":  {"tags": ["sleepy", "half-closed eyes"], "persona": "{pron} is perpetually sleepy, yawning and rubbing {poss} eyes, always a moment away from dozing off."},
+    "mendou":  {"tags": ["bored", "jitome"], "persona": "{pron} cannot be bothered with anything, slouching with a bored, half-lidded stare and clothes worn carelessly."},
     "haraguro":  {"tags": [], "persona": "{pron} wears a perfect polite smile that hides a scheming, two-faced nature."},
     "fushigi":   {"tags": [], "persona": "{pron} is an eccentric, spacey dreamer whose gaze drifts somewhere far away."},
     "iinchou":   {"tags": ["glasses"], "persona": "{pron} is a strict, diligent class representative who pushes up {poss} glasses disapprovingly."},
@@ -4915,7 +4947,7 @@ HANDHELDS = {
         "tags": ["shield", "holding shield"],
         "types": [("kite shield", "shield"), ("round shield", "shield"), ("tower shield", "shield"), ("heater shield", "shield"), ("buckler", "shield")],
         "slots": {
-            "face": ["{main} face with {accent} {pattern} emblem", "silver face with gold rim", "black face with {accent} cross", "white face with {sub} stripe"],
+            "front": ["{main} front plate with {accent} {pattern} emblem", "silver front plate with gold rim", "black front plate with {accent} cross", "white front plate with {sub} stripe"],
             "rim": ["{accent} metal rim", "steel rim with rivets", "gold rim"],
         },
         "holds": [("held on the left arm", "holding shield"), ("planted in front", "holding shield"), ("slung on the back", "shield on back")],
@@ -5126,7 +5158,7 @@ HANDHELDS = {
         "tags": ["shield", "huge weapon", "weapon"],
         "types": [("tower shield taller than its wielder", "shield"), ("door-like greatshield", "shield"), ("ornate kite greatshield", "shield")],
         "slots": {
-            "face": ["{main} face with {accent} rim", "black face with glowing {accent} lines", "{sub} face with {pattern} emblem"],
+            "front": ["{main} front plate with {accent} rim", "black front plate with glowing {accent} lines", "{sub} front plate with {pattern} emblem"],
             "edge": ["{accent} spiked rim", "rounded steel rim", "{shape}-shaped {accent} crest on top"],
         },
         "holds": [("planted in front of the body", "holding shield"), ("strapped to the left arm", "holding shield"), ("slung on the back", "shield on back")],
@@ -5231,6 +5263,16 @@ HANDHELDS = {
         },
         "holds": [("held in the right hand", "holding paintbrush"), ("resting on the shoulder", "holding paintbrush, over shoulder"), ("tucked behind the back", "paintbrush on back")],
     },
+    "milk_gun": {
+        "jp": "ミルク銃", "syn": ["ミルク銃", "ミルクガン", "牛乳銃", "milk gun", "milk blaster"],
+        "tags": ["water gun", "milk"],
+        "types": [("milk-filled water gun", "water gun"), ("cow-print milk blaster", "water gun, cow print"), ("milk gun with a bottle-shaped tank", "water gun, bottle")],
+        "slots": {
+            "tank": ["clear tank full of white milk", "milk-bottle-shaped clear tank", "cow-print tank with a clear window showing the milk"],
+            "body": ["{main} body with {accent} trim", "white body with black cow-print spots", "{sub} body with {accent} nozzle"],
+        },
+        "holds": [("held in the right hand", "holding water gun"), ("aimed with both hands", "holding water gun, aiming"), ("resting on the shoulder", "holding water gun, over shoulder")],
+    },
     "whip": {
         "jp": "鞭", "syn": ["鞭", "ムチ", "whip", "riding crop"],
         "tags": ["whip", "holding whip"],
@@ -5254,7 +5296,7 @@ HANDHELD_EXTRA = {
     "scythe": ["a blade that detaches on a chain", "a crescent blade with a {accent} glowing edge", "a {shape}-shaped counterweight", "twin crescent blades"],
     "dagger": ["a curved blade shaped like a {shape}", "a hidden second blade in the hilt", "a blade with {accent} glowing veins"],
     "gun": ["a {shape}-shaped muzzle", "a revolver cylinder that glows {accent}", "an ornate barrel engraved with {pattern}", "a gun that unfolds into a blade"],
-    "shield": ["a {shape}-shaped face", "a shield that splits open to reveal a {accent} core", "{accent} spikes along the rim", "a mirror-polished face"],
+    "shield": ["a {shape}-shaped outline", "a shield that splits open to reveal a {accent} core", "{accent} spikes along the rim", "a mirror-polished front plate"],
     "umbrella": ["a canopy shaped like a {shape}", "a blade hidden in the handle", "ribs tipped with {accent} gems"],
     "fan": ["bladed steel ribs", "a {shape}-shaped silhouette when open", "{accent} tassels on the pivot"],
     "instrument": ["a body shaped like a {shape}", "strings that glow {accent} when played", "a hidden blade in the neck"],
@@ -5266,6 +5308,7 @@ HANDHELD_EXTRA = {
     "chakram": ["a ring that splits into two halves", "{accent} light trailing from the edge", "a ring shaped like a {shape}"],
     "flail": ["a head shaped like a {shape}", "a chain that glows {accent}", "multiple smaller balls on branching chains"],
     "cannon": ["a {shape}-shaped muzzle", "a barrel that folds for carrying", "{accent} coolant tubes along the body"],
+    "milk_gun": ["a pump handle shaped like a cow bell", "milk dripping from the nozzle", "a bottle-cap-shaped {accent} trigger guard", "a hose connecting it to a milk tank on the back"],
     "dual_blades": ["blades that connect at the hilts into a double-bladed staff", "{accent} light trailing from both blades", "blades that fold into the gauntlets"],
     "crossbow": ["limbs that fold flat against the stock", "bolts tipped with {accent} crystal", "a {shape}-shaped frame"],
     "lance": ["a spiral drill tip", "a tip that opens into three prongs", "{accent} light spiraling along the body"],
@@ -5276,7 +5319,7 @@ HANDHELD_EXTRA = {
     "scissors": ["blades that separate into two swords", "{accent} light along the cutting edges", "ring handles shaped like {shape}s"],
     "bits": ["units that link into a ring", "units shaped like {shape}s", "units that fold into a backpack"],
     "orb": ["a {shape} floating inside the orb", "rings orbiting the orb", "{accent} light leaking from cracks"],
-    "tower_shield": ["a face that opens like a door", "a {shape}-shaped emblem", "{accent} light along the rim"],
+    "tower_shield": ["a front plate that opens like a door", "a {shape}-shaped emblem", "{accent} light along the rim"],
     "rifle": ["a {shape}-shaped muzzle brake", "a stock that folds into a blade", "{accent} coolant lines along the barrel"],
     "twin_pistols": ["pistols that link into a single rifle", "{shape}-shaped muzzles", "{accent} light along the barrels"],
     "gatling": ["barrels that glow {accent} when spinning", "an ammo belt shaped like a {shape} chain", "a body that folds into a backpack"],
@@ -5290,7 +5333,7 @@ HANDHELD_EXTRA = {
 }
 # 武器のサイズ軸: (キー, 説明, タグ, 重み)。giant_ok=False の武器は巨大にならない
 HANDHELD_SIZES = [("normal", "", "", 55), ("oversized", "oversized", "oversized weapon", 30), ("giant", "giant, taller than its wielder", "huge weapon", 15)]
-HANDHELD_NO_GIANT = {"wand", "fan", "umbrella", "lantern", "dagger", "claws", "chakram", "whip", "instrument", "grimoire",
+HANDHELD_NO_GIANT = {"milk_gun", "wand", "fan", "umbrella", "lantern", "dagger", "claws", "chakram", "whip", "instrument", "grimoire",
                      "dual_blades", "crossbow", "bits", "orb", "twin_pistols", "puppet", "kunai", "boomerang", "tower_shield", "gatling"}
 # 職業ごとの武器の好み（手持ち「自動」のとき）
 ROLE_WEAPON = {
@@ -5302,9 +5345,11 @@ ROLE_WEAPON = {
     "shrine_miko": ["bow", "fan", "brush"], "kimono": ["umbrella", "fan"], "princess_dress": ["fan", "umbrella"], "scholar": ["grimoire"], "cultist": ["dagger", "grimoire"],
     "magical_girl": ["wand", "staff"], "succubus": ["whip", "spear", "trident"], "goddess_dress": ["staff", "orb"], "saint": ["staff"], "pontiff": ["staff"], "fortune_teller": ["grimoire", "orb"],
     "steampunk": ["gun", "cannon", "wrench", "gatling", "drill"], "alchemist": ["gun", "orb", "wrench"],
-    "jester_outfit": ["scissors", "puppet", "boomerang"], "gothic_lolita": ["scissors", "umbrella", "puppet"], "maid": ["twin_pistols", "dual_blades"],
+    "cow_suit": ["milk_gun"], "jester_outfit": ["scissors", "puppet", "boomerang"], "gothic_lolita": ["scissors", "umbrella", "puppet"], "maid": ["twin_pistols", "dual_blades"],
     "bodysuit": ["bits", "rifle", "drill"], "village_girl": ["pickaxe"], "chef": ["dual_blades"], "nurse": ["scissors"], "monk": ["claws", "staff", "orb"],
 }
+# モチーフごとの武器の好み（手持ち「自動」で、職業の好みより先に 50% で使う）
+THEME_WEAPON = {"cow": ["milk_gun"], "milk_bottle": ["milk_gun"], "milking_machine": ["milk_gun"], "flask": ["orb"], "coin": ["twin_pistols", "dagger"], "restraints": ["whip", "flail"]}
 # 職業ギア（武器ではない、その職業らしい大きな持ち物。装備出力に入る）
 ROLE_GEAR = {
     "merchant": [{"tags": ["huge backpack", "giant {main} backpack stuffed with wares, pots and lanterns hanging from it"], "nl": "a giant {main} backpack taller than {poss} torso, stuffed with wares with pots and lanterns hanging off it"},
@@ -5562,7 +5607,7 @@ ARCH_SHAPE = {
     "iinchou": "square", "nekketsu": "square", "aneki": "square", "bokukko": "square", "jishinka": "square", "kuudere": "square",
     "tsundere": "sharp", "mesugaki": "sharp", "sadistic": "sharp", "yandere": "sharp", "chuuni": "sharp", "ojousama": "sharp",
     "oneesan": "sharp", "gal": "sharp", "haraguro": "sharp", "dokuzetsu": "sharp",
-    "mama": "round", "hazukashigari": "round", "utagai": "sharp",
+    "mama": "round", "hazukashigari": "round", "utagai": "sharp", "nemuri": "round", "mendou": "square",
     "mukanjou": "square", "kyouki": "sharp", "boukun": "sharp", "fukushu": "sharp", "kyoushin": "round", "kairaku": "round", "higeki": "round", "trickster": "sharp",
 }
 # 部位スロット -> 情報量ゾーン（装飾を集めるゾーンの判定）
@@ -5687,7 +5732,7 @@ ARCH_MOOD = {
     "juujun": ["holy", "cute", "sweet"], "haraguro": ["dark", "elegant", "royal"], "fushigi": ["magic", "sky", "play"], "iinchou": ["military", "elegant", "street"],
     "ottori": ["nature", "sweet", "cute"], "nekketsu": ["fire", "wild", "military"], "dokuzetsu": ["ice", "street", "dark"], "aneki": ["wild", "street", "military"],
     "okubyou": ["cute", "sick", "nature"], "jishinka": ["royal", "fire", "light"],
-    "mama": ["sweet", "cute", "nature"], "hazukashigari": ["cute", "sweet", "light"], "utagai": ["dark", "night", "ruin"],
+    "nemuri": ["night", "sweet", "cute"], "mendou": ["street", "ruin", "play"], "mama": ["sweet", "cute", "nature"], "hazukashigari": ["cute", "sweet", "light"], "utagai": ["dark", "night", "ruin"],
     "mukanjou": ["ice", "tech", "ruin"], "kyouki": ["dark", "sick", "play"], "boukun": ["royal", "dark", "military"], "fukushu": ["dark", "fire", "night"], "kyoushin": ["holy", "dark", "sick"],
     "kairaku": ["sexy", "royal", "elegant"], "higeki": ["night", "elegant", "sick"], "trickster": ["play", "dark", "magic"],
 }
@@ -5713,7 +5758,7 @@ HANDHELD_MOOD = {"sword": ["military", "royal", "holy"], "katana": ["wafu", "mil
                  "lance": ["royal", "military", "holy"], "halberd": ["military", "royal"], "trident": ["water", "royal"], "drill": ["tech", "play"], "anchor": ["water", "wild"],
                  "scissors": ["play", "dark", "cute"], "bits": ["tech", "magic"], "orb": ["magic", "holy", "night"], "tower_shield": ["military", "holy"],
                  "rifle": ["military", "tech"], "twin_pistols": ["street", "military"], "gatling": ["tech", "military"], "puppet": ["dark", "play", "elegant"],
-                 "wrench": ["tech", "play"], "pickaxe": ["nature", "wild"], "boomerang": ["wild", "play"], "kunai": ["wafu", "street"], "gunblade": ["military", "tech"], "brush": ["wafu", "elegant"]}
+                 "wrench": ["tech", "play"], "pickaxe": ["nature", "wild"], "boomerang": ["wild", "play"], "kunai": ["wafu", "street"], "gunblade": ["military", "tech"], "brush": ["wafu", "elegant"], "milk_gun": ["sweet", "play", "cute"]}
 MASCOT_MOOD = {"familiar": ["nature", "magic", "cute"], "spirit": ["magic", "holy", "night"], "drone": ["tech"], "plush": ["cute", "sweet", "sick"], "bird": ["nature", "sky"]}
 ERA_MOOD = {"fantasy": ["magic", "holy", "royal", "military", "nature"], "modern": ["street", "cute", "music", "play"], "scifi": ["tech"], "wafu": ["wafu"]}
 # コンセプト名の「役割」部分（女, 男）

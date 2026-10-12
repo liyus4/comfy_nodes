@@ -1232,8 +1232,11 @@ def generate(
     handheld_key = None
     size_pref = "auto"
     if handheld == "auto":
+        tpref = D.THEME_WEAPON.get(theme_key or "") or D.THEME_WEAPON.get(motif_key)
         pref = D.ROLE_WEAPON.get(role_key) or (D.ROLE_WEAPON.get(role2_key) if role2_key else None)
-        if pref and rng.random() < 0.75:
+        if tpref and rng.random() < 0.5:
+            handheld_key = _pick(rng, tpref)
+        elif pref and rng.random() < 0.75:
             handheld_key = _pick(rng, pref)
         elif strength > 0 and _affinity(["military", "magic", "wafu", "dark", "music", "wild"], concept) >= 3 and rng.random() < 0.45:
             handheld_key = _coherent_pick(rng, list(D.HANDHELDS), lambda k: D.HANDHELD_MOOD.get(k), concept, strength, base=0.05)
@@ -1618,6 +1621,9 @@ def build_negative(c: Character) -> str:
         if c.detail_level >= 1 and c.shape_lang:
             neg += list(D.SHAPES[c.shape_lang]["neg"])
         neg += _alt_color_negatives(c)
+    # 獣耳・尖り耳の種族に人間の耳が追加で付かないようにする
+    if any(" ears" in f.lower() for f in c.features):
+        neg += ["extra ears", "human ears", "four ears"]
     if c.exposure == "modest":
         neg += ["cleavage", "navel", "bare shoulders", "midriff", "nude"]
     elif c.exposure == "high":
