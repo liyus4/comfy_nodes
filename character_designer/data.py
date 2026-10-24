@@ -2088,6 +2088,63 @@ MOTIFS = {
         "classic_jp": "フラスコ——緑×金×紫と薬瓶・試験管で錬金の雰囲気を添える",
         "gap_jp": "フラスコ——記号を{role}に添える",
     },
+    "hologram": {
+        "kind": "theme",
+        "jp": "ホログラム",
+        "syn": ["ホログラム", "ホロ", "投影", "hologram", "holographic", "holo"],
+        "features_primary": [],
+        "features_optional": ["translucent {accent} holographic frills along the hem", "a {accent} holographic panel floating beside the head", "holographic {accent} ribbon that flickers", "a {accent} projected emblem hovering over the chest"],
+        "palettes": [("white", "sky blue", "hot pink"), ("black", "mint", "hot pink"), ("navy", "white", "sky blue")],
+        "patterns": ["hologram pattern", "pixel pattern", "scanline pattern", "hexagon pattern", "circuit pattern", "star print", "gradient", "stripe pattern"],
+        "props": [],
+        "classic_roles": ["holo_idol", "star_noble", "net_runner", "bodysuit", "idol"],
+        "gap_roles": [],
+        "classic_arch": ["fushigi", "kuudere", "genki", "mukanjou"],
+        "gap_arch": [],
+        "hair_colors": ["white hair", "light blue hair", "pink hair"],
+        "eye_colors": ["sky blue eyes", "pink eyes"],
+        "skin": None,
+        "classic_jp": "ホログラム——半透明の投影フリルと浮かぶパネルで電脳感を添える",
+        "gap_jp": "ホログラム——記号を{role}に添える",
+    },
+    "circuit": {
+        "kind": "theme",
+        "jp": "回路",
+        "syn": ["回路", "サーキット", "基板", "電子回路", "circuit", "circuitry", "pcb"],
+        "features_primary": [],
+        "features_optional": ["{accent} glowing circuit lines running along the sleeves", "circuit-pattern {accent} choker", "a {accent} glowing circuit tattoo-like mark on the thigh", "circuit-trace embroidery on the hem"],
+        "palettes": [("black", "mint", "yellow"), ("navy", "sky blue", "white"), ("dark green", "black", "yellow")],
+        "patterns": ["circuit pattern", "circuit print", "hexagon pattern", "grid pattern", "pixel pattern", "stripe pattern", "scanline pattern", "diamond pattern"],
+        "props": [],
+        "classic_roles": ["combat_bioroid", "net_runner", "tactical_suit", "power_frame", "bodysuit"],
+        "gap_roles": [],
+        "classic_arch": ["kuudere", "mukanjou", "iinchou", "chuuni"],
+        "gap_arch": [],
+        "hair_colors": ["black hair", "white hair", "green hair"],
+        "eye_colors": ["green eyes", "yellow eyes"],
+        "skin": None,
+        "classic_jp": "回路——発光する回路線と基板模様で機械の体を記号化",
+        "gap_jp": "回路——記号を{role}に添える",
+    },
+    "glitch": {
+        "kind": "theme",
+        "jp": "グリッチ",
+        "syn": ["グリッチ", "ノイズ", "バグ", "崩壊", "glitch", "corrupted", "noise"],
+        "features_primary": [],
+        "features_optional": ["{accent} glitch fragments breaking off the hem", "one sleeve flickering with {accent} glitch noise", "a {accent} corrupted pixel mark across one eye", "{accent} static-like fragments floating around the body"],
+        "palettes": [("black", "white", "crimson"), ("black", "hot pink", "mint"), ("white", "black", "sky blue")],
+        "patterns": ["glitch pattern", "pixel pattern", "scanline pattern", "static pattern", "stripe pattern", "checkered pattern", "cross pattern", "spiderweb pattern"],
+        "props": [],
+        "classic_roles": ["glitch_gothic", "net_runner", "combat_bioroid", "gothic_lolita", "delinquent"],
+        "gap_roles": [],
+        "classic_arch": ["jirai", "kyouki", "yandere", "mukanjou", "trickster"],
+        "gap_arch": [],
+        "hair_colors": ["black hair", "white hair", "dark purple hair"],
+        "eye_colors": ["red eyes", "pink eyes"],
+        "skin": None,
+        "classic_jp": "グリッチ——崩れる裾とノイズの欠片で壊れかけた電脳の雰囲気",
+        "gap_jp": "グリッチ——記号を{role}に添える",
+    },
     "thorn": {
         "kind": "theme",
         "jp": "茨",
@@ -3362,6 +3419,125 @@ ROLES = {
         "props": ["sci-fi helmet under the arm", "energy pistol"],
         "materials": ["latex", "synthetic"],
         "palettes": [("white", "black", "sky blue"), ("black", "crimson", "silver"), ("navy", "white", "orange")],
+    },
+    "tactical_suit": {
+        "jp": "戦術ボディスーツ",
+        "syn": ["戦術ボディスーツ", "戦術スーツ", "タクティカルスーツ", "戦闘スーツ", "tactical suit", "tactical bodysuit", "combat suit"],
+        "outfits": {
+            "modest": ["{main} skin-tight tactical bodysuit with {accent} glowing seam lines and {sub} armor plates on the chest and shoulders", "{sub} tactical harness with {accent} buckles", "{main} armored thigh plates over the suit", "{sub} armored boots with {accent} lights", "{main} fingerless tactical gloves"],
+            "standard": ["{main} skin-tight tactical bodysuit with {accent} glowing seam lines, {sub} chest armor plate with {pattern} decal", "{sub} tactical harness with {accent} buckles", "{accent} thigh strap holster on the right leg", "{sub} armored knee-high boots", "a compact {main} mechanical back unit with {accent} lights"],
+            "high": ["{main} tactical bodysuit cut open at the chest and back with {accent} glowing seam lines, {sub} {pattern} decal on the hip", "{sub} tactical harness framing the chest", "{accent} thigh straps on both legs", "{sub} armored thigh boots", "a compact {main} mechanical back unit with {accent} lights"],
+        },
+        "male": {
+            "modest": ["{main} tactical bodysuit with {accent} seam lines and {sub} chest armor", "{sub} tactical harness", "{sub} armored boots", "{main} tactical gloves"],
+            "standard": ["{main} tactical bodysuit with {accent} seam lines and {sub} chest armor", "{sub} tactical harness", "{accent} thigh holster", "{sub} armored boots"],
+            "high": ["{main} tactical bodysuit open at the chest with {accent} seam lines", "{sub} tactical harness", "{accent} thigh holster", "{sub} armored boots"],
+        },
+        "props": ["compact submachine gun", "tactical visor"],
+        "materials": ["synthetic", "carbon plate"],
+        "palettes": [('black', 'crimson', 'white'), ('white', 'navy', 'orange'), ('gray', 'black', 'sky blue'), ('navy', 'silver', 'yellow')],
+    },
+    "combat_bioroid": {
+        "jp": "戦闘用生体機械",
+        "syn": ["戦闘用生体機械", "生体機械", "バイオロイド", "戦闘機体", "戦闘用アンドロイド", "bioroid", "combat android", "combat unit"],
+        "outfits": {
+            "modest": ["{main} armored combat frame covering the torso with {accent} glowing joints", "{main} mechanical arms with exposed {accent} joint rings at the elbows", "{main} mechanical legs with {sub} armor plating and {accent} knee joints", "a {sub} cable bundle running from the nape into the back", "a {accent} glowing identification mark on the collarbone"],
+            "standard": ["{main} armored combat frame covering the chest and hips, leaving the midriff bare, with {accent} glowing joints", "{main} mechanical arms with exposed {accent} joint rings at the elbows and wrists", "{main} mechanical legs from the thighs down with {sub} plating", "a {sub} cable bundle running from the nape into the back", "a {accent} glowing identification mark on the collarbone"],
+            "high": ["minimal {main} armor plates over the chest and hips only, bare skin between them, with {accent} glowing joints", "{main} mechanical arms with exposed {accent} joint rings", "{main} mechanical legs from the thighs down with {sub} plating", "{sub} cables running from the nape down the bare back", "a {accent} glowing identification mark on the inner thigh"],
+        },
+        "male": {
+            "modest": ["{main} armored combat frame with {accent} glowing joints", "{main} mechanical arms with {accent} joint rings", "{main} mechanical legs with {sub} plating", "{sub} cable bundle from the nape"],
+            "standard": ["{main} armored combat frame with {accent} glowing joints", "{main} mechanical arms with {accent} joint rings", "{main} mechanical legs with {sub} plating", "{sub} cable bundle from the nape"],
+            "high": ["{main} chest frame open to the bare torso with {accent} glowing joints", "{main} mechanical arms with {accent} joint rings", "{main} mechanical legs with {sub} plating"],
+        },
+        "props": ["arm-mounted blade", "detached mechanical hand"],
+        "materials": ["alloy", "synthetic skin"],
+        "palettes": [('white', 'black', 'sky blue'), ('black', 'gray', 'crimson'), ('silver', 'navy', 'mint'), ('gray', 'white', 'orange')],
+    },
+    "holo_idol": {
+        "jp": "電脳アイドル",
+        "syn": ["電脳アイドル", "ホロアイドル", "バーチャルアイドル", "電子アイドル", "holo idol", "hologram idol", "virtual idol", "cyber idol"],
+        "outfits": {
+            "modest": ["{main} futuristic idol dress with translucent {accent} holographic frills projected along the hem", "{sub} knee-high boots with {accent} light strips", "{accent} glowing ribbon headset", "{main} long gloves with {accent} light lines"],
+            "standard": ["{main} futuristic idol mini dress with translucent {accent} holographic frills and a {sub} {pattern} projection on the skirt", "{sub} thigh-high boots with {accent} light strips", "{accent} glowing ribbon headset with a floating mic", "{main} detached sleeves with {accent} light lines"],
+            "high": ["{main} futuristic idol top and micro skirt with translucent {accent} holographic frills, bare midriff and shoulders", "{sub} thigh-high boots with {accent} light strips", "{accent} glowing ribbon headset with a floating mic", "{main} detached sleeves with {accent} light lines"],
+        },
+        "male": {
+            "modest": ["{main} futuristic stage jacket with {accent} holographic trim", "{sub} slim pants with {accent} light strips", "{accent} glowing headset"],
+            "standard": ["{main} futuristic stage jacket with {accent} holographic trim", "{sub} slim pants with {accent} light strips", "{accent} glowing headset"],
+            "high": ["open {main} futuristic stage jacket over a bare chest with {accent} holographic trim", "{sub} slim pants with {accent} light strips", "{accent} glowing headset"],
+        },
+        "props": ["floating holographic microphone", "glowing light stick"],
+        "materials": ["holographic fabric", "synthetic"],
+        "palettes": [('white', 'sky blue', 'hot pink'), ('black', 'hot pink', 'mint'), ('lavender', 'white', 'yellow'), ('navy', 'white', 'hot pink')],
+    },
+    "star_noble": {
+        "jp": "星海の貴族",
+        "syn": ["星海の貴族", "星間貴族", "宇宙貴族", "未来貴族", "star noble", "space noble", "galactic aristocrat"],
+        "outfits": {
+            "modest": ["{main} long futuristic gown with {accent} metallic trim and translucent {sub} holographic overlayer", "{accent} floating ornament rings hovering behind the shoulders", "{main} long gloves with {accent} cuff rings", "{sub} heeled boots with {accent} trim"],
+            "standard": ["{main} futuristic gown with a high side slit, {accent} metallic trim and translucent {sub} holographic overlayer", "{accent} floating ornament rings hovering behind the shoulders", "{main} long gloves with {accent} cuff rings", "{accent} jeweled collar piece", "{sub} heeled boots"],
+            "high": ["{main} futuristic gown with a plunging neckline and high side slits, {accent} metallic trim and translucent {sub} holographic panels", "{accent} floating ornament rings hovering behind the shoulders", "{main} long gloves with {accent} cuff rings", "{accent} jeweled collar piece"],
+        },
+        "male": {
+            "modest": ["{main} long futuristic coat with {accent} metallic trim and {sub} holographic lining", "{accent} floating ornament rings behind the shoulders", "{sub} slim pants", "{main} gloves"],
+            "standard": ["{main} long futuristic coat with {accent} metallic trim and {sub} holographic lining", "{accent} floating ornament rings behind the shoulders", "{sub} slim pants", "{main} gloves"],
+            "high": ["open {main} futuristic coat with {accent} metallic trim over a bare chest", "{accent} floating ornament rings behind the shoulders", "{sub} slim pants"],
+        },
+        "props": ["floating crystal orb", "ornate energy fan"],
+        "materials": ["holographic silk", "metallic trim"],
+        "palettes": [('white', 'gold', 'sky blue'), ('navy', 'gold', 'white'), ('black', 'gold', 'crimson'), ('lavender', 'silver', 'white')],
+    },
+    "glitch_gothic": {
+        "jp": "電脳ゴシック",
+        "syn": ["電脳ゴシック", "グリッチゴシック", "サイバーゴシック", "テックゴス", "cyber gothic", "glitch gothic", "tech goth"],
+        "outfits": {
+            "modest": ["{main} gothic dress with a torn hem dissolving into {accent} glitch fragments, {sub} cross-strap bodice", "{main} mechanical halo ring with {accent} glitch light behind the head", "asymmetrical {sub} sleeves, one long and one bare arm with a {accent} glowing band", "{main} platform boots with {sub} buckles"],
+            "standard": ["{main} gothic mini dress with a torn hem dissolving into {accent} glitch fragments, {sub} cross-strap bodice", "{main} mechanical halo ring with {accent} glitch light behind the head", "asymmetrical {sub} sleeves, one long and one bare arm with a {accent} glowing band", "{sub} chains hanging from the waist", "{main} platform boots with {sub} buckles", "a single {sub} thighhigh with {accent} glowing seam"],
+            "high": ["{main} gothic bodice and torn micro skirt dissolving into {accent} glitch fragments, bare midriff and shoulders", "{main} mechanical halo ring with {accent} glitch light behind the head", "one {sub} detached sleeve, the other arm bare with a {accent} glowing band", "{sub} chains hanging from the hips", "{main} platform boots", "a single {sub} thighhigh with {accent} glowing seam"],
+        },
+        "male": {
+            "modest": ["{main} gothic longcoat with a torn hem dissolving into {accent} glitch fragments", "{main} mechanical halo ring behind the head", "{sub} chains on the belt", "{main} platform boots"],
+            "standard": ["{main} gothic longcoat with a torn hem dissolving into {accent} glitch fragments", "{main} mechanical halo ring behind the head", "{sub} chains on the belt", "{main} platform boots"],
+            "high": ["open {main} gothic longcoat over a bare chest, torn hem dissolving into {accent} glitch fragments", "{main} mechanical halo ring behind the head", "{sub} chains on the belt"],
+        },
+        "props": ["glitching energy scythe", "floating corrupted data shards"],
+        "materials": ["torn fabric", "glitch light"],
+        "palettes": [('black', 'white', 'crimson'), ('black', 'crimson', 'white'), ('white', 'black', 'hot pink'), ('dark purple', 'black', 'crimson')],
+    },
+    "power_frame": {
+        "jp": "強化外骨格",
+        "syn": ["強化外骨格", "パワーフレーム", "外骨格", "パワードスーツ", "exoskeleton", "power frame", "exo frame", "powered suit"],
+        "outfits": {
+            "modest": ["{main} under-suit with a {sub} exoskeleton frame strapped over the arms, torso and legs, {accent} glowing actuators", "oversized {sub} mechanical shoulder units with {accent} lights", "{sub} exo-leg frames with heavy {main} boots", "{main} armored gloves"],
+            "standard": ["{main} skin-tight under-suit with a {sub} exoskeleton frame over the arms and legs, {accent} glowing actuators, bare midriff between the frame", "oversized {sub} mechanical shoulder units with {accent} lights", "{sub} exo-leg frames with heavy {main} boots", "twin {sub} thrusters on the back"],
+            "high": ["minimal {main} under-suit leaving the midriff, thighs and back bare, {sub} exoskeleton frame over the arms and legs with {accent} glowing actuators", "oversized {sub} mechanical shoulder units with {accent} lights", "{sub} exo-leg frames with heavy {main} boots", "twin {sub} thrusters on the back"],
+        },
+        "male": {
+            "modest": ["{main} under-suit with a {sub} exoskeleton frame and {accent} actuators", "oversized {sub} mechanical shoulder units", "{sub} exo-leg frames with heavy boots"],
+            "standard": ["{main} under-suit with a {sub} exoskeleton frame and {accent} actuators", "oversized {sub} mechanical shoulder units", "{sub} exo-leg frames with heavy boots", "twin {sub} thrusters on the back"],
+            "high": ["{sub} exoskeleton frame over a bare torso with {accent} actuators", "oversized {sub} mechanical shoulder units", "{sub} exo-leg frames with heavy boots"],
+        },
+        "props": ["oversized frame-mounted cannon", "hydraulic claw"],
+        "materials": ["alloy", "hydraulics"],
+        "palettes": [('black', 'orange', 'white'), ('white', 'gray', 'sky blue'), ('navy', 'silver', 'yellow'), ('gray', 'crimson', 'black')],
+    },
+    "net_runner": {
+        "jp": "電脳ストリート",
+        "syn": ["電脳ストリート", "サイバーストリート", "ネットランナー", "ハッカー", "テックウェア", "netrunner", "cyber street", "techwear", "hacker"],
+        "outfits": {
+            "modest": ["oversized {main} techwear jacket with {accent} neon piping and {sub} {pattern} decal", "{sub} cargo pants with {accent} strap details", "{accent} translucent data visor", "{main} high-top sneakers with {accent} lights", "a {sub} cable running from a neck port into the jacket"],
+            "standard": ["cropped {main} techwear jacket with {accent} neon piping, open over a {sub} sports bra", "{sub} cargo shorts with {accent} strap details", "{accent} translucent data visor", "{main} high-top sneakers with {accent} lights", "a {sub} cable running from a neck port into the jacket", "{sub} half face mask with {accent} display"],
+            "high": ["open cropped {main} techwear jacket with {accent} neon piping over a {sub} micro top", "{sub} micro shorts with {accent} strap details and garter straps", "{accent} translucent data visor", "{main} high-top sneakers with {accent} lights", "a {sub} cable running from a neck port down the bare back"],
+        },
+        "male": {
+            "modest": ["oversized {main} techwear jacket with {accent} neon piping", "{sub} cargo pants with {accent} straps", "{accent} data visor", "{main} high-top sneakers"],
+            "standard": ["oversized {main} techwear jacket with {accent} neon piping", "{sub} cargo pants with {accent} straps", "{accent} data visor", "{main} high-top sneakers", "{sub} half face mask"],
+            "high": ["open {main} techwear jacket over a bare chest with {accent} neon piping", "{sub} cargo pants with {accent} straps", "{accent} data visor", "{main} high-top sneakers"],
+        },
+        "props": ["holographic keyboard", "small hacking drone"],
+        "materials": ["nylon", "neon trim"],
+        "palettes": [('black', 'gray', 'mint'), ('black', 'white', 'hot pink'), ('navy', 'black', 'yellow'), ('gray', 'orange', 'black')],
     },
     "sportswear": {
         "jp": "スポーツウェア",
@@ -5425,6 +5601,7 @@ ROLE_WEAPON = {
     "shrine_miko": ["bow", "fan", "brush"], "kimono": ["umbrella", "fan"], "princess_dress": ["fan", "umbrella"], "scholar": ["grimoire"], "cultist": ["dagger", "grimoire"],
     "magical_girl": ["wand", "staff"], "succubus": ["whip", "spear", "trident"], "goddess_dress": ["staff", "orb"], "saint": ["staff"], "pontiff": ["staff"], "fortune_teller": ["grimoire", "orb"],
     "steampunk": ["gun", "cannon", "wrench", "gatling", "drill"], "alchemist": ["gun", "orb", "wrench"],
+    "tactical_suit": ["rifle", "twin_pistols", "gun"], "combat_bioroid": ["bits", "gunblade", "cannon"], "holo_idol": [], "star_noble": ["orb", "fan"], "glitch_gothic": ["scythe", "bits"], "power_frame": ["gatling", "cannon", "drill"], "net_runner": ["twin_pistols", "bits"],
     "cow_suit": ["milk_gun"], "jester_outfit": ["scissors", "puppet", "boomerang"], "gothic_lolita": ["scissors", "umbrella", "puppet"], "maid": ["twin_pistols", "dual_blades"],
     "bodysuit": ["bits", "rifle", "drill"], "village_girl": ["pickaxe"], "chef": ["dual_blades"], "nurse": ["scissors"], "monk": ["claws", "staff", "orb"],
 }
@@ -5432,6 +5609,8 @@ ROLE_WEAPON = {
 THEME_WEAPON = {"cow": ["milk_gun"], "milk_bottle": ["milk_gun"], "milking_machine": ["milk_gun"], "flask": ["orb"], "coin": ["twin_pistols", "dagger"], "restraints": ["whip", "flail"]}
 # 職業ギア（武器ではない、その職業らしい大きな持ち物。装備出力に入る）
 ROLE_GEAR = {
+    "holo_idol": [{"tags": ["microphone", "floating holographic microphone"], "nl": "a floating holographic microphone"}],
+    "net_runner": [{"tags": ["drone", "small {sub} hacking drone hovering beside the head"], "nl": "a small {sub} hacking drone hovering beside {poss} head"}],
     "merchant": [{"tags": ["huge backpack", "giant {main} backpack stuffed with wares, pots and lanterns hanging from it"], "nl": "a giant {main} backpack taller than {poss} torso, stuffed with wares with pots and lanterns hanging off it"},
                  {"tags": ["merchant's cart", "pulling a small {main} cart loaded with goods"], "nl": "a small {main} cart loaded with goods"}],
     "alchemist": [{"tags": ["bandolier", "bandolier of glowing {accent} potion vials"], "nl": "a bandolier of glowing {accent} potion vials across {poss} chest"},
@@ -5530,6 +5709,7 @@ SHAPE_WORDS = {
     "rose": "rose", "feather": "feather", "chain": "chain-link", "thorn": "thorn", "key": "key", "rainbow": "prism", "holy_light": "cross",
     "shadow": "eye", "candle": "flame", "royal": "crown", "neon": "hexagon", "heart": "heart", "skull": "skull",
     "fallen_angel": "feather", "halfling": "leaf", "elemental": "wisp", "lizardfolk": "scale", "orc": "fang", "dryad": "leaf", "unicorn": "spiral-horn", "phoenix": "feather", "golem": "rune",
+    "hologram": "hexagon", "circuit": "circuit", "glitch": "pixel",
     "wind": "swirl", "earth": "rune", "coin": "coin", "milk_bottle": "bottle", "milking_machine": "gauge", "restraints": "buckle", "flask": "flask",
 }
 
@@ -5623,6 +5803,20 @@ EMBELLISHMENTS = {
         {"tags": ["extra long {sub} twin tails of fabric", "long ribbons trailing from the back"], "nl": "two very long {sub} ribbons trailing from {poss} back", "slot": "back", "big": True},
     ],
     "tech": [
+        {"tags": ["mechanical joints", "exposed {accent} glowing joint rings at the elbows and knees"], "nl": "exposed {accent} glowing joint rings at {poss} elbows and knees", "slot": "joints"},
+        {"tags": ["cable", "a {sub} cable bundle running from the nape into the back"], "nl": "a {sub} cable bundle running from {poss} nape into {poss} back", "slot": "nape"},
+        {"tags": ["thigh armor", "{main} armored thigh plate strapped over the bare right thigh"], "nl": "a {main} armored thigh plate strapped over {poss} bare right thigh", "slot": "thigh"},
+        {"tags": ["holographic skirt", "translucent {accent} holographic side panels projected at the hips"], "nl": "translucent {accent} holographic panels projected at {poss} hips", "slot": "holo"},
+        {"tags": ["floating object", "three small {sub} drone units hovering behind the shoulders"], "nl": "three small {sub} drone units hovering behind {poss} shoulders", "slot": "float"},
+        {"tags": ["mechanical halo", "a {sub} mechanical halo ring with {accent} lights behind the head"], "nl": "a {sub} mechanical halo ring with {accent} lights behind {poss} head", "slot": "halo"},
+        {"tags": ["glitch effect", "the hem dissolving into {accent} glitch fragments"], "nl": "the hem dissolving into {accent} glitch fragments", "slot": "damage"},
+        {"tags": ["exoskeleton", "a slim {sub} exo-frame along the spine and legs"], "nl": "a slim {sub} exo-frame running along {poss} spine and legs", "slot": "frame"},
+        {"tags": ["thrusters", "twin {sub} thrusters on the back"], "nl": "twin {sub} thrusters on {poss} back", "slot": "back"},
+        {"tags": ["mechanical arm", "one {main} mechanical arm with {accent} seam lights"], "nl": "one {main} mechanical arm with {accent} seam lights", "slot": "hands", "replace": True},
+        {"tags": ["half mask", "a {sub} half face mask with a {accent} display"], "nl": "a {sub} half face mask with a {accent} display", "slot": "face"},
+        {"tags": ["neon trim", "{accent} neon circuit lines running along the limbs"], "nl": "{accent} neon circuit lines running along {poss} limbs", "slot": "glow"},
+        {"tags": ["identification mark", "a {accent} glowing serial mark on the collarbone"], "nl": "a {accent} glowing serial mark on {poss} collarbone", "slot": "mark"},
+        {"tags": ["armored collar", "a {main} armored neck collar with {accent} lights"], "nl": "a {main} armored neck collar with {accent} lights", "slot": "neck"},
         {"tags": ["glowing", "glowing {accent} lines on the outfit"], "nl": "glowing {accent} lines run along the outfit", "slot": "glow"},
         {"tags": ["mechanical arm", "{main} mechanical left arm with {accent} lights"], "nl": "{poss} left arm is mechanical with {accent} lights", "slot": "hands", "replace": True},
         {"tags": ["{accent} holographic panels on the sleeves"], "nl": "holographic {accent} panels on the sleeves", "slot": "holo"},
@@ -5737,10 +5931,13 @@ ERAS = {
                "roles": ["school_uniform", "office_lady", "casual_street", "nurse", "idol", "police", "teacher", "chef", "cheerleader", "race_queen",
                          "waitress", "flight_attendant", "sportswear", "swimsuit", "loungewear", "gothic_lolita", "maid", "delinquent", "bunny_girl", "military", "cow_suit"]},
     "scifi": {"jp": "近未来", "tags": ["science fiction", "futuristic"], "tech": True,
-              "roles": ["bodysuit", "military", "police", "race_queen", "idol", "casual_street", "office_lady", "nurse", "sportswear", "school_uniform", "magical_girl"]},
+              "roles": ["tactical_suit", "combat_bioroid", "holo_idol", "star_noble", "glitch_gothic", "power_frame", "net_runner",
+                        "bodysuit", "military", "police", "race_queen", "idol", "casual_street", "office_lady", "nurse", "sportswear", "school_uniform", "magical_girl"]},
     "wafu": {"jp": "和風", "tags": ["japanese clothes"], "tech": False,
              "roles": ["kimono", "shrine_miko", "samurai", "ninja", "school_uniform", "delinquent", "fortune_teller", "dancer"]},
 }
+# 世界観を明示したときに 55% で優先する、その世界観らしい服装系統
+ERA_SIGNATURE_ROLES = {"scifi": ["tactical_suit", "combat_bioroid", "holo_idol", "star_noble", "glitch_gothic", "power_frame", "net_runner"]}
 # マスコット同伴（調査: ペット同伴・動物化はシルエットの個性化に効く）。既定はなし
 MASCOTS = [
     {"key": "familiar", "jp": "肩に乗る小動物", "tags": ["small animal on the shoulder", "{shape}-eared {sub} familiar sitting on the shoulder"], "nl": "a tiny {sub} familiar with {shape}-shaped ears sits on {poss} shoulder"},
@@ -5804,6 +6001,7 @@ THEME_MOOD = {
     "skull": ["dark", "ruin", "street"], "face_mark": ["play", "sick", "street"], "medical": ["sick", "cute"], "gamer": ["tech", "play", "street"],
     "cosmetics": ["sexy", "elegant", "street"], "emblem": ["royal", "military", "holy", "magic"], "liquid": ["sweet", "sexy"], "stencil": ["street", "ruin", "play"],
     "wind": ["sky", "nature", "light"], "earth": ["nature", "military", "ruin"],
+    "hologram": ["tech", "light", "music"], "circuit": ["tech", "military"], "glitch": ["tech", "dark", "sick"],
     "coin": ["royal", "play", "street"], "milk_bottle": ["sweet", "cute", "nature"], "milking_machine": ["sexy", "sick", "tech"],
     "restraints": ["dark", "sexy", "sick"], "flask": ["magic", "tech", "sick"],
 }
@@ -5812,6 +6010,8 @@ ROLE_MOOD = {
     "gothic_lolita": ["dark", "elegant", "cute", "night"], "shrine_miko": ["wafu", "holy"], "kimono": ["wafu", "elegant"], "knight": ["military", "royal", "holy"],
     "witch_robe": ["magic", "night"], "nurse": ["sick", "cute"], "idol": ["music", "cute", "light"], "magical_girl": ["magic", "cute", "light"],
     "office_lady": ["street", "elegant"], "casual_street": ["street", "play"], "swimsuit": ["water", "sexy", "play"], "bunny_girl": ["sexy", "play", "night"],
+    "tactical_suit": ["tech", "military"], "combat_bioroid": ["tech", "military", "ice"], "holo_idol": ["tech", "music", "cute"], "star_noble": ["tech", "royal", "elegant"],
+    "glitch_gothic": ["tech", "dark", "sick"], "power_frame": ["tech", "military"], "net_runner": ["tech", "street"],
     "military": ["military"], "princess_dress": ["royal", "elegant"], "cheongsam": ["elegant", "sexy"], "bodysuit": ["tech"], "sportswear": ["play", "street", "wild"],
     "pirate": ["water", "wild", "street"], "ninja": ["wafu", "dark", "military"], "jester_outfit": ["play", "dark"], "loungewear": ["cute", "sweet"],
     "teacher": ["elegant", "street"], "dancer": ["sexy", "elegant", "music"], "delinquent": ["street", "wild"], "saint": ["holy", "light", "elegant"],
@@ -5869,6 +6069,8 @@ ROLE_TITLE = {
     "shrine_miko": ("巫女", "神主"), "kimono": ("大和撫子", "和装の君"), "knight": ("戦姫", "騎士"), "witch_robe": ("魔女", "魔術師"), "nurse": ("看護師", "医師"),
     "idol": ("歌姫", "アイドル"), "magical_girl": ("魔法少女", "魔法少年"), "office_lady": ("秘書", "社員"), "casual_street": ("街娘", "街の少年"),
     "swimsuit": ("水着娘", "水着少年"), "bunny_girl": ("バニー", "バニーボーイ"), "military": ("将校", "将校"), "princess_dress": ("姫", "王子"),
+    "tactical_suit": ("戦術兵", "戦術兵"), "combat_bioroid": ("戦闘機体", "戦闘機体"), "holo_idol": ("電脳歌姫", "電脳歌手"), "star_noble": ("星海の貴婦人", "星海の貴公子"),
+    "glitch_gothic": ("壊れた人形", "壊れた人形"), "power_frame": ("外骨格兵", "外骨格兵"), "net_runner": ("電脳走者", "電脳走者"),
     "cheongsam": ("チャイナ娘", "拳士"), "bodysuit": ("パイロット", "パイロット"), "sportswear": ("アスリート", "アスリート"), "pirate": ("海賊", "海賊"),
     "ninja": ("くノ一", "忍"), "jester_outfit": ("道化師", "道化師"), "loungewear": ("眠り姫", "眠り王子"), "teacher": ("先生", "先生"), "dancer": ("踊り子", "踊り手"),
     "delinquent": ("スケバン", "番長"), "saint": ("聖女", "聖人"), "goddess_dress": ("女神", "神"), "cow_suit": ("牧場娘", "牧童"), "hero": ("勇者", "勇者"),
@@ -5883,6 +6085,7 @@ ROLE_TITLE = {
 }
 ROLE_TITLE_EN = {
     "succubus": "temptress", "sister": "nun", "maid": "maid", "school_uniform": "student", "gothic_lolita": "young lady", "shrine_miko": "shrine maiden",
+    "tactical_suit": "tactical operative", "combat_bioroid": "combat unit", "holo_idol": "holographic songstress", "star_noble": "star noble", "glitch_gothic": "corrupted doll", "power_frame": "exo-frame trooper", "net_runner": "netrunner",
     "kimono": "lady", "knight": "knight", "witch_robe": "witch", "nurse": "nurse", "idol": "songstress", "magical_girl": "magical girl", "office_lady": "secretary",
     "casual_street": "girl next door", "swimsuit": "swimmer", "bunny_girl": "bunny", "military": "officer", "princess_dress": "princess", "cheongsam": "lady",
     "bodysuit": "pilot", "sportswear": "athlete", "pirate": "pirate", "ninja": "shinobi", "jester_outfit": "jester", "loungewear": "sleeper", "teacher": "teacher",
@@ -5900,8 +6103,8 @@ COHERENCE_LEVELS = {"none": 0.0, "weak": 0.6, "normal": 1.2, "strong": 2.5}
 EMBELLISH_LEVELS = {0: (0, False), 1: (2, False), 2: (3, True), 3: (5, True)}
 # カテゴリの重み（テックは種族/モチーフが機械系なら engine が上げる）
 EMBELLISH_WEIGHTS = {"asymmetry": 3, "straps": 3, "hardware": 3, "layering": 2, "cutouts": 1, "tech": 1, "damage": 1}
-TECH_AFFINITY = {"android", "alien", "neon", "clockwork", "thunder", "gamer"}
-DAMAGE_AFFINITY = {"zombie", "delinquent", "reaper", "ghost", "stencil", "chuuni", "jirai"}
+TECH_AFFINITY = {"android", "alien", "neon", "clockwork", "thunder", "gamer", "hologram", "circuit", "glitch"}
+DAMAGE_AFFINITY = {"zombie", "delinquent", "reaper", "ghost", "stencil", "chuuni", "jirai", "glitch", "glitch_gothic"}
 
 # 小物（持ち物）が体に固定されていると見なす語。含まれなければ engine が "holding " を前置して手に持たせる
 PROP_ANCHORED_WORDS = ["worn", "on the", "around", "collar", "necklace", "pendant", "mask", "hair", "perched", "strapped",

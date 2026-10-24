@@ -254,6 +254,90 @@ OUTFIT_TAGS = {
             "high": ["{main} bodysuit", "unzipped bodysuit", "bare pectorals", "{main} gloves", "{main} boots"],
         },
     },
+    "tactical_suit": {
+        "female": {
+            "modest": ["{main} bodysuit", "skin tight", "{sub} chest armor", "harness", "{sub} tactical harness", "{main} thigh armor", "{sub} armored boots", "fingerless gloves"],
+            "standard": ["{main} bodysuit", "skin tight", "{sub} chest armor", "harness", "{sub} tactical harness", "thigh strap", "{accent} thigh holster", "{sub} armored boots", "mechanical back unit"],
+            "high": ["{main} bodysuit", "skin tight", "center opening", "cleavage", "backless outfit", "harness", "{sub} tactical harness", "thigh strap", "{accent} thigh straps", "{sub} armored thigh boots", "mechanical back unit"],
+        },
+        "male": {
+            "modest": ["{main} bodysuit", "{sub} chest armor", "harness", "{sub} armored boots", "{main} gloves"],
+            "standard": ["{main} bodysuit", "{sub} chest armor", "harness", "thigh holster", "{sub} armored boots"],
+            "high": ["{main} bodysuit", "unzipped bodysuit", "bare pectorals", "harness", "thigh holster", "{sub} armored boots"],
+        },
+    },
+    "combat_bioroid": {
+        "female": {
+            "modest": ["{main} armor", "android", "cyborg", "mechanical arms", "mechanical legs", "robot joints", "{accent} glowing joints", "cable", "{sub} cable bundle from the nape"],
+            "standard": ["{main} armor", "android", "cyborg", "midriff", "mechanical arms", "mechanical legs", "robot joints", "{accent} glowing joints", "cable", "{sub} cable bundle from the nape"],
+            "high": ["{main} armor", "android", "cyborg", "bikini armor", "midriff", "mechanical arms", "mechanical legs", "robot joints", "{accent} glowing joints", "cable", "{sub} cables down the bare back"],
+        },
+        "male": {
+            "modest": ["{main} armor", "android", "cyborg", "mechanical arms", "mechanical legs", "robot joints", "cable"],
+            "standard": ["{main} armor", "android", "cyborg", "mechanical arms", "mechanical legs", "robot joints", "cable"],
+            "high": ["{main} armor", "android", "cyborg", "bare pectorals", "mechanical arms", "mechanical legs", "robot joints"],
+        },
+    },
+    "holo_idol": {
+        "female": {
+            "modest": ["{main} dress", "idol", "hologram", "{accent} holographic frills", "{sub} boots", "{accent} headset", "{main} elbow gloves"],
+            "standard": ["{main} dress", "idol", "hologram", "{accent} holographic frills", "{sub} thigh boots", "{accent} headset", "{main} detached sleeves"],
+            "high": ["{main} crop top", "idol", "{main} microskirt", "hologram", "{accent} holographic frills", "midriff", "bare shoulders", "{sub} thigh boots", "{accent} headset", "{main} detached sleeves"],
+        },
+        "male": {
+            "modest": ["{main} jacket", "idol", "hologram", "{accent} holographic trim", "{sub} pants", "{accent} headset"],
+            "standard": ["{main} jacket", "idol", "hologram", "{accent} holographic trim", "{sub} pants", "{accent} headset"],
+            "high": ["open {main} jacket", "idol", "bare pectorals", "hologram", "{sub} pants", "{accent} headset"],
+        },
+    },
+    "star_noble": {
+        "female": {
+            "modest": ["{main} gown", "long dress", "{accent} metallic trim", "see-through overlayer", "floating object", "{accent} floating rings", "{main} elbow gloves", "{sub} boots"],
+            "standard": ["{main} gown", "side slit", "{accent} metallic trim", "see-through overlayer", "floating object", "{accent} floating rings", "{main} elbow gloves", "{accent} collar piece"],
+            "high": ["{main} gown", "plunging neckline", "cleavage", "side slit", "{accent} metallic trim", "see-through", "floating object", "{accent} floating rings", "{main} elbow gloves", "{accent} collar piece"],
+        },
+        "male": {
+            "modest": ["{main} long coat", "{accent} metallic trim", "floating object", "{accent} floating rings", "{sub} pants", "{main} gloves"],
+            "standard": ["{main} long coat", "{accent} metallic trim", "floating object", "{accent} floating rings", "{sub} pants", "{main} gloves"],
+            "high": ["open {main} long coat", "bare pectorals", "{accent} metallic trim", "floating object", "{sub} pants"],
+        },
+    },
+    "glitch_gothic": {
+        "female": {
+            "modest": ["{main} dress", "gothic", "torn clothes", "torn hem", "{accent} glitch effect", "mechanical halo", "asymmetrical sleeves", "{main} platform boots"],
+            "standard": ["{main} dress", "gothic", "torn clothes", "torn hem", "{accent} glitch effect", "mechanical halo", "asymmetrical sleeves", "{sub} chains", "{main} platform boots", "single thighhigh"],
+            "high": ["{main} corset", "gothic", "{main} microskirt", "torn clothes", "midriff", "bare shoulders", "{accent} glitch effect", "mechanical halo", "single detached sleeve", "{sub} chains", "{main} platform boots", "single thighhigh"],
+        },
+        "male": {
+            "modest": ["{main} long coat", "gothic", "torn clothes", "{accent} glitch effect", "mechanical halo", "{sub} chains", "{main} platform boots"],
+            "standard": ["{main} long coat", "gothic", "torn clothes", "{accent} glitch effect", "mechanical halo", "{sub} chains", "{main} platform boots"],
+            "high": ["open {main} long coat", "bare pectorals", "torn clothes", "{accent} glitch effect", "mechanical halo", "{sub} chains"],
+        },
+    },
+    "power_frame": {
+        "female": {
+            "modest": ["{main} bodysuit", "exoskeleton", "{sub} exoskeleton frame", "{accent} glowing actuators", "oversized mechanical shoulders", "mechanical legs", "{main} armored boots", "{main} gauntlets"],
+            "standard": ["{main} bodysuit", "skin tight", "exoskeleton", "{sub} exoskeleton frame", "{accent} glowing actuators", "midriff", "oversized mechanical shoulders", "mechanical legs", "{main} armored boots", "thrusters"],
+            "high": ["{main} bikini armor", "exoskeleton", "{sub} exoskeleton frame", "{accent} glowing actuators", "midriff", "thighs", "backless outfit", "oversized mechanical shoulders", "mechanical legs", "{main} armored boots", "thrusters"],
+        },
+        "male": {
+            "modest": ["{main} bodysuit", "exoskeleton", "{sub} exoskeleton frame", "oversized mechanical shoulders", "mechanical legs", "{main} armored boots"],
+            "standard": ["{main} bodysuit", "exoskeleton", "{sub} exoskeleton frame", "oversized mechanical shoulders", "mechanical legs", "{main} armored boots", "thrusters"],
+            "high": ["exoskeleton", "bare pectorals", "{sub} exoskeleton frame", "oversized mechanical shoulders", "mechanical legs", "{main} armored boots"],
+        },
+    },
+    "net_runner": {
+        "female": {
+            "modest": ["{main} jacket", "oversized jacket", "{accent} neon trim", "{sub} cargo pants", "visor", "{accent} translucent visor", "{main} sneakers", "cable"],
+            "standard": ["{main} cropped jacket", "open jacket", "{sub} sports bra", "{accent} neon trim", "{sub} cargo shorts", "visor", "{accent} translucent visor", "{main} sneakers", "cable", "{sub} half mask"],
+            "high": ["{main} cropped jacket", "open jacket", "{sub} micro top", "cleavage", "{accent} neon trim", "{sub} micro shorts", "garter straps", "visor", "{accent} translucent visor", "{main} sneakers", "cable"],
+        },
+        "male": {
+            "modest": ["{main} jacket", "oversized jacket", "{accent} neon trim", "{sub} cargo pants", "visor", "{main} sneakers"],
+            "standard": ["{main} jacket", "oversized jacket", "{accent} neon trim", "{sub} cargo pants", "visor", "{main} sneakers", "{sub} half mask"],
+            "high": ["open {main} jacket", "bare pectorals", "{accent} neon trim", "{sub} cargo pants", "visor", "{main} sneakers"],
+        },
+    },
     "sportswear": {
         "female": {
             "modest": ["{main} track jacket", "track suit", "{main} track pants", "white sneakers", "towel around neck"],

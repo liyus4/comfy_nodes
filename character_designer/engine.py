@@ -844,6 +844,9 @@ def generate(
         pool = [r for r in pool if _role_available(r, gender) and r not in excluded["role"]]
         if era_roles:
             pool = [r for r in pool if r in era_roles] or [r for r in era_roles if _role_available(r, gender) and r not in excluded["role"]]
+            sig = [r for r in D.ERA_SIGNATURE_ROLES.get(era_key, []) if _role_available(r, gender) and r not in excluded["role"]]
+            if sig and rng.random() < 0.55:
+                pool = sig  # 世界観らしい服装系統を優先
         if not pool:
             # human モチーフなど候補が無い場合は全系統から（surprise なら王道を除く）
             pool = _all_roles(gender)

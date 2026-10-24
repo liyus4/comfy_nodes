@@ -141,7 +141,31 @@ TYPES: Dict[str, dict] = {
     "crystal_beast": {"jp": "結晶獣", "syn": ["結晶獣", "クリスタルビースト", "宝石の魔物", "crystal beast", "gem monster"], "tags": ["crystal", "monster"], "surface": "crystal", "loco": "quadruped", "size": "medium",
                       "kind": "a beast made of living crystal", "moods": ["ice", "magic", "royal"], "elements": ["crystal", "ice", "light", "thunder"],
                       "parts": {"body": ["a {main} crystal body with {accent} light inside", "clustered {main} crystal shards forming a body"], "head": ["a head of {sub} crystal spikes", "a {shape}-shaped crystal head"], "extra": ["{accent} light refracting through the body", "crystal shards floating around it"]}},
-    "machine_beast": {"jp": "機械獣", "syn": ["機械獣", "メカ獣", "機械の魔物", "ロボ獣", "machine beast", "mech beast", "robot beast"], "tags": ["mecha", "robot", "monster"], "surface": "armor", "loco": "quadruped", "size": "large",
+    "bio_weapon": {"jp": "生体兵器", "syn": ["生体兵器", "バイオウェポン", "培養体", "bio weapon", "bioweapon", "engineered creature"], "tags": ["monster", "bioweapon"], "surface": "skin", "loco": "quadruped", "size": "large", "era": "scifi",
+                   "kind": "an engineered creature grown in a lab, part flesh and part implant", "moods": ["tech", "sick", "military"], "elements": ["poison", "thunder", "metal", "void"],
+                   "parts": {"body": ["pale {main} skin stretched over an elongated frame with {sub} implant plates", "a {main} body with {accent} glowing veins and surgical seams"], "head": ["a skull-like head with a {accent} sensor array instead of eyes", "a jawless head with a {accent} glowing throat"],
+                             "limbs": ["too-long limbs ending in {sub} blade claws", "limbs with {accent} glowing injector tubes"], "extra": ["a {sub} containment collar with a serial number", "tubes pumping {accent} fluid along the spine"]}},
+    "drone_swarm": {"jp": "ドローン群", "syn": ["ドローン群", "ドローン", "無人機", "群体兵器", "drone swarm", "drones", "swarm"], "tags": ["drone", "robot", "floating"], "surface": "armor", "loco": "floating", "size": "medium", "era": "scifi",
+                    "kind": "a swarm of small drones moving as one creature", "moods": ["tech", "sky", "military"], "elements": ["thunder", "metal", "light", "void"],
+                    "parts": {"units": ["dozens of {main} {shape}-shaped drone units with {accent} lights", "a cloud of {main} blade-like drones"], "core": ["a {accent} glowing command core at the center", "a larger {sub} mother unit the others orbit"],
+                              "extra": ["{accent} light threads linking the units", "units folding into a beast-like silhouette"]}},
+    "cyber_dragon": {"jp": "機竜", "syn": ["機竜", "機械竜", "サイバードラゴン", "メカドラゴン", "cyber dragon", "mech dragon", "mechanical dragon"], "tags": ["dragon", "mecha", "robot"], "surface": "armor", "loco": "flying", "size": "huge", "era": "scifi",
+                     "kind": "a dragon built from armor plates and engines", "moods": ["tech", "fire", "military"], "elements": ["thunder", "fire", "metal", "void"],
+                     "parts": {"head": ["a {main} armored head with a {accent} single-lens eye", "a head with a {accent} glowing jaw cannon"], "wings": ["{sub} folding wing frames with {accent} thrusters", "wings of {accent} hard light"],
+                               "tail": ["a segmented {main} tail with {accent} joint lights", "a tail ending in a {shape}-shaped {sub} blade"], "body": ["{main} plating with {accent} coolant lines", "exposed {sub} cables between the plates"]}},
+    "walker_tank": {"jp": "多脚戦車", "syn": ["多脚戦車", "多脚兵器", "ウォーカー", "戦闘機械", "walker tank", "multi-legged tank", "spider tank"], "tags": ["mecha", "tank", "robot"], "surface": "armor", "loco": "multi_legged", "size": "huge", "era": "scifi",
+                    "kind": "a multi-legged armored war machine", "moods": ["tech", "military", "ruin"], "elements": ["metal", "thunder", "fire"],
+                    "parts": {"legs": ["six {main} hydraulic legs with {accent} joint lights", "four heavy {main} legs with {sub} claw feet"], "body": ["a {main} armored hull with {sub} hatches", "a hull scarred by battle with {accent} glowing cracks"],
+                              "weapons": ["a {sub} cannon turret on top", "{accent} glowing missile pods on the sides"], "sensor": ["a {accent} single-lens sensor eye", "a row of {accent} sensor lights"]}},
+    "rogue_core": {"jp": "暴走コア", "syn": ["暴走コア", "暴走AI", "機械の核", "浮遊兵器核", "rogue core", "rogue AI", "machine core"], "tags": ["robot", "floating", "monster"], "surface": "armor", "loco": "floating", "size": "medium", "era": "scifi",
+                   "kind": "a floating machine core surrounded by detached armor", "moods": ["tech", "magic", "dark"], "elements": ["void", "thunder", "light", "metal"],
+                   "parts": {"core": ["a {accent} glowing {shape}-shaped core", "a cracked {main} sphere leaking {accent} light"], "shell": ["{main} armor fragments orbiting the core", "{sub} blade segments rotating around it"],
+                             "extra": ["{accent} light threads holding the fragments together", "corrupted data symbols flickering around it"]}},
+    "mutant_beast": {"jp": "変異獣", "syn": ["変異獣", "ミュータント", "汚染獣", "変異体", "mutant beast", "mutant", "contaminated beast"], "tags": ["monster", "mutant"], "surface": "hide", "loco": "quadruped", "size": "large", "era": "scifi",
+                     "kind": "a beast warped by contamination", "moods": ["sick", "ruin", "dark"], "elements": ["poison", "void", "thunder", "crystal"],
+                     "parts": {"body": ["asymmetrical {main} hide with {accent} glowing tumors", "a body split by {accent} glowing fissures"], "head": ["a head with too many {accent} eyes", "a head fused with {sub} crystal growths"],
+                               "limbs": ["a third mismatched limb", "limbs of different lengths ending in {sub} claws"], "extra": ["{accent} spores drifting from the back", "metal debris embedded in the hide"]}},
+    "machine_beast": {"jp": "機械獣", "syn": ["機械獣", "メカ獣", "機械の魔物", "ロボ獣", "machine beast", "mech beast", "robot beast"], "tags": ["mecha", "robot", "monster"], "surface": "armor", "loco": "quadruped", "size": "large", "era": "scifi",
                       "kind": "a beast-shaped war machine", "moods": ["tech", "military", "ruin"], "elements": ["thunder", "metal", "fire", "void"],
                       "parts": {"body": ["{main} armor plates with {accent} glowing lines", "a rusted {main} frame with exposed {sub} cables"], "head": ["a {accent} single-lens sensor head", "a head shaped like a {shape}"], "extra": ["thrusters on the back", "a cannon mounted on the back", "cables trailing like a tail"]}},
     "living_armor": {"jp": "生きた鎧", "syn": ["生きた鎧", "リビングアーマー", "空の鎧", "living armor", "animated armor"], "tags": ["living armor", "empty armor", "monster"], "surface": "armor", "loco": "biped", "size": "medium",
@@ -257,6 +281,7 @@ BASE_NEGATIVE = ["humanoid", "human", "1girl", "1boy", "anthro", "furry", "human
 SURFACE_JP = {"scales": "鱗", "fur": "毛皮", "stone": "石", "bark": "樹皮", "skin": "皮膚", "gel": "ゲル", "carapace": "甲殻", "feathers": "羽毛", "bones": "骨", "hide": "皮", "petals": "花弁",
               "cap": "傘", "membrane": "膜", "flesh": "肉", "light": "光", "mist": "霧", "element": "元素", "crystal": "結晶", "armor": "装甲", "wood": "木", "shell": "甲羅"}
 TYPE_WEIGHTS = {k: (3 if k in ("dragon", "giant_wolf", "slime", "golem", "wyvern", "griffin", "machine_beast", "kraken") else 1) for k in TYPES}
+SCIFI_TYPES = {k for k, v in TYPES.items() if v.get("era") == "scifi"}
 
 # ---------------------------------------------------------------------------
 # 指示文のパース
@@ -371,6 +396,12 @@ def generate(brief: str = "", seed: int = 0, mtype: str = "auto", element: str =
         t_key = spec.mtype; brief_hits.append("type")
     else:
         pool = [k for k in TYPES if k not in excluded["type"]] or list(TYPES)
+        if era == "scifi":
+            pool = [k for k in pool if k in SCIFI_TYPES] or pool  # SF 世界観では SF 種別だけ
+        elif era in D.ERAS:
+            pool = [k for k in pool if k not in SCIFI_TYPES] or pool  # 他の世界観では SF 種別を外す
+        else:
+            pool = [k for k in pool if k not in SCIFI_TYPES or rng.random() < 0.5]  # 自動では SF 種別を半分の重みで
         t_key = rng.choices(pool, weights=[TYPE_WEIGHTS[k] for k in pool], k=1)[0]
     t = TYPES[t_key]
     E._add_moods(concept, t["moods"], 1.5)
@@ -384,6 +415,8 @@ def generate(brief: str = "", seed: int = 0, mtype: str = "auto", element: str =
         e_key = spec.element; brief_hits.append("element")
     else:
         pref = [e for e in t["elements"] if e not in excluded["element"]]
+        if era == "scifi":
+            pref = [e for e in pref if e in ("thunder", "metal", "void", "light", "poison", "fire", "ice")] or pref
         others = [e for e in ELEMENTS if e not in excluded["element"] and e not in pref]
         if rng.random() < 0.8 and pref:
             e_key = E._coherent_pick(rng, pref, lambda e: ELEMENTS[e]["moods"], concept, strength)
@@ -441,7 +474,7 @@ def generate(brief: str = "", seed: int = 0, mtype: str = "auto", element: str =
     shape_key = shape_lang if shape_lang in D.SHAPES else {"feral": "sharp", "berserk": "sharp", "cunning": "sharp", "majestic": "square", "ancient": "square", "sacred": "round", "playful": "round", "eerie": "sharp"}[tp_key]
 
     # 世界観
-    era_key = era if era in D.ERAS else ("scifi" if t_key in ("machine_beast",) else "fantasy")
+    era_key = era if era in D.ERAS else ("scifi" if t_key in SCIFI_TYPES else "fantasy")
 
     # 体の装飾（装飾量）: コンセプトとの相性で選び、slot は1つまで
     n_mod = DETAIL_LEVELS.get(detail_level, 2)
